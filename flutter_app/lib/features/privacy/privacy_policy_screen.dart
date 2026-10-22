@@ -216,10 +216,7 @@ class _PolicySectionCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            body,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text(body, style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );

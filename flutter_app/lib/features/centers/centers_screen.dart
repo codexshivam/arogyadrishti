@@ -85,8 +85,8 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
           if (placemarks.isNotEmpty) {
             final pm = placemarks.first;
             final sub = (pm.subLocality ?? pm.locality ?? 'Sector 22-B').trim();
-            final city =
-                (pm.locality ?? pm.administrativeArea ?? 'Chandigarh').trim();
+            final city = (pm.locality ?? pm.administrativeArea ?? 'Chandigarh')
+                .trim();
             label = '$sub, $city';
           }
         } catch (_) {}
@@ -159,8 +159,9 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
     if (_selectedFilter == 'All') return _centers;
     final target = _selectedFilter.toUpperCase();
     return _centers.where((c) {
-      final type =
-          (c['facility_type'] ?? c['type'] ?? '').toString().toUpperCase();
+      final type = (c['facility_type'] ?? c['type'] ?? '')
+          .toString()
+          .toUpperCase();
       final name = (c['name'] ?? '').toString().toUpperCase();
 
       if (target == 'PHC / UPHC') {
@@ -195,22 +196,21 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Dialing facility: $phone')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Dialing facility: $phone')));
     }
   }
 
   Future<void> _navigateToFacility(double lat, double lng, String name) async {
-    final url =
-        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng';
+    final url = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng';
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Opening directions to $name...')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Opening directions to $name...')));
     }
   }
 
@@ -235,7 +235,8 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
       final name = (c['name'] ?? 'Healthcare Facility').toString();
       final lat = (c['lat'] as num?)?.toDouble() ?? _currentLat;
       final lng = (c['lng'] as num?)?.toDouble() ?? _currentLng;
-      final type = (c['facility_type'] ?? c['type'] ?? 'Health Center').toString();
+      final type = (c['facility_type'] ?? c['type'] ?? 'Health Center')
+          .toString();
 
       double hue = BitmapDescriptor.hueRed;
       if (type.toUpperCase().contains('PHC') ||
@@ -273,7 +274,8 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
       const r = 6371.0;
       final dLat = (lat - _currentLat) * (pi / 180.0);
       final dLng = (lng - _currentLng) * (pi / 180.0);
-      final a = sin(dLat / 2) * sin(dLat / 2) +
+      final a =
+          sin(dLat / 2) * sin(dLat / 2) +
           cos(_currentLat * (pi / 180.0)) *
               cos(lat * (pi / 180.0)) *
               sin(dLng / 2) *
@@ -299,7 +301,7 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
           color: const Color(0xFF8B0000),
           onRefresh: _loadCenters,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 24),
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -345,7 +347,9 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                             borderRadius: BorderRadius.circular(6),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFEBEE),
                                 borderRadius: BorderRadius.circular(6),
@@ -467,8 +471,10 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                             ),
                             suffixIcon: _searchController.text.isNotEmpty
                                 ? IconButton(
-                                    icon: const Icon(Icons.clear_rounded,
-                                        size: 16),
+                                    icon: const Icon(
+                                      Icons.clear_rounded,
+                                      size: 16,
+                                    ),
                                     onPressed: () {
                                       _searchController.clear();
                                       _loadCenters();
@@ -563,11 +569,12 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                           markers: _buildMapMarkers(),
                           myLocationButtonEnabled: false,
                           zoomControlsEnabled: false,
-                          gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                            Factory<OneSequenceGestureRecognizer>(
-                              () => EagerGestureRecognizer(),
-                            ),
-                          },
+                          gestureRecognizers:
+                              <Factory<OneSequenceGestureRecognizer>>{
+                                Factory<OneSequenceGestureRecognizer>(
+                                  () => EagerGestureRecognizer(),
+                                ),
+                              },
                           onMapCreated: (ctrl) => _miniMapController = ctrl,
                         ),
                         Positioned(
@@ -577,12 +584,15 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                             onTap: () => context.push('/map'),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 6),
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.95),
                                 borderRadius: BorderRadius.circular(8),
-                                border:
-                                    Border.all(color: const Color(0xFFE2E8F0)),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
                                 boxShadow: const [
                                   BoxShadow(
                                     color: Color(0x14000000),
@@ -659,8 +669,10 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded,
-                            color: Color(0xFFB71C1C)),
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: Color(0xFFB71C1C),
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -711,13 +723,26 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                   )
                 else
                   ...facilities.map((c) {
-                    final name = (c['name'] ?? 'Healthcare Facility').toString();
+                    final name = (c['name'] ?? 'Healthcare Facility')
+                        .toString();
                     final facilityType =
-                        (c['facility_type'] ?? c['type'] ?? 'General').toString();
-                    final phone = (c['phone'] ?? c['contact_phone'] ?? '+911722744400').toString();
-                    final hours = (c['operating_hours'] ?? c['hours'] ?? '24 Hours Open').toString();
-                    final rdtKits = (c['rdt_kit_stock'] ?? c['rapid_kits_available'] as num?)?.toInt() ?? 240;
-                    final bedsFree = (c['dengue_beds_free'] ?? c['free_dengue_beds'] as num?)?.toInt() ?? 12;
+                        (c['facility_type'] ?? c['type'] ?? 'General')
+                            .toString();
+                    final phone =
+                        (c['phone'] ?? c['contact_phone'] ?? '+911722744400')
+                            .toString();
+                    final hours =
+                        (c['operating_hours'] ?? c['hours'] ?? '24 Hours Open')
+                            .toString();
+                    final rdtKits =
+                        (c['rdt_kit_stock'] ??
+                                c['rapid_kits_available'] as num?)
+                            ?.toInt() ??
+                        240;
+                    final bedsFree =
+                        (c['dengue_beds_free'] ?? c['free_dengue_beds'] as num?)
+                            ?.toInt() ??
+                        12;
                     final lat = (c['lat'] as num?)?.toDouble() ?? _currentLat;
                     final lng = (c['lng'] as num?)?.toDouble() ?? _currentLng;
                     final distanceStr = _formatDistance(c);
@@ -785,7 +810,9 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 3),
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
                                   color: is24x7
                                       ? const Color(0xFFE8F5E9)
@@ -847,7 +874,9 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                             children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFF8FAFC),
                                   borderRadius: BorderRadius.circular(6),
@@ -877,7 +906,9 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFF8FAFC),
                                   borderRadius: BorderRadius.circular(6),
@@ -925,8 +956,10 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                                       ),
                                     ),
                                     onPressed: () => _callFacility(phone),
-                                    icon: const Icon(Icons.phone_outlined,
-                                        size: 15),
+                                    icon: const Icon(
+                                      Icons.phone_outlined,
+                                      size: 15,
+                                    ),
                                     label: const Text(
                                       'Call Center',
                                       style: TextStyle(
@@ -949,11 +982,8 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
-                                    onPressed: () => _navigateToFacility(
-                                      lat,
-                                      lng,
-                                      name,
-                                    ),
+                                    onPressed: () =>
+                                        _navigateToFacility(lat, lng, name),
                                     icon: const Icon(
                                       Icons.directions_rounded,
                                       size: 15,

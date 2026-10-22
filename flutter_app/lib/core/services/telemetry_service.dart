@@ -21,17 +21,20 @@ class ArogyaTelemetryService {
     try {
       // 1. Enable Firebase Analytics collection
       await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
-      await FirebaseAnalytics.instance.setDefaultEventParameters(<String, Object>{
-        'app_package': 'teamrocket.arogyadrishti.android',
-        'gcp_region': 'asia-south1',
-      });
+      await FirebaseAnalytics.instance
+          .setDefaultEventParameters(<String, Object>{
+            'app_package': 'teamrocket.arogyadrishti.android',
+            'gcp_region': 'asia-south1',
+          });
 
       // 2. Enable Firebase Performance Monitoring
       await FirebasePerformance.instance.setPerformanceCollectionEnabled(true);
 
       // 3. Configure Firebase Crashlytics (Supported on Android / iOS / macOS)
       if (!kIsWeb) {
-        await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+        await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+          true,
+        );
         await FirebaseCrashlytics.instance.setCustomKey(
           'app_package',
           'teamrocket.arogyadrishti.android',
@@ -172,7 +175,9 @@ class ArogyaTelemetryService {
           },
         );
         await recordNonFatalError(
-          StateError('Diagnostic Non-Fatal Verification Check for LGD $lgdCode'),
+          StateError(
+            'Diagnostic Non-Fatal Verification Check for LGD $lgdCode',
+          ),
           StackTrace.current,
           reason: 'Manual telemetry health check from SettingsScreen',
         );
@@ -237,8 +242,9 @@ class FirebasePerformanceAndCrashlyticsDioInterceptor extends Interceptor {
     if (metric != null) {
       try {
         metric.httpResponseCode = response.statusCode;
-        metric.responseContentType =
-            response.headers.value(Headers.contentTypeHeader);
+        metric.responseContentType = response.headers.value(
+          Headers.contentTypeHeader,
+        );
         await metric.stop();
       } catch (_) {}
     }

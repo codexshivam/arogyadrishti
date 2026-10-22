@@ -35,6 +35,8 @@ dependencies:
   firebase_crashlytics: ^4.3.4
   firebase_performance: ^0.10.1+4
   flutter_markdown: ^0.7.7+1
+  skeletonizer: ^3.0.0
+  plump_icons: ^0.0.1+2
 
 dev_dependencies:
   flutter_test:

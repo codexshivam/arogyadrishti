@@ -179,8 +179,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Set<Polygon> _buildPolygons() {
-    final poly =
-        (_gisData?['polygon_boundary'] as Map<String, dynamic>?) ?? {};
+    final poly = (_gisData?['polygon_boundary'] as Map<String, dynamic>?) ?? {};
     final rawCoords = (poly['coordinates'] as List<dynamic>?) ?? [];
     if (rawCoords.length < 3) return {};
 
@@ -279,7 +278,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         Marker(
           markerId: const MarkerId('inspector_agent_gps'),
           position: LatLng(lat, lng),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueViolet,
+          ),
           infoWindow: InfoWindow(
             title: agentName,
             snippet: 'Active Inspector GPS',
@@ -297,7 +298,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         (_gisData?['ward_gis_metadata'] as Map<String, dynamic>?) ?? {};
     final wardTitle = meta['ward_name']?.toString() ?? _selectedWardName;
     final tierRisk = meta['tier_risk']?.toString() ?? 'TIER 1 OUTBREAK RISK';
-    final nearestHotspot = meta['nearest_hotspot_label']?.toString() ??
+    final nearestHotspot =
+        meta['nearest_hotspot_label']?.toString() ??
         'Community Center Yard • 120m away';
 
     final bi = (meta['breteau_index'] as num?)?.toDouble() ?? 0.0;
@@ -357,11 +359,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         markers: _buildMarkers(),
                         myLocationButtonEnabled: false,
                         zoomControlsEnabled: false,
-                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                          Factory<OneSequenceGestureRecognizer>(
-                            () => EagerGestureRecognizer(),
-                          ),
-                        },
+                        gestureRecognizers:
+                            <Factory<OneSequenceGestureRecognizer>>{
+                              Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer(),
+                              ),
+                            },
                         onMapCreated: (controller) {
                           _mapController = controller;
                         },
@@ -386,7 +389,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         right: 10,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -430,24 +435,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     }).toList(),
                                     onChanged: (val) {
                                       if (val != null) {
-                                        final match = _availableWards.firstWhere(
-                                          (w) => w['lgd_code'].toString() == val,
-                                          orElse: () => {
-                                            'ward_name': val,
-                                            'lat': 30.7675,
-                                            'lng': 76.7460,
-                                          },
-                                        );
+                                        final match = _availableWards
+                                            .firstWhere(
+                                              (w) =>
+                                                  w['lgd_code'].toString() ==
+                                                  val,
+                                              orElse: () => {
+                                                'ward_name': val,
+                                                'lat': 30.7675,
+                                                'lng': 76.7460,
+                                              },
+                                            );
                                         setState(() {
                                           _selectedLgdCode = val;
-                                          _selectedWardName =
-                                              match['ward_name'].toString();
+                                          _selectedWardName = match['ward_name']
+                                              .toString();
                                           _selectedLat =
-                                              (match['lat'] as num?)?.toDouble() ??
-                                                  30.7675;
+                                              (match['lat'] as num?)
+                                                  ?.toDouble() ??
+                                              30.7675;
                                           _selectedLng =
-                                              (match['lng'] as num?)?.toDouble() ??
-                                                  76.7460;
+                                              (match['lng'] as num?)
+                                                  ?.toDouble() ??
+                                              76.7460;
                                         });
                                         _loadGisData();
                                       }
@@ -496,7 +506,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             ],
                           ),
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 2),
+                            vertical: 4,
+                            horizontal: 2,
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -512,7 +524,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       : const Color(0xFF94A3B8),
                                 ),
                                 onPressed: () {
-                                  setState(() => _heatmapVisible = !_heatmapVisible);
+                                  setState(
+                                    () => _heatmapVisible = !_heatmapVisible,
+                                  );
                                 },
                               ),
                               IconButton(
@@ -545,8 +559,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   setState(() {
                                     _currentMapType =
                                         _currentMapType == MapType.normal
-                                            ? MapType.hybrid
-                                            : MapType.normal;
+                                        ? MapType.hybrid
+                                        : MapType.normal;
                                   });
                                 },
                               ),
@@ -565,8 +579,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   Icons.add,
                                   color: Color(0xFF64748B),
                                 ),
-                                onPressed: () =>
-                                    _mapController?.animateCamera(CameraUpdate.zoomIn()),
+                                onPressed: () => _mapController?.animateCamera(
+                                  CameraUpdate.zoomIn(),
+                                ),
                               ),
                               IconButton(
                                 iconSize: 18,
@@ -577,8 +592,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   Icons.remove,
                                   color: Color(0xFF64748B),
                                 ),
-                                onPressed: () =>
-                                    _mapController?.animateCamera(CameraUpdate.zoomOut()),
+                                onPressed: () => _mapController?.animateCamera(
+                                  CameraUpdate.zoomOut(),
+                                ),
                               ),
                             ],
                           ),
@@ -627,11 +643,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         const SizedBox(height: 3),
                                         Container(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 6, vertical: 2),
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFFFEBEE),
-                                            borderRadius:
-                                                BorderRadius.circular(4),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
                                           ),
                                           child: Text(
                                             tierRisk,
@@ -716,8 +735,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       value: larvaStage.split(' ').first,
                                       status: larvaStage.contains('(')
                                           ? larvaStage
-                                              .split('(')[1]
-                                              .replaceAll(')', '')
+                                                .split('(')[1]
+                                                .replaceAll(')', '')
                                           : 'Pupae',
                                       valueColor: const Color(0xFF8B0000),
                                       statusColor: const Color(0xFFB71C1C),
@@ -735,16 +754,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       height: 38,
                                       child: OutlinedButton.icon(
                                         style: OutlinedButton.styleFrom(
-                                          backgroundColor:
-                                              const Color(0xFFF1F5F9),
-                                          foregroundColor:
-                                              const Color(0xFF334155),
+                                          backgroundColor: const Color(
+                                            0xFFF1F5F9,
+                                          ),
+                                          foregroundColor: const Color(
+                                            0xFF334155,
+                                          ),
                                           side: const BorderSide(
                                             color: Color(0xFFCBD5E1),
                                           ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                         ),
                                         onPressed: _launchNavigation,
@@ -769,15 +791,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     width: 48,
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFFFFCDD2),
-                                        foregroundColor:
-                                            const Color(0xFFB71C1C),
+                                        backgroundColor: const Color(
+                                          0xFFFFCDD2,
+                                        ),
+                                        foregroundColor: const Color(
+                                          0xFFB71C1C,
+                                        ),
                                         elevation: 0,
                                         padding: EdgeInsets.zero,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                       ),
                                       onPressed: _openDispatchAction,
@@ -996,10 +1021,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
         Text(

@@ -98,7 +98,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           'probable_vector_species': ['Aedes aegypti', 'Aedes albopictus'],
           'recommended_intervention':
               'Immediate thermal fogging & Abate (Temephos 50% EC) larvicide application within 2 hours.',
-          'larvicide_dosage_protocol': 'Temephos 50% EC @ 1 ppm (1ml per 1000L)',
+          'larvicide_dosage_protocol':
+              'Temephos 50% EC @ 1 ppm (1ml per 1000L)',
           'gee_telemetry': {
             'lst_celsius': 31.4,
             'ndwi': 0.48,
@@ -175,7 +176,9 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         lng: _currentLng,
         wardLgd: _selectedWardLgd,
         wardName: _selectedWardName,
-        officerUid: active.officerUid.isNotEmpty ? active.officerUid : 'officer_9915549455',
+        officerUid: active.officerUid.isNotEmpty
+            ? active.officerUid
+            : 'officer_9915549455',
         housesInspected: 100,
         positiveHouses: 26,
         containersInspected: 180,
@@ -193,13 +196,16 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: _crimson,
-          content: Text('AI Diagnostic Complete: Bounding Boxes & Micro-Climate Analyzed.'),
+          content: Text(
+            'AI Diagnostic Complete: Bounding Boxes & Micro-Climate Analyzed.',
+          ),
         ),
       );
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Unable to complete AI scan. Please check your network connection and try again.';
+        _error =
+            'Unable to complete AI scan. Please check your network connection and try again.';
         _scanning = false;
       });
     }
@@ -220,16 +226,18 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     if (result != null && mounted) {
       setState(() {
         if (_scanResult != null) {
-          _scanResult!['assigned_van'] = result['van_details'] ?? {
-            'van_id': 'VAN-04',
-            'vehicle_no': 'CH-01-GA-3412',
-            'driver_phone': '+91 98150 22001',
-            'eta_minutes': 14,
-            'distance_km': 2.4,
-            'status_label': 'Dispatched',
-            'ticket_id': '#VEC-9812',
-            'status_badge': 'In Progress',
-          };
+          _scanResult!['assigned_van'] =
+              result['van_details'] ??
+              {
+                'van_id': 'VAN-04',
+                'vehicle_no': 'CH-01-GA-3412',
+                'driver_phone': '+91 98150 22001',
+                'eta_minutes': 14,
+                'distance_km': 2.4,
+                'status_label': 'Dispatched',
+                'ticket_id': '#VEC-9812',
+                'status_badge': 'In Progress',
+              };
           _scanResult!['alert_message_id'] = '#VEC-9812';
         }
       });
@@ -261,7 +269,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         ),
         leading: IconButton(
           tooltip: 'Back',
-          icon: const Icon(Icons.arrow_back_rounded, color: ArogyaTheme.slateHeading),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: ArogyaTheme.slateHeading,
+          ),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -273,7 +284,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
@@ -310,7 +321,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                       _buildBottomActionBanner(),
                     ] else ...[
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
@@ -336,7 +347,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                                 const SizedBox(width: 10),
                                 const Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Municipal Fogging Unit',
@@ -400,7 +412,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   // Card 1: Camera Viewfinder & Multimodal Vision Preview
   // ---------------------------------------------------------------------------
   Widget _buildCameraViewfinderCard() {
-    final detections = (_scanResult?['detections'] as List<dynamic>?) ?? const [];
+    final detections =
+        (_scanResult?['detections'] as List<dynamic>?) ?? const [];
 
     return Container(
       decoration: BoxDecoration(
@@ -428,10 +441,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 if (_imageBytes != null)
                   Transform.scale(
                     scale: _zoomLevel,
-                    child: Image.memory(
-                      _imageBytes!,
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.memory(_imageBytes!, fit: BoxFit.cover),
                   )
                 else
                   _buildSyntheticViewfinder(),
@@ -458,9 +468,14 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 // Zoom 1x / 2x Toggle
                 TextButton(
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     backgroundColor: Colors.white.withValues(alpha: 0.1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () {
                     setState(() {
@@ -494,7 +509,9 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
                 // Shutter / Capture Button
                 InkWell(
-                  onTap: _scanning ? null : () => _pickAndScan(ImageSource.camera),
+                  onTap: _scanning
+                      ? null
+                      : () => _pickAndScan(ImageSource.camera),
                   borderRadius: BorderRadius.circular(35),
                   child: Container(
                     width: 58,
@@ -521,27 +538,46 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 // Gallery Upload
                 IconButton(
                   tooltip: 'Gallery Photo',
-                  icon: const Icon(Icons.photo_library_rounded, color: Colors.white70, size: 20),
-                  onPressed: _scanning ? null : () => _pickAndScan(ImageSource.gallery),
+                  icon: const Icon(
+                    Icons.photo_library_rounded,
+                    color: Colors.white70,
+                    size: 20,
+                  ),
+                  onPressed: _scanning
+                      ? null
+                      : () => _pickAndScan(ImageSource.gallery),
                 ),
 
                 // Retake / Quick Demo
                 TextButton.icon(
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
                     backgroundColor: Colors.white.withValues(alpha: 0.1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: _scanning
                       ? null
                       : () => _executeScan(
-                            _generateSampleFieldPng(),
-                            'field_breeding_site.png',
-                          ),
-                  icon: const Icon(Icons.refresh_rounded, size: 14, color: Colors.white70),
+                          _generateSampleFieldPng(),
+                          'field_breeding_site.png',
+                        ),
+                  icon: const Icon(
+                    Icons.refresh_rounded,
+                    size: 14,
+                    color: Colors.white70,
+                  ),
                   label: const Text(
                     'Retake',
-                    style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -617,15 +653,22 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   // Card 2: Vector Risk Assessment Card
   // ---------------------------------------------------------------------------
   Widget _buildVectorRiskAssessmentCard() {
-    final compScore = (_scanResult?['composite_risk_score'] as num?)?.toDouble() ?? 0.91;
+    final compScore =
+        (_scanResult?['composite_risk_score'] as num?)?.toDouble() ?? 0.91;
     final score100 = (compScore * 100).round();
-    final riskTier = (_scanResult?['risk_tier'] ?? 'CRITICAL').toString().toUpperCase();
-    final matrixPct = (_scanResult?['stagnant_water_matrix_pct'] as num?)?.toInt() ?? 96;
-    final larvalDensity = (_scanResult?['larval_density_estimate'] ?? 'High Alert (35–45/500ml)').toString();
-    final larvalStage = (_scanResult?['estimated_larval_stage'] ?? 'Instar II-III').toString();
+    final riskTier = (_scanResult?['risk_tier'] ?? 'CRITICAL')
+        .toString()
+        .toUpperCase();
+    final matrixPct =
+        (_scanResult?['stagnant_water_matrix_pct'] as num?)?.toInt() ?? 96;
+    final larvalDensity =
+        (_scanResult?['larval_density_estimate'] ?? 'High Alert (35–45/500ml)')
+            .toString();
+    final larvalStage =
+        (_scanResult?['estimated_larval_stage'] ?? 'Instar II-III').toString();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -687,7 +730,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEE2E2),
                       borderRadius: BorderRadius.circular(6),
@@ -704,7 +750,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                   ),
                   const SizedBox(height: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEF3C7),
                       borderRadius: BorderRadius.circular(6),
@@ -798,14 +847,16 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   // Card 3: 4-Metric Micro-Climate Grid
   // ---------------------------------------------------------------------------
   Widget _buildMicroClimateGrid() {
-    final containerType = (_scanResult?['container_or_water_body_type'] ??
-            _scanResult?['primary_classification'] ??
-            'Open Drum')
-        .toString();
-    final waterType = (_scanResult?['water_turbidity_and_organic_matter'] ??
-            _scanResult?['water_type'] ??
-            'Turbid Organic')
-        .toString();
+    final containerType =
+        (_scanResult?['container_or_water_body_type'] ??
+                _scanResult?['primary_classification'] ??
+                'Open Drum')
+            .toString();
+    final waterType =
+        (_scanResult?['water_turbidity_and_organic_matter'] ??
+                _scanResult?['water_type'] ??
+                'Turbid Organic')
+            .toString();
 
     final gee = _scanResult?['gee_telemetry'] as Map<String, dynamic>?;
     final lst = (gee?['lst_celsius'] as num?)?.toDouble() ?? 31.4;
@@ -940,10 +991,11 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     final driverPhone = assignedVan?['driver_phone'] ?? '+91 98150 22001';
     final etaMins = (assignedVan?['eta_minutes'] as num?)?.toInt() ?? 14;
     final distKm = (assignedVan?['distance_km'] as num?)?.toDouble() ?? 2.4;
-    final statusBadge = (assignedVan?['status_badge'] ?? 'In Progress').toString();
+    final statusBadge = (assignedVan?['status_badge'] ?? 'In Progress')
+        .toString();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1055,10 +1107,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
               const SizedBox(height: 1),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: Color(0xFF64748B),
-                ),
+                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
               ),
             ],
           ),
@@ -1080,7 +1129,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   // Bottom Action Banner: Crimson Button
   // ---------------------------------------------------------------------------
   Widget _buildBottomActionBanner() {
-    final ticketId = _scanResult?['alert_message_id'] ??
+    final ticketId =
+        _scanResult?['alert_message_id'] ??
         (_scanResult?['assigned_van']?['ticket_id']) ??
         '#VEC-9812';
 
@@ -1102,10 +1152,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         icon: const Icon(Icons.navigation_rounded, size: 18),
         label: Text(
           'Ticket $ticketId Opened • View Dispatch Fleet',
-          style: const TextStyle(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w700,
-          ),
+          style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
         ),
       ),
     );
@@ -1140,7 +1187,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
   Widget _buildErrorState() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFFFEE2E2),
         borderRadius: BorderRadius.circular(12),
@@ -1152,7 +1199,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              _error ?? 'Unable to complete AI scan. Please check your network connection and try again.',
+              _error ??
+                  'Unable to complete AI scan. Please check your network connection and try again.',
               style: const TextStyle(
                 color: Color(0xFF991B1B),
                 fontSize: 12,
@@ -1212,17 +1260,49 @@ class _BoundingBoxPainter extends CustomPainter {
 
       // Draw high-tech HUD corner brackets
       const cornerLen = 12.0;
-      canvas.drawLine(Offset(xmin, ymin), Offset(xmin + cornerLen, ymin), cornerPaint);
-      canvas.drawLine(Offset(xmin, ymin), Offset(xmin, ymin + cornerLen), cornerPaint);
+      canvas.drawLine(
+        Offset(xmin, ymin),
+        Offset(xmin + cornerLen, ymin),
+        cornerPaint,
+      );
+      canvas.drawLine(
+        Offset(xmin, ymin),
+        Offset(xmin, ymin + cornerLen),
+        cornerPaint,
+      );
 
-      canvas.drawLine(Offset(xmax, ymin), Offset(xmax - cornerLen, ymin), cornerPaint);
-      canvas.drawLine(Offset(xmax, ymin), Offset(xmax, ymin + cornerLen), cornerPaint);
+      canvas.drawLine(
+        Offset(xmax, ymin),
+        Offset(xmax - cornerLen, ymin),
+        cornerPaint,
+      );
+      canvas.drawLine(
+        Offset(xmax, ymin),
+        Offset(xmax, ymin + cornerLen),
+        cornerPaint,
+      );
 
-      canvas.drawLine(Offset(xmin, ymax), Offset(xmin + cornerLen, ymax), cornerPaint);
-      canvas.drawLine(Offset(xmin, ymax), Offset(xmin, ymax - cornerLen), cornerPaint);
+      canvas.drawLine(
+        Offset(xmin, ymax),
+        Offset(xmin + cornerLen, ymax),
+        cornerPaint,
+      );
+      canvas.drawLine(
+        Offset(xmin, ymax),
+        Offset(xmin, ymax - cornerLen),
+        cornerPaint,
+      );
 
-      canvas.drawLine(Offset(xmax, ymax), Offset(xmax - cornerLen, ymax), cornerPaint);
-      canvas.drawLine(Offset(xmax, ymax), Offset(xmax, ymax - cornerLen), cornerPaint);
+      canvas.drawLine(
+        Offset(xmax, ymax),
+        Offset(xmax - cornerLen, ymax),
+        cornerPaint,
+      );
+      canvas.drawLine(
+        Offset(xmax, ymax),
+        Offset(xmax, ymax - cornerLen),
+        cornerPaint,
+      );
 
       // Label and confidence tag
       final label = (raw['label'] ?? 'Breeding Habitat').toString();

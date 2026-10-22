@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:plump_icons/plump_icons.dart';
 
 import '../network/api_client.dart';
 import '../services/firestore_sync.dart';
 import '../theme/app_theme.dart';
+
+class _ShellTab {
+  const _ShellTab({
+    required this.solidIcon,
+    required this.lineIcon,
+    required this.route,
+    required this.label,
+  });
+
+  final PlumpIconData solidIcon;
+  final PlumpIconData lineIcon;
+  final String route;
+  final String label;
+}
 
 /// Top brand header + 5-tab navigation bar matching `ui_design.png` (Home, Chat, Stats, Map, Settings)
 /// implemented as an [AppBar] widget with white background and dark system UI overlay icons.
@@ -13,16 +28,41 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
 
   final int activeTabIndex;
 
-  static const List<({IconData icon, String route, String label})> _tabs = [
-    (icon: Icons.home_rounded, route: '/home', label: 'Home'),
-    (icon: Icons.chat_bubble_outline_rounded, route: '/chat', label: 'Chat'),
-    (icon: Icons.bar_chart_rounded, route: '/stats', label: 'Stats'),
-    (icon: Icons.map_outlined, route: '/map', label: 'Map'),
-    (icon: Icons.settings_outlined, route: '/settings', label: 'Settings'),
+  static const List<_ShellTab> _tabs = [
+    _ShellTab(
+      solidIcon: PlumpIcons.home1Solid,
+      lineIcon: PlumpIcons.home1Line,
+      route: '/home',
+      label: 'Home',
+    ),
+    _ShellTab(
+      solidIcon: PlumpIcons.chatBubbleTextSquareSolid,
+      lineIcon: PlumpIcons.chatBubbleTextSquareLine,
+      route: '/chat',
+      label: 'Chat',
+    ),
+    _ShellTab(
+      solidIcon: PlumpIcons.contentStatisticSolid,
+      lineIcon: PlumpIcons.contentStatisticLine,
+      route: '/stats',
+      label: 'Stats',
+    ),
+    _ShellTab(
+      solidIcon: PlumpIcons.locationPin3Solid,
+      lineIcon: PlumpIcons.locationPin3Line,
+      route: '/map',
+      label: 'Map',
+    ),
+    _ShellTab(
+      solidIcon: PlumpIcons.cogSolid,
+      lineIcon: PlumpIcons.cogLine,
+      route: '/settings',
+      label: 'Settings',
+    ),
   ];
 
   @override
-  Size get preferredSize => const Size.fromHeight(92);
+  Size get preferredSize => const Size.fromHeight(96);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,33 +74,33 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
       centerTitle: true,
       automaticallyImplyLeading: false,
       systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
-      toolbarHeight: 50,
+      toolbarHeight: 48,
       title: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Arogya',
+            'ArogyaDrishti',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: ArogyaTheme.primaryCrimson,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 18,
-                  letterSpacing: 0.2,
-                ),
+              color: ArogyaTheme.primaryCrimson,
+              fontWeight: FontWeight.w800,
+              fontSize: 18,
+              letterSpacing: 0.2,
+            ),
           ),
           const SizedBox(height: 1),
           Text(
             'developed and managed by Team Rocket',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: ArogyaTheme.slateMuted,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.1,
-                ),
+              color: ArogyaTheme.slateMuted,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.1,
+            ),
           ),
         ],
       ),
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(42),
+        preferredSize: const Size.fromHeight(46),
         child: Container(
           color: Colors.white,
           padding: const EdgeInsets.only(bottom: 2),
@@ -82,11 +122,11 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
                   },
                   child: Container(
                     constraints: const BoxConstraints(
-                      minWidth: 52,
-                      minHeight: 40,
+                      minWidth: 54,
+                      minHeight: 44,
                     ),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: 10,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
@@ -99,12 +139,14 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
                         ),
                       ),
                     ),
-                    child: Icon(
-                      tab.icon,
-                      size: 20,
-                      color: isSelected
-                          ? ArogyaTheme.primaryCrimson
-                          : ArogyaTheme.slateMuted,
+                    child: Center(
+                      child: PlumpIcon(
+                        isSelected ? tab.solidIcon : tab.lineIcon,
+                        size: 24,
+                        color: isSelected
+                            ? ArogyaTheme.primaryCrimson
+                            : ArogyaTheme.slateMuted,
+                      ),
                     ),
                   ),
                 ),
@@ -424,12 +466,14 @@ void showArogyaToast(
   dynamic contentType,
   Color? backgroundColor,
 }) {
-  final isError = title.toLowerCase().contains('error') ||
+  final isError =
+      title.toLowerCase().contains('error') ||
       title.toLowerCase().contains('fail') ||
       title.toLowerCase().contains('reject') ||
       message.toLowerCase().contains('error') ||
       message.toLowerCase().contains('fail');
-  final bg = backgroundColor ??
+  final bg =
+      backgroundColor ??
       (isError ? const Color(0xFF8B0000) : const Color(0xFF1E293B));
 
   final snackBar = SnackBar(
@@ -558,7 +602,8 @@ class _ActionDispatchBottomSheetState
       showArogyaToast(
         context,
         title: 'Dispatch Notice',
-        message: 'Could not reach dispatch service. Please check your network and try again.',
+        message:
+            'Could not reach dispatch service. Please check your network and try again.',
       );
     }
   }

@@ -51,11 +51,11 @@ class ArogyaApiClient {
           final client = HttpClient();
           client.badCertificateCallback =
               (X509Certificate cert, String host, int port) {
-            // Strictly reject self-signed certificates on any external domain
-            return host == 'localhost' ||
-                host == '127.0.0.1' ||
-                host == '10.0.2.2';
-          };
+                // Strictly reject self-signed certificates on any external domain
+                return host == 'localhost' ||
+                    host == '127.0.0.1' ||
+                    host == '10.0.2.2';
+              };
           return client;
         };
       }
@@ -112,8 +112,9 @@ class ArogyaApiClient {
   }
 
   Future<Map<String, dynamic>> fetchUserProfile(String uid) async {
-    final resp =
-        await _dio.get<Map<String, dynamic>>('/api/v1/users/$uid/profile');
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/users/$uid/profile',
+    );
     return resp.data ?? <String, dynamic>{};
   }
 
@@ -265,8 +266,9 @@ class ArogyaApiClient {
   }
 
   Future<Map<String, dynamic>> fetchLocationsWards() async {
-    final resp =
-        await _dio.get<Map<String, dynamic>>('/api/v1/locations/wards');
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/locations/wards',
+    );
     return resp.data ?? <String, dynamic>{};
   }
 
@@ -276,9 +278,7 @@ class ArogyaApiClient {
   }) async {
     final resp = await _dio.get<Map<String, dynamic>>(
       '/api/v1/stats/ward/$lgdCode',
-      queryParameters: <String, dynamic>{
-        'weeks': weeks,
-      },
+      queryParameters: <String, dynamic>{'weeks': weeks},
     );
     return resp.data ?? <String, dynamic>{};
   }
@@ -286,8 +286,9 @@ class ArogyaApiClient {
   Future<Map<String, dynamic>> fetchMapSurveillance({String? wardId}) async {
     final resp = await _dio.get<Map<String, dynamic>>(
       '/api/v1/map/surveillance',
-      queryParameters:
-          wardId != null ? <String, dynamic>{'ward_id': wardId} : null,
+      queryParameters: wardId != null
+          ? <String, dynamic>{'ward_id': wardId}
+          : null,
     );
     return resp.data ?? <String, dynamic>{};
   }
@@ -295,8 +296,9 @@ class ArogyaApiClient {
   Future<Map<String, dynamic>> fetchMapGisData({String? wardId}) async {
     final resp = await _dio.get<Map<String, dynamic>>(
       '/api/v1/map/gis-data',
-      queryParameters:
-          wardId != null ? <String, dynamic>{'ward_id': wardId} : null,
+      queryParameters: wardId != null
+          ? <String, dynamic>{'ward_id': wardId}
+          : null,
     );
     return resp.data ?? <String, dynamic>{};
   }
@@ -419,9 +421,7 @@ class ArogyaApiClient {
         );
         return resp.data ?? <String, dynamic>{};
       },
-      attributes: <String, String>{
-        'lgd_code': effectiveLgd,
-      },
+      attributes: <String, String>{'lgd_code': effectiveLgd},
     );
   }
 
@@ -457,19 +457,19 @@ class ArogyaApiClient {
     required String description,
     String? officerUid,
     String? wardVillage,
-  }) =>
-      submitSupportTicket(
-        officerUid: officerUid ?? 'officer_9915549455',
-        category: category,
-        severitySla: severity,
-        wardVillage: wardVillage ?? 'Ward $wardLgdCode',
-        lgdCode: wardLgdCode,
-        observationNotes: description,
-      );
+  }) => submitSupportTicket(
+    officerUid: officerUid ?? 'officer_9915549455',
+    category: category,
+    severitySla: severity,
+    wardVillage: wardVillage ?? 'Ward $wardLgdCode',
+    lgdCode: wardLgdCode,
+    observationNotes: description,
+  );
 
   Future<Map<String, dynamic>> fetchSupportTickets() async {
-    final resp =
-        await _dio.get<Map<String, dynamic>>('/api/v1/support/tickets');
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/support/tickets',
+    );
     return resp.data ?? <String, dynamic>{};
   }
 

@@ -126,12 +126,18 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: ArogyaTheme.slateHeading),
+            icon: const Icon(
+              Icons.refresh_rounded,
+              color: ArogyaTheme.slateHeading,
+            ),
             tooltip: 'Reload Document',
             onPressed: _loadDocument,
           ),
           IconButton(
-            icon: const Icon(Icons.share_outlined, color: ArogyaTheme.slateHeading),
+            icon: const Icon(
+              Icons.share_outlined,
+              color: ArogyaTheme.slateHeading,
+            ),
             tooltip: 'Share Document',
             onPressed: _shareDocument,
           ),
@@ -148,7 +154,9 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(ArogyaTheme.primaryCrimson),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ArogyaTheme.primaryCrimson,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -197,15 +205,20 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
               Text(
                 _errorMessage!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: ArogyaTheme.slateMuted, fontSize: 13),
+                style: const TextStyle(
+                  color: ArogyaTheme.slateMuted,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ArogyaTheme.primaryCrimson,
                   foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -227,9 +240,7 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: Colors.white,
-            border: Border(
-              bottom: BorderSide(color: Colors.grey.shade200),
-            ),
+            border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
           ),
           child: Row(
             children: [
@@ -282,73 +293,74 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
             data: _markdownContent,
             selectable: true,
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 40),
-            styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-              h1: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: ArogyaTheme.slateHeading,
-                height: 1.3,
-              ),
-              h2: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: ArogyaTheme.primaryCrimson,
-                height: 1.3,
-              ),
-              h3: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: ArogyaTheme.slateHeading,
-                height: 1.3,
-              ),
-              p: GoogleFonts.inter(
-                fontSize: 13.5,
-                height: 1.6,
-                color: ArogyaTheme.slateBody,
-              ),
-              listBullet: GoogleFonts.inter(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w600,
-                color: ArogyaTheme.primaryCrimson,
-              ),
-              code: GoogleFonts.ibmPlexMono(
-                fontSize: 12,
-                backgroundColor: const Color(0xFFF1F5F9),
-                color: ArogyaTheme.primaryCrimson,
-              ),
-              codeblockDecoration: BoxDecoration(
-                color: const Color(0xFF0F172A),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              blockquoteDecoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                border: const Border(
-                  left: BorderSide(color: ArogyaTheme.primaryCrimson, width: 4),
-                ),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              tableBorder: TableBorder.all(
-                color: const Color(0xFFE2E8F0),
-                width: 1,
-              ),
-              tableHead: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF0F172A),
-              ),
-              tableBody: GoogleFonts.inter(
-                fontSize: 12,
-                color: const Color(0xFF334155),
-              ),
-              horizontalRuleDecoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.shade300,
+            styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                .copyWith(
+                  h1: GoogleFonts.plusJakartaSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: ArogyaTheme.slateHeading,
+                    height: 1.3,
+                  ),
+                  h2: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: ArogyaTheme.primaryCrimson,
+                    height: 1.3,
+                  ),
+                  h3: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: ArogyaTheme.slateHeading,
+                    height: 1.3,
+                  ),
+                  p: GoogleFonts.inter(
+                    fontSize: 13.5,
+                    height: 1.6,
+                    color: ArogyaTheme.slateBody,
+                  ),
+                  listBullet: GoogleFonts.inter(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: ArogyaTheme.primaryCrimson,
+                  ),
+                  code: GoogleFonts.ibmPlexMono(
+                    fontSize: 12,
+                    backgroundColor: const Color(0xFFF1F5F9),
+                    color: ArogyaTheme.primaryCrimson,
+                  ),
+                  codeblockDecoration: BoxDecoration(
+                    color: const Color(0xFF0F172A),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  blockquoteDecoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    border: const Border(
+                      left: BorderSide(
+                        color: ArogyaTheme.primaryCrimson,
+                        width: 4,
+                      ),
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  tableBorder: TableBorder.all(
+                    color: const Color(0xFFE2E8F0),
                     width: 1,
                   ),
+                  tableHead: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF0F172A),
+                  ),
+                  tableBody: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: const Color(0xFF334155),
+                  ),
+                  horizontalRuleDecoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.grey.shade300, width: 1),
+                    ),
+                  ),
                 ),
-              ),
-            ),
             onTapLink: (text, href, title) async {
               if (href != null && href.isNotEmpty) {
                 if (href == 'privacy_policy.md') {

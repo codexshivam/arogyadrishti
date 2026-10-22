@@ -38,9 +38,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Confirm Logout'),
-        content: const Text(
-          'Are you sure you want to log out?',
-        ),
+        content: const Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -90,10 +88,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           .doc('settings')
           .set({key: value}, SetOptions(merge: true));
 
-      await ref.read(apiClientProvider).updateUserPreferences(
-        uid,
-        {key: value},
-      );
+      await ref.read(apiClientProvider).updateUserPreferences(uid, {
+        key: value,
+      });
     } catch (_) {}
   }
 
@@ -101,16 +98,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final uid = _getEffectiveUid();
     final wardState = ref.read(activeWardProvider);
     final nameCtrl = TextEditingController(
-      text: currentProfile['name']?.toString() ??
-          (wardState.officerName.isNotEmpty ? wardState.officerName : 'Shivam Yadav'),
+      text:
+          currentProfile['name']?.toString() ??
+          (wardState.officerName.isNotEmpty
+              ? wardState.officerName
+              : 'Shivam Yadav'),
     );
     final emailCtrl = TextEditingController(
-      text: currentProfile['email']?.toString() ??
-          (wardState.officerEmail.isNotEmpty ? wardState.officerEmail : 'academyxshivam@gmail.com'),
+      text:
+          currentProfile['email']?.toString() ??
+          (wardState.officerEmail.isNotEmpty
+              ? wardState.officerEmail
+              : 'academyxshivam@gmail.com'),
     );
     final phoneCtrl = TextEditingController(
-      text: currentProfile['phone']?.toString() ??
-          (wardState.officerPhone.isNotEmpty ? wardState.officerPhone : '+91 99155 49458'),
+      text:
+          currentProfile['phone']?.toString() ??
+          (wardState.officerPhone.isNotEmpty
+              ? wardState.officerPhone
+              : '+91 99155 49458'),
     );
     final wardCtrl = TextEditingController(
       text: currentProfile['assigned_ward']?.toString() ?? wardState.wardName,
@@ -215,8 +221,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 final newEmail = emailCtrl.text.trim();
                                 final newPhone = phoneCtrl.text.trim();
                                 final newWard = wardCtrl.text.trim();
-                                final initial =
-                                    newName.isNotEmpty ? newName[0].toUpperCase() : 'S';
+                                final initial = newName.isNotEmpty
+                                    ? newName[0].toUpperCase()
+                                    : 'S';
 
                                 final updatePayload = {
                                   'name': newName,
@@ -231,16 +238,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   await FirebaseFirestore.instance
                                       .collection('users')
                                       .doc(uid)
-                                      .set(updatePayload, SetOptions(merge: true));
+                                      .set(
+                                        updatePayload,
+                                        SetOptions(merge: true),
+                                      );
 
                                   await ref
                                       .read(apiClientProvider)
                                       .updateUserProfile(uid, {
-                                    'name': newName,
-                                    'email': newEmail,
-                                    'phone': newPhone,
-                                    'assigned_ward': newWard,
-                                  });
+                                        'name': newName,
+                                        'email': newEmail,
+                                        'phone': newPhone,
+                                        'assigned_ward': newWard,
+                                      });
 
                                   if (ctx.mounted) {
                                     Navigator.of(ctx).pop();
@@ -248,7 +258,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Account details updated successfully'),
+                                        content: Text(
+                                          'Account details updated successfully',
+                                        ),
                                       ),
                                     );
                                   }
@@ -368,12 +380,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: const ArogyaTopShellBar(activeTabIndex: 4),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .snapshots(),
         builder: (context, userSnap) {
           final userData = userSnap.data?.data() ?? {};
-          final officerName =
-              userData['name']?.toString() ?? 'Shivam Yadav';
-          final avatarInitial = (userData['avatar_initials']?.toString().isNotEmpty ?? false)
+          final officerName = userData['name']?.toString() ?? 'Shivam Yadav';
+          final avatarInitial =
+              (userData['avatar_initials']?.toString().isNotEmpty ?? false)
               ? userData['avatar_initials'].toString()[0].toUpperCase()
               : (officerName.isNotEmpty ? officerName[0].toUpperCase() : 'S');
 
@@ -402,7 +417,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       metaData['app_version']?.toString() ?? 'v1.0.0';
 
                   return ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 20),
                     children: [
                       // Component A: Officer Profile Card
                       Container(
@@ -449,14 +464,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               style: TextButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF8B0000),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
                               onPressed: () => _openEditProfileSheet(userData),
                               icon: const Icon(Icons.edit_outlined, size: 14),
                               label: const Text(
                                 'Account Settings',
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ],
@@ -497,7 +520,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             // 1. Push Notifications
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 10),
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
                               child: Row(
                                 children: [
                                   Container(
@@ -560,7 +585,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             // 2. Email Notifications
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 10),
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
                               child: Row(
                                 children: [
                                   Container(
@@ -624,10 +651,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             InkWell(
                               onTap: _openNotificationSettings,
                               borderRadius: const BorderRadius.vertical(
-                                  bottom: Radius.circular(14)),
+                                bottom: Radius.circular(14),
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 12),
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
                                 child: Row(
                                   children: [
                                     Container(
@@ -711,10 +741,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 );
                               },
                               borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(14)),
+                                top: Radius.circular(14),
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 12),
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
                                 child: Row(
                                   children: [
                                     Container(
@@ -771,7 +804,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 12),
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
                                 child: Row(
                                   children: [
                                     Container(
@@ -825,7 +860,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 12),
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
                                 child: Row(
                                   children: [
                                     Container(
@@ -871,7 +908,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             // 4. About Arogya Drishti
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 12),
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
                               child: Row(
                                 children: [
                                   Container(
@@ -963,7 +1002,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: Column(
                           children: const [
                             Text(
-                              'Arogya Drishti • Team Rocket',
+                              'Arogya Drishti by Team Rocket',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,

@@ -39,8 +39,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   void _initInitialGreeting() {
     final wardState = ref.read(activeWardProvider);
-    final officer = wardState.officerName.isNotEmpty ? wardState.officerName : 'Officer';
-    final ward = wardState.wardName.isNotEmpty ? wardState.wardName : 'Chandigarh';
+    final officer = wardState.officerName.isNotEmpty
+        ? wardState.officerName
+        : 'Officer';
+    final ward = wardState.wardName.isNotEmpty
+        ? wardState.wardName
+        : 'Chandigarh';
 
     setState(() {
       _messages.clear();
@@ -59,7 +63,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final wardState = ref.read(activeWardProvider);
     final uid = wardState.officerUid.isNotEmpty
         ? wardState.officerUid
-        : (wardState.lgdCode.isNotEmpty ? 'officer_${wardState.lgdCode}' : 'asha_field_officer');
+        : (wardState.lgdCode.isNotEmpty
+              ? 'officer_${wardState.lgdCode}'
+              : 'asha_field_officer');
 
     try {
       _chatSub = FirebaseFirestore.instance
@@ -69,36 +75,40 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           .orderBy('timestamp', descending: false)
           .limit(40)
           .snapshots()
-          .listen((snap) {
-        if (snap.docs.isNotEmpty && mounted) {
-          final List<Map<String, dynamic>> loaded = [];
-          for (final doc in snap.docs) {
-            final data = doc.data();
-            final isUser = data['role'] == 'user';
-            loaded.add({
-              'role': data['role'] ?? 'assistant',
-              'sender': isUser
-                  ? (wardState.officerName.isNotEmpty
-                      ? wardState.officerName
-                      : 'Field Officer')
-                  : 'Dr. Arogya',
-              'time': _formatTimestamp(data['timestamp']),
-              'text': (data['text'] ?? '').toString(),
-              'tool_cards': (data['tool_cards'] as List<dynamic>? ?? <dynamic>[])
-                  .cast<Map<String, dynamic>>(),
-            });
-          }
-          if (loaded.isNotEmpty && mounted) {
-            setState(() {
-              _messages.clear();
-              _messages.addAll(loaded);
-            });
-            _scrollToBottom();
-          }
-        }
-      }, onError: (_) {
-        // Fallback to local memory if offline
-      });
+          .listen(
+            (snap) {
+              if (snap.docs.isNotEmpty && mounted) {
+                final List<Map<String, dynamic>> loaded = [];
+                for (final doc in snap.docs) {
+                  final data = doc.data();
+                  final isUser = data['role'] == 'user';
+                  loaded.add({
+                    'role': data['role'] ?? 'assistant',
+                    'sender': isUser
+                        ? (wardState.officerName.isNotEmpty
+                              ? wardState.officerName
+                              : 'Field Officer')
+                        : 'Dr. Arogya',
+                    'time': _formatTimestamp(data['timestamp']),
+                    'text': (data['text'] ?? '').toString(),
+                    'tool_cards':
+                        (data['tool_cards'] as List<dynamic>? ?? <dynamic>[])
+                            .cast<Map<String, dynamic>>(),
+                  });
+                }
+                if (loaded.isNotEmpty && mounted) {
+                  setState(() {
+                    _messages.clear();
+                    _messages.addAll(loaded);
+                  });
+                  _scrollToBottom();
+                }
+              }
+            },
+            onError: (_) {
+              // Fallback to local memory if offline
+            },
+          );
     } catch (_) {}
   }
 
@@ -140,7 +150,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _inputController.clear();
 
     final wardState = ref.read(activeWardProvider);
-    final officer = wardState.officerName.isNotEmpty ? wardState.officerName : 'Field Officer';
+    final officer = wardState.officerName.isNotEmpty
+        ? wardState.officerName
+        : 'Field Officer';
 
     setState(() {
       _sending = true;
@@ -155,13 +167,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _scrollToBottom();
 
     try {
-      final res = await ref.read(apiClientProvider).sendAgentChat(
-            uid: wardState.officerUid.isNotEmpty ? wardState.officerUid : 'officer_9915549455',
+      final res = await ref
+          .read(apiClientProvider)
+          .sendAgentChat(
+            uid: wardState.officerUid.isNotEmpty
+                ? wardState.officerUid
+                : 'officer_9915549455',
             message: text,
             wardVillage: wardState.wardName,
-            lgdCode: wardState.lgdCode.isNotEmpty ? wardState.lgdCode : '0404400017',
+            lgdCode: wardState.lgdCode.isNotEmpty
+                ? wardState.lgdCode
+                : '0404400017',
             latitude: wardState.latitude != 0.0 ? wardState.latitude : 30.7333,
-            longitude: wardState.longitude != 0.0 ? wardState.longitude : 76.7794,
+            longitude: wardState.longitude != 0.0
+                ? wardState.longitude
+                : 76.7794,
           );
 
       if (!mounted) return;
@@ -224,7 +244,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Expanded(
               child: ListView.separated(
                 controller: _scrollController,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
                 itemCount: _messages.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, idx) {
@@ -330,7 +350,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFDE8E8),
                                     borderRadius: BorderRadius.circular(4),
@@ -350,27 +373,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             MarkdownBody(
                               data: (msg['text'] ?? '').toString(),
                               selectable: true,
-                              styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                                p: const TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFF1E293B),
-                                  height: 1.45,
-                                ),
-                                strong: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0F172A),
-                                ),
-                                listBullet: const TextStyle(
-                                  color: _crimson,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                code: const TextStyle(
-                                  backgroundColor: Color(0xFFF1F5F9),
-                                  fontFamily: 'monospace',
-                                  fontSize: 12,
-                                ),
-                              ),
+                              styleSheet:
+                                  MarkdownStyleSheet.fromTheme(
+                                    Theme.of(context),
+                                  ).copyWith(
+                                    p: const TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF1E293B),
+                                      height: 1.45,
+                                    ),
+                                    strong: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                    listBullet: const TextStyle(
+                                      color: _crimson,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    code: const TextStyle(
+                                      backgroundColor: Color(0xFFF1F5F9),
+                                      fontFamily: 'monospace',
+                                      fontSize: 12,
+                                    ),
+                                  ),
                             ),
                           ],
                         ),
@@ -397,7 +423,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     child: Row(
                       children: [
                         ActionChip(
-                          avatar: const Icon(Icons.analytics_outlined, size: 15),
+                          avatar: const Icon(
+                            Icons.analytics_outlined,
+                            size: 15,
+                          ),
                           label: const Text(
                             'Larval Index Analysis',
                             style: TextStyle(fontSize: 11.5),
@@ -408,7 +437,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         ),
                         const SizedBox(width: 8),
                         ActionChip(
-                          avatar: const Icon(Icons.local_shipping_outlined, size: 15),
+                          avatar: const Icon(
+                            Icons.local_shipping_outlined,
+                            size: 15,
+                          ),
                           label: const Text(
                             'Dispatch Fogging Unit',
                             style: TextStyle(fontSize: 11.5),
@@ -419,7 +451,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         ),
                         const SizedBox(width: 8),
                         ActionChip(
-                          avatar: const Icon(Icons.medication_liquid_outlined, size: 15),
+                          avatar: const Icon(
+                            Icons.medication_liquid_outlined,
+                            size: 15,
+                          ),
                           label: const Text(
                             'Temephos & Bti Dosage',
                             style: TextStyle(fontSize: 11.5),
@@ -450,22 +485,36 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           controller: _inputController,
                           onSubmitted: (_) => _sendPrompt(),
                           decoration: InputDecoration(
-                            hintText: 'Ask Dr. Arogya (English, हिंदी, ਪੰਜਾਬੀ)...',
-                            hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8)),
+                            hintText:
+                                'Ask Dr. Arogya (English, हिंदी, ਪੰਜਾਬੀ)...',
+                            hintStyle: const TextStyle(
+                              fontSize: 12.5,
+                              color: Color(0xFF94A3B8),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFF8FAFC),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE2E8F0),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE2E8F0),
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: _crimson, width: 1.2),
+                              borderSide: const BorderSide(
+                                color: _crimson,
+                                width: 1.2,
+                              ),
                             ),
                           ),
                         ),
@@ -512,7 +561,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildToolCard(BuildContext context, Map<String, dynamic> card) {
     final type = (card['card_type'] ?? '').toString();
-    final metrics = (card['metrics'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    final metrics =
+        (card['metrics'] as Map<String, dynamic>?) ?? <String, dynamic>{};
     final rawTitle = (card['title'] ?? '').toString();
     final cleanTitle = rawTitle
         .replaceAll('(GEE)', '')
@@ -525,11 +575,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       final ci = (metrics['container_index_pct'] as num?)?.toDouble() ?? 0.0;
       final hi = (metrics['house_index_pct'] as num?)?.toDouble() ?? 0.0;
       final bi = (metrics['breteau_index'] as num?)?.toDouble() ?? 0.0;
-      final risk = (metrics['who_risk_tier'] ?? 'HIGH').toString().toUpperCase();
-      final protocol = (metrics['recommended_ncvbdc_protocol'] ??
-              metrics['recommended_action'] ??
-              '')
-          .toString();
+      final risk = (metrics['who_risk_tier'] ?? 'HIGH')
+          .toString()
+          .toUpperCase();
+      final protocol =
+          (metrics['recommended_ncvbdc_protocol'] ??
+                  metrics['recommended_action'] ??
+                  '')
+              .toString();
 
       final isCritical = bi >= 20.0 || risk == 'CRITICAL';
 
@@ -547,11 +600,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.verified_user_rounded, size: 16, color: _crimson),
+                  const Icon(
+                    Icons.verified_user_rounded,
+                    size: 16,
+                    color: _crimson,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      cleanTitle.isNotEmpty ? cleanTitle : 'Actionable Field Protocol',
+                      cleanTitle.isNotEmpty
+                          ? cleanTitle
+                          : 'Actionable Field Protocol',
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         color: _crimson,
@@ -560,9 +619,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: isCritical ? const Color(0xFFFEE2E2) : const Color(0xFFFEF3C7),
+                      color: isCritical
+                          ? const Color(0xFFFEE2E2)
+                          : const Color(0xFFFEF3C7),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -570,7 +634,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
-                        color: isCritical ? const Color(0xFFDC2626) : const Color(0xFFD97706),
+                        color: isCritical
+                            ? const Color(0xFFDC2626)
+                            : const Color(0xFFD97706),
                       ),
                     ),
                   ),
@@ -581,7 +647,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isCritical ? const Color(0xFFFFF1F2) : const Color(0xFFFFFBEB),
+                  color: isCritical
+                      ? const Color(0xFFFFF1F2)
+                      : const Color(0xFFFFFBEB),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -597,7 +665,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 const SizedBox(height: 8),
                 Text(
                   protocol,
-                  style: const TextStyle(fontSize: 12, height: 1.4, color: Color(0xFF334155)),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 1.4,
+                    color: Color(0xFF334155),
+                  ),
                 ),
               ],
               const SizedBox(height: 10),
@@ -605,11 +677,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: _crimson,
                   side: const BorderSide(color: _crimson),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () => _openDispatchModal('SEND_ALERT'),
                 icon: const Icon(Icons.notifications_active_outlined, size: 15),
-                label: const Text('Alert Ward Supervisor', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                label: const Text(
+                  'Alert Ward Supervisor',
+                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
@@ -622,7 +699,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       final lst = (metrics['lst_celsius'] as num?)?.toDouble() ?? 0.0;
       final ndwi = (metrics['ndwi'] as num?)?.toDouble() ?? 0.0;
       final rain = (metrics['rain_14d_mm'] as num?)?.toDouble() ?? 0.0;
-      final score = ((metrics['environmental_suitability_score'] as num?)?.toDouble() ?? 0.0) * 100;
+      final score =
+          ((metrics['environmental_suitability_score'] as num?)?.toDouble() ??
+              0.0) *
+          100;
 
       return Card(
         color: Colors.white,
@@ -638,11 +718,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.satellite_alt_rounded, size: 16, color: Color(0xFF0284C7)),
+                  const Icon(
+                    Icons.satellite_alt_rounded,
+                    size: 16,
+                    color: Color(0xFF0284C7),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      cleanTitle.isNotEmpty ? cleanTitle : 'Satellite Bio-Climate Telemetry',
+                      cleanTitle.isNotEmpty
+                          ? cleanTitle
+                          : 'Satellite Bio-Climate Telemetry',
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF0F172A),
@@ -651,7 +737,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE0F2FE),
                       borderRadius: BorderRadius.circular(4),
@@ -670,9 +759,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(child: _buildIndexMiniStat('Surface Temp', '${lst.toStringAsFixed(1)}°C')),
-                  Expanded(child: _buildIndexMiniStat('Water Index', ndwi.toStringAsFixed(2))),
-                  Expanded(child: _buildIndexMiniStat('14d Rain', '${rain.toStringAsFixed(1)} mm')),
+                  Expanded(
+                    child: _buildIndexMiniStat(
+                      'Surface Temp',
+                      '${lst.toStringAsFixed(1)}°C',
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildIndexMiniStat(
+                      'Water Index',
+                      ndwi.toStringAsFixed(2),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildIndexMiniStat(
+                      '14d Rain',
+                      '${rain.toStringAsFixed(1)} mm',
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -703,11 +807,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.local_shipping_rounded, size: 16, color: _crimson),
+                  const Icon(
+                    Icons.local_shipping_rounded,
+                    size: 16,
+                    color: _crimson,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      cleanTitle.isNotEmpty ? cleanTitle : 'Fogging Van Dispatched',
+                      cleanTitle.isNotEmpty
+                          ? cleanTitle
+                          : 'Fogging Van Dispatched',
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         color: _crimson,
@@ -716,7 +826,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFDCFCE7),
                       borderRadius: BorderRadius.circular(4),
@@ -735,18 +848,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               const SizedBox(height: 8),
               Text(
                 'Unit: $vanId • Plate: $plate\nETA: $eta mins ($dist km away)${phone.isNotEmpty ? ' • Driver: $phone' : ''}',
-                style: const TextStyle(fontSize: 12, height: 1.4, color: Color(0xFF1E293B)),
+                style: const TextStyle(
+                  fontSize: 12,
+                  height: 1.4,
+                  color: Color(0xFF1E293B),
+                ),
               ),
               const SizedBox(height: 10),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _crimson,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () => context.push('/vans'),
                 icon: const Icon(Icons.navigation_rounded, size: 14),
-                label: const Text('Track Van Telemetry', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                label: const Text(
+                  'Track Van Telemetry',
+                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
@@ -774,11 +896,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.emergency_rounded, size: 16, color: Color(0xFFE11D48)),
+                  const Icon(
+                    Icons.emergency_rounded,
+                    size: 16,
+                    color: Color(0xFFE11D48),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      cleanTitle.isNotEmpty ? cleanTitle : 'Emergency Ward Alert Dispatched',
+                      cleanTitle.isNotEmpty
+                          ? cleanTitle
+                          : 'Emergency Ward Alert Dispatched',
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF0F172A),
@@ -791,18 +919,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               const SizedBox(height: 8),
               Text(
                 'Alert ID: $alertId\nDispatched to: $emailedTo\nRepresentative: $districtRep',
-                style: const TextStyle(fontSize: 12, height: 1.4, color: Color(0xFF334155)),
+                style: const TextStyle(
+                  fontSize: 12,
+                  height: 1.4,
+                  color: Color(0xFF334155),
+                ),
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF0F172A),
                   side: const BorderSide(color: Color(0xFFCBD5E1)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () => context.push('/support'),
                 icon: const Icon(Icons.support_agent_rounded, size: 15),
-                label: const Text('View Support Desk', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                label: const Text(
+                  'View Support Desk',
+                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
@@ -840,14 +977,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE0F2FE),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       '$conf% Confidence',
-                      style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Color(0xFF0284C7)),
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0284C7),
+                      ),
                     ),
                   ),
                 ],
@@ -855,13 +999,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               const SizedBox(height: 8),
               Text(
                 species,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF0F172A)),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: Color(0xFF0F172A),
+                ),
               ),
               if (summary.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(
                   summary,
-                  style: const TextStyle(fontSize: 12, height: 1.35, color: Color(0xFF475569)),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 1.35,
+                    color: Color(0xFF475569),
+                  ),
                 ),
               ],
               const SizedBox(height: 10),
@@ -869,11 +1021,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: _crimson,
                   side: const BorderSide(color: _crimson),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () => _openDispatchModal('REQUEST_VAN'),
                 icon: const Icon(Icons.local_shipping_outlined, size: 15),
-                label: const Text('Dispatch Fogging Unit', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                label: const Text(
+                  'Dispatch Fogging Unit',
+                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
@@ -889,7 +1046,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF64748B),
+          ),
         ),
         const SizedBox(height: 2),
         Text(

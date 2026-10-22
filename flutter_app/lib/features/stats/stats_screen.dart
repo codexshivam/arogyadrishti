@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
@@ -162,8 +162,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   @override
   Widget build(BuildContext context) {
     final banner = (_wardStats?['alert_banner'] as Map<String, dynamic>?) ?? {};
-    final metrics = (_wardStats?['core_surveillance_metrics']
-            as Map<String, dynamic>?) ??
+    final metrics =
+        (_wardStats?['core_surveillance_metrics'] as Map<String, dynamic>?) ??
         (_wardStats?['core_metrics'] as Map<String, dynamic>?) ??
         {};
     final hiMap = (metrics['house_index'] as Map<String, dynamic>?) ?? {};
@@ -174,36 +174,44 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     final ciVal = (ciMap['value_pct'] as num?)?.toDouble() ?? 0.0;
     final biVal = (biMap['value'] as num?)?.toDouble() ?? 0.0;
 
-    final trends = (_wardStats?['weekly_trends'] as Map<String, dynamic>?) ?? {};
-    final xLabels = (trends['x_labels'] as List<dynamic>?)
+    final trends =
+        (_wardStats?['weekly_trends'] as Map<String, dynamic>?) ?? {};
+    final xLabels =
+        (trends['x_labels'] as List<dynamic>?)
             ?.map((e) => e.toString())
             .toList() ??
         [];
     final datasets = (trends['datasets'] as Map<String, dynamic>?) ?? {};
-    final hiSeries = (datasets['hi'] as List<dynamic>?)
+    final hiSeries =
+        (datasets['hi'] as List<dynamic>?)
             ?.map((e) => (e as num).toDouble())
             .toList() ??
         [];
-    final ciSeries = (datasets['ci'] as List<dynamic>?)
+    final ciSeries =
+        (datasets['ci'] as List<dynamic>?)
             ?.map((e) => (e as num).toDouble())
             .toList() ??
         [];
-    final biSeries = (datasets['bi'] as List<dynamic>?)
+    final biSeries =
+        (datasets['bi'] as List<dynamic>?)
             ?.map((e) => (e as num).toDouble())
             .toList() ??
         [];
     final hotspotCallout = trends['hotspot_callout']?.toString() ?? '';
 
-    final whoEval = (_wardStats?['who_nvbdcp_evaluation'] as List<dynamic>?)
+    final whoEval =
+        (_wardStats?['who_nvbdcp_evaluation'] as List<dynamic>?)
             ?.cast<Map<String, dynamic>>() ??
         [];
-    final interventions = (_wardStats?['recommended_interventions']
-            as List<dynamic>?)
-        ?.cast<Map<String, dynamic>>() ??
+    final interventions =
+        (_wardStats?['recommended_interventions'] as List<dynamic>?)
+            ?.cast<Map<String, dynamic>>() ??
         [];
 
     final wardInfo = (_wardStats?['ward_info'] as Map<String, dynamic>?) ?? {};
-    final updatedAgoText = _formatUpdatedAgo(wardInfo['updated_at']?.toString());
+    final updatedAgoText = _formatUpdatedAgo(
+      wardInfo['updated_at']?.toString(),
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -212,13 +220,16 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         color: const Color(0xFF8B0000),
         onRefresh: _loadWardStats,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Component A1: Ward Selector Dropdown
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -235,7 +246,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     Expanded(
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
-                          value: _selectedLgdCode.isNotEmpty ? _selectedLgdCode : null,
+                          value: _selectedLgdCode.isNotEmpty
+                              ? _selectedLgdCode
+                              : null,
                           isExpanded: true,
                           icon: const Icon(
                             Icons.keyboard_arrow_down_rounded,
@@ -286,11 +299,14 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                               );
                               setState(() {
                                 _selectedLgdCode = val;
-                                _selectedWardName = match['ward_name'].toString();
+                                _selectedWardName = match['ward_name']
+                                    .toString();
                                 _selectedLat =
-                                    (match['lat'] as num?)?.toDouble() ?? 30.7675;
+                                    (match['lat'] as num?)?.toDouble() ??
+                                    30.7675;
                                 _selectedLng =
-                                    (match['lng'] as num?)?.toDouble() ?? 76.7644;
+                                    (match['lng'] as num?)?.toDouble() ??
+                                    76.7644;
                               });
                               _loadWardStats();
                             }
@@ -326,7 +342,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           duration: const Duration(milliseconds: 150),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: isSelected ? Colors.white : Colors.transparent,
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                             boxShadow: isSelected
                                 ? const [
@@ -342,8 +360,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                             '$w Weeks',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight:
-                                  isSelected ? FontWeight.w800 : FontWeight.w600,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
                               color: isSelected
                                   ? const Color(0xFF8B0000)
                                   : const Color(0xFF64748B),
@@ -369,8 +388,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline_rounded,
-                          color: Color(0xFFB71C1C)),
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: Color(0xFFB71C1C),
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -405,7 +426,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFB71C1C).withValues(alpha: 0.12),
+                            color: const Color(
+                              0xFFB71C1C,
+                            ).withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -524,11 +547,11 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   progress: biVal / 50.0,
                   progressColor: const Color(0xFF8B0000),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
 
                 // Component D: Weekly Index Trends Line Chart (fl_chart)
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -571,7 +594,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           const SizedBox(width: 14),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFFFEBEE),
                               borderRadius: BorderRadius.circular(10),
@@ -607,7 +632,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       SizedBox(
                         height: 210,
                         child: biSeries.isEmpty
-                            ? const Center(child: Text('No historical trends available'))
+                            ? const Center(
+                                child: Text('No historical trends available'),
+                              )
                             : LineChart(
                                 LineChartData(
                                   minY: 0,
@@ -670,7 +697,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                           final i = v.toInt();
                                           if (i >= 0 && i < xLabels.length) {
                                             return Padding(
-                                              padding: const EdgeInsets.only(top: 5),
+                                              padding: const EdgeInsets.only(
+                                                top: 5,
+                                              ),
                                               child: Text(
                                                 xLabels[i],
                                                 style: const TextStyle(
@@ -697,7 +726,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                         dotData: const FlDotData(show: false),
                                         spots: List.generate(
                                           hiSeries.length,
-                                          (i) => FlSpot(i.toDouble(), hiSeries[i]),
+                                          (i) =>
+                                              FlSpot(i.toDouble(), hiSeries[i]),
                                         ),
                                       ),
                                     // CI line (dark navy)
@@ -709,7 +739,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                         dotData: const FlDotData(show: false),
                                         spots: List.generate(
                                           ciSeries.length,
-                                          (i) => FlSpot(i.toDouble(), ciSeries[i]),
+                                          (i) =>
+                                              FlSpot(i.toDouble(), ciSeries[i]),
                                         ),
                                       ),
                                     // BI line (crimson primary)
@@ -720,25 +751,30 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                         barWidth: 3,
                                         belowBarData: BarAreaData(
                                           show: true,
-                                          color: const Color(0xFF8B0000)
-                                              .withValues(alpha: 0.06),
+                                          color: const Color(
+                                            0xFF8B0000,
+                                          ).withValues(alpha: 0.06),
                                         ),
                                         dotData: FlDotData(
                                           show: true,
                                           checkToShowDot: (spot, barData) =>
-                                              spot.x == (biSeries.length - 1).toDouble(),
+                                              spot.x ==
+                                              (biSeries.length - 1).toDouble(),
                                           getDotPainter:
                                               (spot, percent, barData, index) =>
                                                   FlDotCirclePainter(
-                                            radius: 4,
-                                            color: const Color(0xFF8B0000),
-                                            strokeWidth: 2,
-                                            strokeColor: Colors.white,
-                                          ),
+                                                    radius: 4,
+                                                    color: const Color(
+                                                      0xFF8B0000,
+                                                    ),
+                                                    strokeWidth: 2,
+                                                    strokeColor: Colors.white,
+                                                  ),
                                         ),
                                         spots: List.generate(
                                           biSeries.length,
-                                          (i) => FlSpot(i.toDouble(), biSeries[i]),
+                                          (i) =>
+                                              FlSpot(i.toDouble(), biSeries[i]),
                                         ),
                                       ),
                                   ],
@@ -751,7 +787,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       if (hotspotCallout.isNotEmpty)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 8),
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(8),
@@ -781,11 +819,11 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
 
                 // Component E: WHO / NVBDCP Standard Evaluation Matrix
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -835,7 +873,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       const SizedBox(height: 12),
 
                       ...whoEval.map((item) {
-                        final badgeColor = item['badge_color']?.toString() ?? 'crimson';
+                        final badgeColor =
+                            item['badge_color']?.toString() ?? 'crimson';
                         Color badgeBg;
                         Color badgeText;
                         if (badgeColor == 'maroon') {
@@ -894,7 +933,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                               const SizedBox(height: 6),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: badgeBg,
                                   borderRadius: BorderRadius.circular(4),
@@ -915,12 +956,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
 
                 // Component F: Recommended Epidemiological Interventions
                 if (interventions.isNotEmpty) ...[
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -966,7 +1007,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         ...interventions.map((act) {
                           final title = act['title']?.toString() ?? '';
                           final desc = act['description']?.toString() ?? '';
-                          final isFogging = title.toLowerCase().contains('fogging');
+                          final isFogging = title.toLowerCase().contains(
+                            'fogging',
+                          );
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 8),
@@ -988,7 +1031,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         title,
@@ -1037,7 +1081,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     icon: const Icon(Icons.download_rounded, size: 18),
                     label: const Text(
                       'Export PDF Report',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -1057,7 +1104,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     icon: const Icon(Icons.send_rounded, size: 18),
                     label: const Text(
                       'Dispatch Vector Unit',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -1092,44 +1142,90 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   }
 
   Widget _buildShimmerLoading() {
-    return Shimmer.fromColors(
-      baseColor: const Color(0xFFE2E8F0),
-      highlightColor: const Color(0xFFF8FAFC),
+    return Skeletonizer(
+      enabled: true,
       child: Column(
         children: [
           Container(
-            height: 70,
-            width: double.infinity,
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Row(
+              children: [
+                const CircleAvatar(radius: 16),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('Critical Outbreak Warning: Ward Surveillance'),
+                      SizedBox(height: 4),
+                      Text(
+                        'Elevated Breteau Index 31.4 exceeding statutory threshold.',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Container(
-            height: 100,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 10),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 1.4,
+            children: List.generate(
+              4,
+              (_) => Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text('House Index (HI)', style: TextStyle(fontSize: 12)),
+                    SizedBox(height: 4),
+                    Text(
+                      '14.2%',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Container(
-            height: 100,
-            width: double.infinity,
+            height: 160,
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            height: 240,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Epidemiological Trend (14 Days)',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 12),
+                Expanded(child: Center(child: Text('Surveillance Chart Data'))),
+              ],
             ),
           ),
         ],

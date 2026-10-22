@@ -23,11 +23,7 @@ class ArogyaTheme {
   ArogyaTheme._();
 
   static const List<BoxShadow> ambientElevation = [
-    BoxShadow(
-      color: Color(0x0D0F172A),
-      blurRadius: 16,
-      offset: Offset(0, 6),
-    ),
+    BoxShadow(color: Color(0x0D0F172A), blurRadius: 16, offset: Offset(0, 6)),
   ];
 
   // --- Core Palette (DESIGN.md) ---
@@ -168,9 +164,7 @@ class ArogyaTheme {
           foregroundColor: surfaceWhite,
           minimumSize: const Size(64, 48),
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: GoogleFonts.plusJakartaSans(
             fontSize: 14,
             fontWeight: FontWeight.w700,
@@ -183,9 +177,7 @@ class ArogyaTheme {
           foregroundColor: slateHeading,
           minimumSize: const Size(64, 48),
           side: const BorderSide(color: inputBorder, width: 1.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: GoogleFonts.plusJakartaSans(
             fontSize: 13.5,
             fontWeight: FontWeight.w600,
@@ -195,7 +187,10 @@ class ArogyaTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceWhite,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: inputBorder, width: 1),

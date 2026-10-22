@@ -63,21 +63,21 @@ class ActiveWardState {
 
 class ActiveWardNotifier extends StateNotifier<ActiveWardState> {
   ActiveWardNotifier()
-      : super(
-          const ActiveWardState(
-            lgdCode: '',
-            wardName: '',
-            district: '',
-            latitude: 0.0,
-            longitude: 0.0,
-            officerUid: '',
-            officerName: '',
-            officerPhone: '',
-            officerEmail: '',
-            isAuthenticated: false,
-            localeCode: 'en',
-          ),
-        );
+    : super(
+        const ActiveWardState(
+          lgdCode: '',
+          wardName: '',
+          district: '',
+          latitude: 0.0,
+          longitude: 0.0,
+          officerUid: '',
+          officerName: '',
+          officerPhone: '',
+          officerEmail: '',
+          isAuthenticated: false,
+          localeCode: 'en',
+        ),
+      );
 
   void updateWard({
     required String lgdCode,
@@ -119,10 +119,7 @@ class ActiveWardNotifier extends StateNotifier<ActiveWardState> {
     );
     ArogyaTelemetryService.logEvent(
       'officer_sign_in',
-      parameters: <String, Object>{
-        'lgd_code': lgdCode,
-        'ward_name': wardName,
-      },
+      parameters: <String, Object>{'lgd_code': lgdCode, 'ward_name': wardName},
     );
   }
 
@@ -137,8 +134,8 @@ class ActiveWardNotifier extends StateNotifier<ActiveWardState> {
 
 final activeWardProvider =
     StateNotifierProvider<ActiveWardNotifier, ActiveWardState>((ref) {
-  return ActiveWardNotifier();
-});
+      return ActiveWardNotifier();
+    });
 
 /// Configures Cloud Firestore unlimited offline persistence and provides real-time streams.
 class FirestoreSyncService {
@@ -148,7 +145,9 @@ class FirestoreSyncService {
 
   static bool get isFirebaseReady => _firebaseReady;
 
-  static Future<void> configureOfflinePersistence({bool firebaseInitialized = true}) async {
+  static Future<void> configureOfflinePersistence({
+    bool firebaseInitialized = true,
+  }) async {
     _firebaseReady = firebaseInitialized;
     if (!firebaseInitialized) return;
     try {
@@ -170,14 +169,14 @@ class FirestoreSyncService {
         .collection('field_logs')
         .snapshots(includeMetadataChanges: true)
         .map((snap) {
-      var pending = 0;
-      for (final doc in snap.docs) {
-        if (doc.metadata.hasPendingWrites) {
-          pending++;
-        }
-      }
-      return pending;
-    });
+          var pending = 0;
+          for (final doc in snap.docs) {
+            if (doc.metadata.hasPendingWrites) {
+              pending++;
+            }
+          }
+          return pending;
+        });
   }
 
   /// Force cloud sync of queued offline Firestore documents.

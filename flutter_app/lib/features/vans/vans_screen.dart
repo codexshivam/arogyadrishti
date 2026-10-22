@@ -70,8 +70,8 @@ class _VansScreenState extends ConsumerState<VansScreen> {
           if (placemarks.isNotEmpty) {
             final pm = placemarks.first;
             final sub = (pm.subLocality ?? pm.locality ?? 'Sector 22-B').trim();
-            final city =
-                (pm.locality ?? pm.administrativeArea ?? 'Chandigarh').trim();
+            final city = (pm.locality ?? pm.administrativeArea ?? 'Chandigarh')
+                .trim();
             label = '$sub, $city';
           }
         } catch (_) {}
@@ -139,9 +139,7 @@ class _VansScreenState extends ConsumerState<VansScreen> {
         final first = _vans.first;
         final lat = (first['base_lat'] as num?)?.toDouble() ?? _currentLat;
         final lng = (first['base_lng'] as num?)?.toDouble() ?? _currentLng;
-        _mapController?.animateCamera(
-          CameraUpdate.newLatLng(LatLng(lat, lng)),
-        );
+        _mapController?.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
       }
     } catch (e) {
       if (!mounted) return;
@@ -194,9 +192,9 @@ class _VansScreenState extends ConsumerState<VansScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Calling driver: $phone')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Calling driver: $phone')));
     }
   }
 
@@ -209,10 +207,7 @@ class _VansScreenState extends ConsumerState<VansScreen> {
 
     _mapController?.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(lat, lng),
-          zoom: 14.5,
-        ),
+        CameraPosition(target: LatLng(lat, lng), zoom: 14.5),
       ),
     );
   }
@@ -302,7 +297,7 @@ class _VansScreenState extends ConsumerState<VansScreen> {
           color: const Color(0xFF8B0000),
           onRefresh: _loadFleetData,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 80),
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 80),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -348,7 +343,9 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                             borderRadius: BorderRadius.circular(6),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFEBEE),
                                 borderRadius: BorderRadius.circular(6),
@@ -463,11 +460,12 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                           polylines: _polylines.values.toSet(),
                           myLocationButtonEnabled: false,
                           zoomControlsEnabled: false,
-                          gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                            Factory<OneSequenceGestureRecognizer>(
-                              () => EagerGestureRecognizer(),
-                            ),
-                          },
+                          gestureRecognizers:
+                              <Factory<OneSequenceGestureRecognizer>>{
+                                Factory<OneSequenceGestureRecognizer>(
+                                  () => EagerGestureRecognizer(),
+                                ),
+                              },
                           onMapCreated: (ctrl) => _mapController = ctrl,
                         ),
                         Positioned(
@@ -475,12 +473,15 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                           left: 10,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.94),
                               borderRadius: BorderRadius.circular(6),
-                              border:
-                                  Border.all(color: const Color(0xFFE2E8F0)),
+                              border: Border.all(
+                                color: const Color(0xFFE2E8F0),
+                              ),
                             ),
                             child: Row(
                               children: [
@@ -553,8 +554,10 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline_rounded,
-                            color: Color(0xFFB71C1C)),
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: Color(0xFFB71C1C),
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -608,18 +611,18 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                     final vehicleNo =
                         (v['vehicle_no'] ?? v['van_id'] ?? 'CH-01-GA-4920')
                             .toString();
-                    final status =
-                        (v['status'] ?? 'Available').toString().toUpperCase();
-                    final driverName =
-                        (v['driver_name'] ?? 'Driver Assigned').toString();
-                    final driverPhone =
-                        (v['driver_phone'] ?? '+919815044920').toString();
+                    final status = (v['status'] ?? 'Available')
+                        .toString()
+                        .toUpperCase();
+                    final driverName = (v['driver_name'] ?? 'Driver Assigned')
+                        .toString();
+                    final driverPhone = (v['driver_phone'] ?? '+919815044920')
+                        .toString();
                     final chemicalStock =
                         (v['chemical_stock'] ?? '45 L (Cyphenothrin 5% EC)')
                             .toString();
                     final eta = (v['eta_minutes'] as num?)?.toInt() ?? 8;
-                    final dist =
-                        (v['distance_km'] as num?)?.toDouble() ?? 2.4;
+                    final dist = (v['distance_km'] as num?)?.toDouble() ?? 2.4;
                     final depotLocation =
                         (v['base_location'] ?? v['depot'] ?? 'Sector 17 Depot')
                             .toString();
@@ -703,7 +706,9 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 3),
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
                                   color: statusBg,
                                   borderRadius: BorderRadius.circular(6),
@@ -769,7 +774,9 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                           // Traffic ETA Badge & Distance
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(6),
@@ -824,8 +831,10 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                                       ),
                                     ),
                                     onPressed: () => _callDriver(driverPhone),
-                                    icon: const Icon(Icons.phone_outlined,
-                                        size: 15),
+                                    icon: const Icon(
+                                      Icons.phone_outlined,
+                                      size: 15,
+                                    ),
                                     label: const Text(
                                       'Call Driver',
                                       style: TextStyle(
@@ -876,7 +885,7 @@ class _VansScreenState extends ConsumerState<VansScreen> {
       ),
       // Bottom Action Bar: Request New Van
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: const [
@@ -902,10 +911,7 @@ class _VansScreenState extends ConsumerState<VansScreen> {
             icon: const Icon(Icons.add_location_alt_rounded, size: 18),
             label: const Text(
               'Request New Fogging Van',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
             ),
           ),
         ),

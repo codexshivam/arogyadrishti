@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
@@ -55,7 +56,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
   ];
 
   static const List<Map<String, String>> _fallbackChandigarhWards = [
-    {'lgd_code': '0404400001', 'ward_name': 'Ward 1: Surajpur, Manimajra North'},
+    {
+      'lgd_code': '0404400001',
+      'ward_name': 'Ward 1: Surajpur, Manimajra North',
+    },
     {'lgd_code': '0404400002', 'ward_name': 'Ward 2: Manimajra Central, MHC'},
     {'lgd_code': '0404400003', 'ward_name': 'Ward 3: Sector 26, Bapu Dham'},
     {'lgd_code': '0404400004', 'ward_name': 'Ward 4: Sector 27, Sector 28'},
@@ -71,7 +75,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     {'lgd_code': '0404400014', 'ward_name': 'Ward 14: Dhanas Milk Colony'},
     {'lgd_code': '0404400015', 'ward_name': 'Ward 15: Sector 24, Sector 36'},
     {'lgd_code': '0404400016', 'ward_name': 'Ward 16: Sector 37, Sector 38'},
-    {'lgd_code': '0404400017', 'ward_name': 'Ward 17: Sector 38 West, Dadu Majra'},
+    {
+      'lgd_code': '0404400017',
+      'ward_name': 'Ward 17: Sector 38 West, Dadu Majra',
+    },
     {'lgd_code': '0404400018', 'ward_name': 'Ward 18: Sector 39, Sector 40'},
     {'lgd_code': '0404400019', 'ward_name': 'Ward 19: Sector 41, Sector 42'},
     {'lgd_code': '0404400020', 'ward_name': 'Ward 20: Sector 43, Sector 44'},
@@ -82,12 +89,24 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     {'lgd_code': '0404400025', 'ward_name': 'Ward 25: Sector 53, 54, Badheri'},
     {'lgd_code': '0404400026', 'ward_name': 'Ward 26: Sector 55, Sector 56'},
     {'lgd_code': '0404400027', 'ward_name': 'Ward 27: Ram Darbar, Ind Area 2'},
-    {'lgd_code': '0404400028', 'ward_name': 'Ward 28: Hallo Majra, Makhan Majra'},
+    {
+      'lgd_code': '0404400028',
+      'ward_name': 'Ward 28: Hallo Majra, Makhan Majra',
+    },
     {'lgd_code': '0404400029', 'ward_name': 'Ward 29: Daria Railway Colony'},
     {'lgd_code': '0404400030', 'ward_name': 'Ward 30: Mani Majra Village'},
-    {'lgd_code': '0404400031', 'ward_name': 'Ward 31: Kaimbwala, Khuda Ali Sher'},
-    {'lgd_code': '0404400032', 'ward_name': 'Ward 32: Khuda Jassu, Khuda Lahora'},
-    {'lgd_code': '0404400033', 'ward_name': 'Ward 33: Sarangpur, Dhanas Village'},
+    {
+      'lgd_code': '0404400031',
+      'ward_name': 'Ward 31: Kaimbwala, Khuda Ali Sher',
+    },
+    {
+      'lgd_code': '0404400032',
+      'ward_name': 'Ward 32: Khuda Jassu, Khuda Lahora',
+    },
+    {
+      'lgd_code': '0404400033',
+      'ward_name': 'Ward 33: Sarangpur, Dhanas Village',
+    },
     {'lgd_code': '0404400034', 'ward_name': 'Ward 34: Maloya EWS Colony'},
     {'lgd_code': '0404400035', 'ward_name': 'Ward 35: Behlana, Raipur Khurd'},
   ];
@@ -129,22 +148,22 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           .limit(40)
           .snapshots()
           .listen(
-        (snapshot) {
-          final liveList = snapshot.docs.map((d) {
-            final data = d.data();
-            data['ticket_id'] = data['ticket_id'] ?? d.id;
-            return data;
-          }).toList();
-          if (mounted && liveList.isNotEmpty) {
-            setState(() {
-              _apiTickets = liveList;
-            });
-          }
-        },
-        onError: (_) {
-          // Gracefully handled by API fallback
-        },
-      );
+            (snapshot) {
+              final liveList = snapshot.docs.map((d) {
+                final data = d.data();
+                data['ticket_id'] = data['ticket_id'] ?? d.id;
+                return data;
+              }).toList();
+              if (mounted && liveList.isNotEmpty) {
+                setState(() {
+                  _apiTickets = liveList;
+                });
+              }
+            },
+            onError: (_) {
+              // Gracefully handled by API fallback
+            },
+          );
     } catch (_) {}
   }
 
@@ -215,7 +234,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     if (desc.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please describe the field observation or required action.'),
+          content: Text(
+            'Please describe the field observation or required action.',
+          ),
         ),
       );
       return;
@@ -231,13 +252,16 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         category: _selectedCategory,
         severity: _selectedSeverity,
         description: desc,
-        officerUid: active.officerUid.isNotEmpty ? active.officerUid : 'officer_9915549455',
+        officerUid: active.officerUid.isNotEmpty
+            ? active.officerUid
+            : 'officer_9915549455',
         wardVillage: _selectedWardName,
       );
 
       final returned =
           (ticketRes['ticket'] as Map<String, dynamic>?) ?? ticketRes;
-      final rawTicketId = returned['ticket_id'] ??
+      final rawTicketId =
+          returned['ticket_id'] ??
           '#ESC-2026-${(1000 + _apiTickets.length).toString()}';
       final formattedId = _formatTicketId(rawTicketId);
 
@@ -263,7 +287,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           backgroundColor: _crimson,
           duration: const Duration(seconds: 4),
           content: Text(
-            'Escalation Ticket Logged: $formattedId (Auto-assigned & synced to Master Sheet & Firestore)',
+            'Escalation Ticket Logged: $formattedId (Auto-assigned & synced to Central Health Registry)',
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         ),
@@ -273,7 +297,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: _crimson,
-          content: Text('Network error. Ticket will retry automatically on connection.'),
+          content: Text(
+            'Network error. Ticket will retry automatically on connection.',
+          ),
         ),
       );
     } finally {
@@ -387,7 +413,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         ),
         leading: IconButton(
           tooltip: 'Back',
-          icon: const Icon(Icons.arrow_back_rounded, color: ArogyaTheme.slateHeading),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: ArogyaTheme.slateHeading,
+          ),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -398,38 +427,37 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         ),
       ),
       body: SafeArea(
-        child: _loading
-            ? const Center(
-                child: CircularProgressIndicator(color: _crimson),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 520),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Card 1: Outbreak Emergency SOS Hotline
-                        _buildSosHotlineCard(),
-                        const SizedBox(height: 18),
+        child: Skeletonizer(
+          enabled: _loading,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 20),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Card 1: Outbreak Emergency SOS Hotline
+                    _buildSosHotlineCard(),
+                    const SizedBox(height: 14),
 
-                        // Card 2: Log Field Issue / Outbreak Alert
-                        _buildLogIssueCard(),
-                        const SizedBox(height: 18),
+                    // Card 2: Log Field Issue / Outbreak Alert
+                    _buildLogIssueCard(),
+                    const SizedBox(height: 14),
 
-                        // Card 3: Recent Tickets & Dispatch Pipeline
-                        _buildRecentTicketsCard(),
-                        const SizedBox(height: 18),
+                    // Card 3: Recent Tickets & Dispatch Pipeline
+                    _buildRecentTicketsCard(),
+                    const SizedBox(height: 18),
 
-                        // Card 4: Direct Nodal Officer Directory
-                        _buildNodalDirectoryCard(),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  ),
+                    // Card 4: Direct Nodal Officer Directory
+                    _buildNodalDirectoryCard(),
+                    const SizedBox(height: 24),
+                  ],
                 ),
               ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -514,10 +542,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     SizedBox(height: 1),
                     Text(
                       'Direct dialing to national & regional escalation desks',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF64748B),
-                      ),
+                      style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -547,7 +572,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(12),
@@ -628,10 +656,17 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     const SizedBox(width: 8),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isPrimary ? _crimson : const Color(0xFFE2E8F0),
-                        foregroundColor: isPrimary ? Colors.white : const Color(0xFF0F172A),
+                        backgroundColor: isPrimary
+                            ? _crimson
+                            : const Color(0xFFE2E8F0),
+                        foregroundColor: isPrimary
+                            ? Colors.white
+                            : const Color(0xFF0F172A),
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         shape: RoundedRectangleBorder(
@@ -708,11 +743,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     ),
                     SizedBox(height: 1),
                     Text(
-                      'Automated ticket dispatch to ward inspector & master sheet',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF64748B),
-                      ),
+                      'Automated ticket dispatch to ward inspector & nodal authority',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -802,7 +834,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         color: isSelected ? _crimson : const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: isSelected ? _crimson : const Color(0xFFE2E8F0),
+                          color: isSelected
+                              ? _crimson
+                              : const Color(0xFFE2E8F0),
                         ),
                       ),
                       child: Text(
@@ -812,7 +846,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF1E293B),
                         ),
                       ),
                     ),
@@ -844,11 +880,14 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 isExpanded: true,
-                value: _availableWards.any((w) => w['lgd_code'].toString() == _selectedWardLgd)
+                value:
+                    _availableWards.any(
+                      (w) => w['lgd_code'].toString() == _selectedWardLgd,
+                    )
                     ? _selectedWardLgd
                     : (_availableWards.isNotEmpty
-                        ? _availableWards.first['lgd_code'].toString()
-                        : null),
+                          ? _availableWards.first['lgd_code'].toString()
+                          : null),
                 icon: const Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: Color(0xFF64748B),
@@ -891,7 +930,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     );
                     setState(() {
                       _selectedWardLgd = v;
-                      _selectedWardName = (match['ward_name'] ?? 'Ward $v').toString();
+                      _selectedWardName = (match['ward_name'] ?? 'Ward $v')
+                          .toString();
                     });
                   }
                 },
@@ -940,10 +980,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: _crimson,
-                  width: 1.2,
-                ),
+                borderSide: const BorderSide(color: _crimson, width: 1.2),
               ),
             ),
           ),
@@ -1040,10 +1077,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     SizedBox(height: 1),
                     Text(
                       'Real-time status of district escalation requests',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF64748B),
-                      ),
+                      style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -1073,7 +1107,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         color: isSelected ? _crimson : const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: isSelected ? _crimson : const Color(0xFFE2E8F0),
+                          color: isSelected
+                              ? _crimson
+                              : const Color(0xFFE2E8F0),
                         ),
                       ),
                       child: Text(
@@ -1081,7 +1117,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: isSelected ? Colors.white : const Color(0xFF334155),
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF334155),
                         ),
                       ),
                     ),
@@ -1099,10 +1137,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
               alignment: Alignment.center,
               child: const Text(
                 'No escalation tickets found under this filter.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF94A3B8),
-                ),
+                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
               ),
             )
           else
@@ -1138,9 +1173,14 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
 
     final ticketId = _formatTicketId(t['ticket_id']);
     final category = (t['category'] ?? 'Outbreak Cluster Flare-up').toString();
-    final ward = (t['ward_name'] ?? t['ward_village'] ?? 'Ward ${t['ward_lgd_code'] ?? '17'}')
-        .toString();
-    final timeStr = _formatRelativeTime(t['created_at_utc'] ?? t['timestamp_utc']);
+    final ward =
+        (t['ward_name'] ??
+                t['ward_village'] ??
+                'Ward ${t['ward_lgd_code'] ?? '17'}')
+            .toString();
+    final timeStr = _formatRelativeTime(
+      t['created_at_utc'] ?? t['timestamp_utc'],
+    );
     final notes = (t['observation_notes'] ?? t['description'] ?? '').toString();
 
     return Container(
@@ -1166,10 +1206,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: statusBg,
                   borderRadius: BorderRadius.circular(6),
@@ -1200,10 +1237,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           const SizedBox(height: 3),
           Text(
             '$ward • $timeStr',
-            style: const TextStyle(
-              fontSize: 11,
-              color: Color(0xFF64748B),
-            ),
+            style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
           ),
           if (notes.isNotEmpty) ...[
             const SizedBox(height: 4),
@@ -1306,10 +1340,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     SizedBox(height: 1),
                     Text(
                       'Real Chandigarh Nodal Officers with One-Tap Call, Email & Chat',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF64748B),
-                      ),
+                      style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -1321,7 +1352,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           ...items.map((o) {
             final isChat = o['is_chat'] == true;
             final hex = o['color_hex']?.toString() ?? '0xFF8B0014';
-            final colorVal = int.tryParse(hex.replaceFirst('0x', ''), radix: 16) ??
+            final colorVal =
+                int.tryParse(hex.replaceFirst('0x', ''), radix: 16) ??
                 0xFF8B0014;
             final initials = (o['initials'] ?? 'NO').toString();
             final name = (o['name'] ?? '').toString();
@@ -1332,7 +1364,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(12),
@@ -1389,7 +1424,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                           backgroundColor: const Color(0xFFE2E8F0),
                           foregroundColor: const Color(0xFF0F172A),
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           shape: RoundedRectangleBorder(
@@ -1418,7 +1456,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                           tooltip: 'Call $name',
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.white,
                             side: const BorderSide(color: Color(0xFFE2E8F0)),
@@ -1439,7 +1480,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                           tooltip: 'Email $name',
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.white,
                             side: const BorderSide(color: Color(0xFFE2E8F0)),
