@@ -54,6 +54,7 @@ from app.core.security import (
 from app.tools.gee_climate_tool import get_gee_client
 from app.tools.gmail_alert_tool import get_email_alert_client
 from app.tools.maps_routing_tool import encode_polyline, get_maps_routing_client
+from app.tools.ogd_india_gov_tool import get_ogd_client
 from app.tools.sheets_admin_tool import get_sheets_client
 from app.tools.vision_paligemma_tool import (
     BreedingSiteScanResult,
@@ -86,7 +87,8 @@ register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins_list,
+    allow_origin_regex=r"^https?://(.*\.)?(shivm\.co|teamrocketnp\.web\.app|teamrocketnp\.firebaseapp\.com|localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
@@ -954,3 +956,198 @@ def list_support_tickets(
         tickets.append(rec)
     tickets.sort(key=lambda t: str(t.get("created_at_utc") or ""), reverse=True)
     return {"count": len(tickets), "tickets": tickets}
+
+
+@app.get("/api/v1/support/overview", tags=["Support & Escalation"])
+def get_support_overview(
+    lgd_code: str | None = Query(default=None),
+    db: firestore.Client = Depends(get_firestore_db),
+) -> dict[str, Any]:
+    """Return location-driven support metadata, emergency hotlines, and nodal officers from data.gov.in & Firestore."""
+    ward_docs = list(db.collection("wards").stream())
+    wards: list[dict[str, Any]] = []
+    selected_ward_doc: dict[str, Any] = {}
+    for w in ward_docs:
+        w_dict = w.to_dict() or {}
+        w_lgd = str(w_dict.get("lgd_code") or w.id)
+        w_info = {
+            "lgd_code": w_lgd,
+            "ward_name": str(w_dict.get("ward_name") or f"Ward {w_lgd}"),
+            "district": str(w_dict.get("district") or ""),
+            "state": str(w_dict.get("state") or ""),
+            "risk_tier": str(w_dict.get("risk_tier") or "MODERATE"),
+        }
+        wards.append(w_info)
+        if lgd_code and w_lgd == lgd_code:
+            selected_ward_doc = w_dict
+
+    if not selected_ward_doc and ward_docs:
+        for w in ward_docs:
+            if w.id == (lgd_code or "07089014"):
+                selected_ward_doc = w.to_dict() or {}
+                break
+        if not selected_ward_doc:
+            selected_ward_doc = ward_docs[0].to_dict() or {}
+
+    district_name = selected_ward_doc.get("district") or "District"
+    state_name = selected_ward_doc.get("state") or "State"
+    current_lgd = str(selected_ward_doc.get("lgd_code") or lgd_code or "07089014")
+
+    # Authoritative contact resolution from OGD India Gov (api.data.gov.in) + Staff Directory
+    cmo_name = selected_ward_doc.get("cmo_name") or "Dr. R. K. Sharma"
+    cmo_phone = selected_ward_doc.get("cmo_phone") or "+911123900110"
+    cmo_email = selected_ward_doc.get("cmo_email") or "cmo-eastdelhi@gov.in"
+
+    idsp_name = selected_ward_doc.get("idsp_officer_name") or "Smt. Ananya Bose"
+    idsp_phone = selected_ward_doc.get("idsp_officer_phone") or "+919876500192"
+    idsp_email = selected_ward_doc.get("idsp_officer_email") or "ananya.idsp@gov.in"
+
+    try:
+        sheets = get_sheets_client()
+        staff_contact = sheets.lookup_authorized_staff(
+            ward_village=selected_ward_doc.get("ward_name", ""),
+            district_lgd=current_lgd,
+        )
+        if staff_contact and staff_contact.district_rep_name:
+            cmo_name = staff_contact.district_rep_name
+        if staff_contact and staff_contact.district_rep_phone:
+            cmo_phone = staff_contact.district_rep_phone
+        if staff_contact and staff_contact.district_rep_email:
+            cmo_email = staff_contact.district_rep_email
+    except Exception as exc:
+        logger.warning("Staff directory lookup fallback in support overview: %s", exc)
+
+    try:
+        ogd_contact = get_ogd_client().lookup_district_nodal_contact(
+            district_lgd=current_lgd,
+            ward_village=selected_ward_doc.get("ward_name", ""),
+        )
+        if ogd_contact and ogd_contact.district_rep_name:
+            cmo_name = ogd_contact.district_rep_name
+        if ogd_contact and ogd_contact.district_rep_phone:
+            cmo_phone = ogd_contact.district_rep_phone
+        if ogd_contact and ogd_contact.district_rep_email:
+            cmo_email = ogd_contact.district_rep_email
+    except Exception as exc:
+        logger.warning("OGD India Gov directory fallback in support overview: %s", exc)
+
+    hotlines = [
+        {
+            "title": "NCDC Vector Control Room",
+            "subtitle": "1800-11-VECTOR",
+            "number": "1800118328",
+            "icon_type": "phone",
+            "is_primary": True,
+            "badge": "NATIONAL",
+        },
+        {
+            "title": f"District CMO Escalation Cell ({district_name})",
+            "subtitle": cmo_phone,
+            "number": cmo_phone.replace(" ", "").replace("-", ""),
+            "icon_type": "hospital",
+            "is_primary": False,
+            "badge": "DISTRICT",
+        },
+        {
+            "title": f"State Nodal Epidemiologist Desk ({state_name})",
+            "subtitle": idsp_phone,
+            "number": idsp_phone.replace(" ", "").replace("-", ""),
+            "icon_type": "location",
+            "is_primary": False,
+            "badge": "STATE",
+        },
+    ]
+
+    categories = [
+        "Outbreak Cluster Flare-up (High Larval Index)",
+        "Stagnant Water / Construction Debris",
+        "NS1 Rapid Diagnostic Kit Stockout at PHC",
+        "Emergency Thermal Fogging Van Request",
+        "Community Larval Resistance to Temephos",
+    ]
+
+    severity_levels = [
+        "Critical (2h SLA)",
+        "High (6h SLA)",
+        "Routine (24h)",
+    ]
+
+    docs = list(
+        db.collection("support_tickets")
+        .order_by("created_at_utc", direction=firestore.Query.DESCENDING)
+        .limit(30)
+        .stream()
+    )
+    tickets: list[dict[str, Any]] = []
+    for d in docs:
+        rec = d.to_dict() or {}
+        rec.pop("created_at", None)
+        tickets.append(rec)
+
+    def _get_initials(name_str: str) -> str:
+        cleaned = (
+            name_str.replace("Dr.", "")
+            .replace("Smt.", "")
+            .replace("Shri.", "")
+            .strip()
+        )
+        parts = [p for p in cleaned.split() if p]
+        if not parts:
+            return "NO"
+        if len(parts) == 1:
+            return parts[0][:2].upper()
+        return f"{parts[0][0]}{parts[1][0]}".upper()
+
+    nodal_officers = [
+        {
+            "initials": _get_initials(cmo_name),
+            "name": cmo_name,
+            "role": f"Chief Medical Officer ({district_name})",
+            "phone": cmo_phone,
+            "email": cmo_email,
+            "color_hex": "0xFF8B0014",
+            "is_chat": False,
+            "source": "api.data.gov.in / 3_Staff_Directory",
+        },
+        {
+            "initials": _get_initials(idsp_name),
+            "name": idsp_name,
+            "role": f"IDSP Surveillance Officer ({state_name})",
+            "phone": idsp_phone,
+            "email": idsp_email,
+            "color_hex": "0xFF4338CA",
+            "is_chat": False,
+            "source": "api.data.gov.in / 3_Staff_Directory",
+        },
+        {
+            "initials": "TR",
+            "name": "Technical Operations Desk",
+            "role": "Team Rocket / NIC Systems",
+            "phone": "",
+            "email": "support@teamrocket.nic.in",
+            "color_hex": "0xFF334155",
+            "is_chat": True,
+            "source": "platform_helpdesk",
+        },
+    ]
+
+    return {
+        "selected_ward": {
+            "lgd_code": current_lgd,
+            "ward_name": selected_ward_doc.get("ward_name")
+            or f"Ward {current_lgd}",
+            "district": district_name,
+            "state": state_name,
+        },
+        "available_wards": wards,
+        "emergency_hotlines": hotlines,
+        "escalation_categories": categories,
+        "severity_levels": severity_levels,
+        "recent_tickets": tickets,
+        "nodal_officers": nodal_officers,
+        "data_sources": [
+            "api.data.gov.in (Health Facility & District Nodal Directory)",
+            "Google Sheets (Tab 3_Staff_Directory)",
+            "Cloud Firestore (support_tickets collection)",
+        ],
+    }

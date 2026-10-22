@@ -8,22 +8,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/telemetry_service.dart';
 
-/// Base backend URL (defaults to Cloud Run asia-south1 or local uvicorn port 8080).
-const String kDefaultBackendBaseUrl = String.fromEnvironment(
-  'AROGYA_API_BASE_URL',
-  defaultValue: 'http://localhost:8080',
-);
-
-/// Backup Google Trust Services SPKI SHA-256 pins for Cloud Run (*.a.run.app) TLS 1.3 verification.
-const List<String> kCloudRunTrustedHostSuffixes = <String>[
-  '.a.run.app',
-  'localhost',
-  '127.0.0.1',
-  '10.0.2.2',
-];
+/// Resolves backend base URL dynamically depending on environment and platform.
+String resolveBackendBaseUrl() {
+  const fromEnv = String.fromEnvironment('AROGYA_API_BASE_URL');
+  if (fromEnv.isNotEmpty) return fromEnv;
+  if (kIsWeb) {
+    final host = Uri.base.host;
+    if (kDebugMode && (host == 'localhost' || host == '127.0.0.1')) {
+      return 'http://localhost:8080';
+    }
+    // In production (https://arogya.shivm.co), empty base URL routes to current origin
+    // where Firebase Hosting rewrites /api/** to Cloud Run in asia-south1.
+    return '';
+  }
+  // Android & iOS mobile clients route directly to production backend HTTPS gateway
+  return 'https://arogya.shivm.co';
+}
 
 final apiClientProvider = Provider<ArogyaApiClient>((ref) {
-  return ArogyaApiClient(baseUrl: kDefaultBackendBaseUrl);
+  return ArogyaApiClient(baseUrl: resolveBackendBaseUrl());
 });
 
 /// Production Dio client with Firebase JWT + App Check interceptor, retry policy, and TLS 1.3 verification.
@@ -376,6 +379,14 @@ class ArogyaApiClient {
   Future<Map<String, dynamic>> fetchSupportTickets() async {
     final resp =
         await _dio.get<Map<String, dynamic>>('/api/v1/support/tickets');
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> fetchSupportOverview({String? lgdCode}) async {
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/support/overview',
+      queryParameters: lgdCode != null ? {'lgd_code': lgdCode} : null,
+    );
     return resp.data ?? <String, dynamic>{};
   }
 

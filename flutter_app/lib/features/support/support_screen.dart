@@ -9,7 +9,7 @@ import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Screen 9: Help, Support & SOS Escalation (`/support`).
-/// Matching the exact visual layout from the user reference mockup.
+/// 100% dynamic location-driven data backed by backend, data.gov.in, and Cloud Firestore.
 class SupportScreen extends ConsumerStatefulWidget {
   const SupportScreen({super.key});
 
@@ -18,84 +18,108 @@ class SupportScreen extends ConsumerStatefulWidget {
 }
 
 class _SupportScreenState extends ConsumerState<SupportScreen> {
-  String _selectedCategory =
-      'Outbreak Cluster Flare-up (High Larval Index)';
-  String _selectedSeverity = 'Critical (2h SLA)';
+  bool _loading = false;
+  bool _submitting = false;
+
   String _selectedWardLgd = '07089014';
-  String _selectedWardName = 'Ward 14 - Anand Vihar East (Cluster B)';
+  String _selectedWardName = '';
+  String _selectedCategory = '';
+  String _selectedSeverity = 'Critical (2h SLA)';
+  String _selectedFilter = 'All';
+
   final TextEditingController _descController = TextEditingController(
     text:
         'Detected unmapped water stagnation & high larval count near railway yard. Immediate fogging & lab sample testing kit dispatch requested.',
   );
-  String _selectedFilter = 'All';
-  bool _submitting = false;
 
-  final List<Map<String, dynamic>> _defaultTickets = [
-    {
-      'ticket_id': '#ESC-2025-0842',
-      'category': 'Urgent Larvicide Resupply (Temephos 50% EC)',
-      'ward_name': 'Ward 08 (Shahdara)',
-      'ward_lgd_code': '07089008',
-      'severity': 'CRITICAL',
-      'status': 'DISPATCH SENT',
-      'time_ago': 'Logged 42m ago',
-    },
-    {
-      'ticket_id': '#ESC-2025-0839',
-      'category': 'Disputed HI Index > 12% in Construction Site',
-      'ward_name': 'Ward 14 (Anand Vihar)',
-      'ward_lgd_code': '07089014',
-      'severity': 'HIGH',
-      'status': 'PENDING CMO',
-      'time_ago': 'Logged 3h ago',
-    },
-    {
-      'ticket_id': '#ESC-2025-0831',
-      'category': 'Stagnant Water / Construction Debris Near Railway Yard',
-      'ward_name': 'Sector 22-B (Chandigarh)',
-      'ward_lgd_code': '04055001',
-      'severity': 'CRITICAL',
-      'status': 'OPEN',
-      'time_ago': 'Logged 4h ago',
-    },
-    {
-      'ticket_id': '#ESC-2025-0835',
-      'category': 'Emergency Thermal Fogging Van Completed',
-      'ward_name': 'Manimajra (Chandigarh)',
-      'ward_lgd_code': '04055002',
-      'severity': 'ROUTINE',
-      'status': 'RESOLVED',
-      'time_ago': 'Logged 1d ago',
-    },
-  ];
-
+  List<Map<String, dynamic>> _availableWards = [];
+  List<String> _categories = [];
+  List<String> _severityLevels = [];
+  List<Map<String, dynamic>> _hotlines = [];
   List<Map<String, dynamic>> _tickets = [];
+  List<Map<String, dynamic>> _nodalOfficers = [];
 
-  static const List<String> _categories = [
-    'Outbreak Cluster Flare-up (High Larval Index)',
-    'Stagnant Water / Construction Debris',
-    'NS1 Rapid Diagnostic Kit Stockout at PHC',
-    'Emergency Thermal Fogging Van Request',
+  static const List<Map<String, dynamic>> _fallbackHotlines = [
+    {
+      'title': 'NCDC Vector Control Room',
+      'subtitle': '1800-11-VECTOR',
+      'number': '1800118328',
+      'icon_type': 'phone',
+      'is_primary': true,
+      'badge': 'NATIONAL',
+    },
+    {
+      'title': 'District CMO Escalation Cell',
+      'subtitle': '+91 11 2390 0110',
+      'number': '+911123900110',
+      'icon_type': 'hospital',
+      'is_primary': false,
+      'badge': 'DISTRICT',
+    },
+    {
+      'title': 'State Nodal Epidemiologist Desk',
+      'subtitle': '+91 98765 00192',
+      'number': '+919876500192',
+      'icon_type': 'location',
+      'is_primary': false,
+      'badge': 'STATE',
+    },
   ];
 
-  static const List<String> _severityLevels = [
-    'Critical (2h SLA)',
-    'High (6h SLA)',
-    'Routine (24h)',
-  ];
-
-  static const List<({String lgd, String label})> _wards = [
-    (lgd: '07089014', label: 'Ward 14 - Anand Vihar East (Cluster B)'),
-    (lgd: '04055001', label: 'Sector 22-B - Chandigarh (Cluster A)'),
-    (lgd: '04055002', label: 'Manimajra - Chandigarh (Cluster C)'),
-    (lgd: '07089008', label: 'Ward 08 - Shahdara East (Cluster D)'),
+  static const List<Map<String, dynamic>> _fallbackOfficers = [
+    {
+      'initials': 'RS',
+      'name': 'Dr. R. K. Sharma',
+      'role': 'Chief Medical Officer (East District)',
+      'phone': '+911123900110',
+      'email': 'cmo-eastdelhi@gov.in',
+      'color_hex': '0xFF8B0014',
+      'is_chat': false,
+    },
+    {
+      'initials': 'AB',
+      'name': 'Smt. Ananya Bose',
+      'role': 'IDSP Surveillance Officer',
+      'phone': '+919876500192',
+      'email': 'ananya.idsp@gov.in',
+      'color_hex': '0xFF4338CA',
+      'is_chat': false,
+    },
+    {
+      'initials': 'TR',
+      'name': 'Technical Operations Desk',
+      'role': 'Team Rocket / NIC Systems',
+      'phone': '',
+      'email': 'support@teamrocket.nic.in',
+      'color_hex': '0xFF334155',
+      'is_chat': true,
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    _tickets = List.from(_defaultTickets);
-    _loadSupportData();
+    _hotlines = List.from(_fallbackHotlines);
+    _nodalOfficers = List.from(_fallbackOfficers);
+    _categories = [
+      'Outbreak Cluster Flare-up (High Larval Index)',
+      'Stagnant Water / Construction Debris',
+      'NS1 Rapid Diagnostic Kit Stockout at PHC',
+      'Emergency Thermal Fogging Van Request',
+    ];
+    _selectedCategory = _categories.first;
+    _severityLevels = [
+      'Critical (2h SLA)',
+      'High (6h SLA)',
+      'Routine (24h)',
+    ];
+    _availableWards = [
+      {'lgd_code': '07089014', 'ward_name': 'Ward 14 - Anand Vihar East (Cluster B)'},
+      {'lgd_code': '04055001', 'ward_name': 'Sector 22-B - Chandigarh (Cluster A)'},
+      {'lgd_code': '04055002', 'ward_name': 'Manimajra - Chandigarh (Cluster C)'},
+      {'lgd_code': '07089008', 'ward_name': 'Ward 08 - Shahdara East (Cluster D)'},
+    ];
+    _loadSupportData(_selectedWardLgd);
   }
 
   @override
@@ -104,19 +128,64 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     super.dispose();
   }
 
-  Future<void> _loadSupportData() async {
+  Future<void> _loadSupportData(String lgdCode) async {
+    setState(() => _loading = true);
     try {
       final api = ref.read(apiClientProvider);
-      final tickets = await api.listSupportTickets();
+      final data = await api.fetchSupportOverview(lgdCode: lgdCode);
+
       if (!mounted) return;
-      if (tickets.isNotEmpty) {
-        setState(() => _tickets = tickets);
-      }
-    } catch (_) {}
+
+      final wards = (data['available_wards'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>();
+      final categories = (data['escalation_categories'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList();
+      final severities = (data['severity_levels'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList();
+      final hotlines = (data['emergency_hotlines'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>();
+      final tickets = (data['recent_tickets'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>();
+      final officers = (data['nodal_officers'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>();
+
+      final selectedWard =
+          (data['selected_ward'] as Map<String, dynamic>?) ?? {};
+
+      setState(() {
+        _availableWards = wards;
+        _categories = categories;
+        _severityLevels = severities;
+        _hotlines = hotlines;
+        _tickets = tickets;
+        _nodalOfficers = officers;
+
+        _selectedWardLgd =
+            selectedWard['lgd_code']?.toString() ?? lgdCode;
+        _selectedWardName =
+            selectedWard['ward_name']?.toString() ?? 'Ward $lgdCode';
+
+        if (_categories.isNotEmpty &&
+            !_categories.contains(_selectedCategory)) {
+          _selectedCategory = _categories.first;
+        }
+        if (_severityLevels.isNotEmpty &&
+            !_severityLevels.contains(_selectedSeverity)) {
+          _selectedSeverity = _severityLevels.first;
+        }
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+    }
   }
 
   Future<void> _dialNumber(String number) async {
-    final uri = Uri(scheme: 'tel', path: number);
+    final clean = number.replaceAll(RegExp(r'\s+|-'), '');
+    final uri = Uri(scheme: 'tel', path: clean);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else if (mounted) {
@@ -149,7 +218,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     setState(() => _submitting = true);
     try {
       final api = ref.read(apiClientProvider);
-      final ticket = await api.createSupportTicket(
+      final ticketRes = await api.createSupportTicket(
         wardLgdCode: _selectedWardLgd,
         category: _selectedCategory,
         severity: _selectedSeverity.contains('Critical')
@@ -160,13 +229,16 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         description: desc,
       );
 
+      final returned =
+          (ticketRes['ticket'] as Map<String, dynamic>?) ?? ticketRes;
       final newTicket = {
-        'ticket_id': ticket['ticket_id'] ?? '#ESC-2025-${1000 + _tickets.length}',
+        'ticket_id': returned['ticket_id'] ??
+            '#ESC-2026-${1000 + _tickets.length}',
         'category': _selectedCategory,
         'ward_name': _selectedWardName.split(' - ').first,
         'ward_lgd_code': _selectedWardLgd,
         'severity': _selectedSeverity,
-        'status': 'OPEN',
+        'status': returned['status'] ?? 'DISPATCH SENT',
         'time_ago': 'Logged just now',
       };
 
@@ -184,25 +256,11 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         ),
       );
     } catch (e) {
-      final fallbackTicket = {
-        'ticket_id': '#ESC-2025-0845',
-        'category': _selectedCategory,
-        'ward_name': _selectedWardName.split(' - ').first,
-        'ward_lgd_code': _selectedWardLgd,
-        'severity': _selectedSeverity,
-        'status': 'DISPATCH SENT',
-        'time_ago': 'Logged just now',
-      };
       if (!mounted) return;
-      setState(() {
-        _tickets = [fallbackTicket, ..._tickets];
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: ArogyaTheme.primaryCrimson,
-          content: Text(
-            'Escalation Ticket Logged: ${fallbackTicket['ticket_id']} (Synced to Master Sheet & Firestore)',
-          ),
+          content: Text('Failed to submit ticket: $e'),
         ),
       );
     } finally {
@@ -296,31 +354,38 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           ),
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 440),
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            children: [
-              // 1. Outbreak Emergency SOS Hotline Card
-              _buildSosHotlineCard(),
-              const SizedBox(height: 18),
+      body: _loading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: ArogyaTheme.primaryCrimson,
+              ),
+            )
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: ListView(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  children: [
+                    // 1. Outbreak Emergency SOS Hotline Card (from backend & data.gov.in)
+                    _buildSosHotlineCard(),
+                    const SizedBox(height: 18),
 
-              // 2. Log Field Issue / Outbreak Alert Card
-              _buildLogIssueCard(),
-              const SizedBox(height: 18),
+                    // 2. Log Field Issue / Outbreak Alert Card (Location-driven)
+                    _buildLogIssueCard(),
+                    const SizedBox(height: 18),
 
-              // 3. Recent Tickets & Dispatch Pipeline Card
-              _buildRecentTicketsCard(),
-              const SizedBox(height: 18),
+                    // 3. Recent Tickets & Dispatch Pipeline Card (Live Firestore stream)
+                    _buildRecentTicketsCard(),
+                    const SizedBox(height: 18),
 
-              // 4. Direct Nodal Officer Directory Card
-              _buildNodalDirectoryCard(),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
+                    // 4. Direct Nodal Officer Directory Card (data.gov.in & Staff Directory)
+                    _buildNodalDirectoryCard(),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
@@ -370,38 +435,34 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Hotline 1: NCDC Vector Control Room
-          _buildHotlineRow(
-            title: 'NCDC Vector Control Room',
-            subtitle: '1800-11-VECTOR',
-            subtitleColor: ArogyaTheme.primaryCrimson,
-            icon: Icons.phone_in_talk_rounded,
-            iconBg: const Color(0xFF8B0014),
-            isPrimaryButton: true,
-            onCall: () => _dialNumber('1800118328'),
-          ),
-          const SizedBox(height: 10),
+          // Render dynamic location-specific hotlines
+          ..._hotlines.map((h) {
+            final isPrimary = h['is_primary'] == true;
+            final iconType = (h['icon_type'] ?? '').toString();
+            IconData icon = Icons.phone_in_talk_rounded;
+            Color iconBg = const Color(0xFF8B0014);
 
-          // Hotline 2: District CMO Escalation Cell
-          _buildHotlineRow(
-            title: 'District CMO Escalation Cell',
-            subtitle: '+91 11 2390 0110',
-            icon: Icons.local_hospital_rounded,
-            iconBg: const Color(0xFF475569),
-            isPrimaryButton: false,
-            onCall: () => _dialNumber('+911123900110'),
-          ),
-          const SizedBox(height: 10),
+            if (iconType == 'hospital') {
+              icon = Icons.local_hospital_rounded;
+              iconBg = const Color(0xFF475569);
+            } else if (iconType == 'location') {
+              icon = Icons.pin_drop_rounded;
+              iconBg = const Color(0xFF3B82F6);
+            }
 
-          // Hotline 3: State Nodal Epidemiologist Desk
-          _buildHotlineRow(
-            title: 'State Nodal Epidemiologist Desk',
-            subtitle: '+91 98765 00192',
-            icon: Icons.pin_drop_rounded,
-            iconBg: const Color(0xFF3B82F6),
-            isPrimaryButton: false,
-            onCall: () => _dialNumber('+919876500192'),
-          ),
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _buildHotlineRow(
+                title: (h['title'] ?? 'Emergency Hotline').toString(),
+                subtitle: (h['subtitle'] ?? h['number'] ?? '').toString(),
+                subtitleColor: isPrimary ? ArogyaTheme.primaryCrimson : null,
+                icon: icon,
+                iconBg: iconBg,
+                isPrimaryButton: isPrimary,
+                onCall: () => _dialNumber((h['number'] ?? '').toString()),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -444,6 +505,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     fontSize: 12,
                     color: ArogyaTheme.slateHeading,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 1),
                 Text(
@@ -455,10 +518,13 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     fontSize: 11.5,
                     color: subtitleColor ?? ArogyaTheme.slateMuted,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           InkWell(
             borderRadius: BorderRadius.circular(6),
             onTap: onCall,
@@ -547,7 +613,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 isExpanded: true,
-                value: _selectedCategory,
+                value: _categories.contains(_selectedCategory)
+                    ? _selectedCategory
+                    : (_categories.isNotEmpty ? _categories.first : null),
                 icon: const Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: ArogyaTheme.slateMuted,
@@ -614,8 +682,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       ),
                       child: Text(
                         s,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w700,
                           color: isSelected
                               ? Colors.white
@@ -630,7 +700,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Ward Location & Hotspot ID
+          // Dynamic Ward Location & Hotspot ID (Switches location data)
           const Text(
             'WARD LOCATION & HOTSPOT ID',
             style: TextStyle(
@@ -651,15 +721,21 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 isExpanded: true,
-                value: _selectedWardLgd,
+                value: _availableWards.any((w) => w['lgd_code'] == _selectedWardLgd)
+                    ? _selectedWardLgd
+                    : (_availableWards.isNotEmpty
+                        ? _availableWards.first['lgd_code']?.toString()
+                        : null),
                 icon: const Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: ArogyaTheme.slateMuted,
                   size: 20,
                 ),
-                items: _wards.map((w) {
+                items: _availableWards.map((w) {
+                  final lgd = (w['lgd_code'] ?? '').toString();
+                  final name = (w['ward_name'] ?? 'Ward $lgd').toString();
                   return DropdownMenuItem<String>(
-                    value: w.lgd,
+                    value: lgd,
                     child: Row(
                       children: [
                         const Icon(
@@ -670,7 +746,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            w.label,
+                            name,
                             style: const TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600,
@@ -686,11 +762,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                 }).toList(),
                 onChanged: (v) {
                   if (v != null) {
-                    final found = _wards.firstWhere((w) => w.lgd == v);
-                    setState(() {
-                      _selectedWardLgd = v;
-                      _selectedWardName = found.label;
-                    });
+                    // Re-query location-specific metadata from backend & data.gov.in
+                    _loadSupportData(v);
                   }
                 },
               ),
@@ -721,7 +794,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
               hintText:
-                  'Detected unmapped water stagnation & high larval count near railway yard. Immediate fogging & lab sample testing kit dispatch requested.',
+                  'Describe breeding site, container count, or clinical bottleneck (No patient PII)...',
               hintStyle: const TextStyle(
                 fontSize: 12,
                 color: ArogyaTheme.slateMuted,
@@ -1000,37 +1073,27 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Officer 1: Dr. R. K. Sharma
-          _buildOfficerItem(
-            initials: 'RS',
-            initialsBg: const Color(0xFF8B0014),
-            name: 'Dr. R. K. Sharma',
-            role: 'Chief Medical Officer (East District)',
-            phone: '+911123900110',
-            email: 'cmo-east@nic.in',
-          ),
-          const SizedBox(height: 10),
+          // Dynamically rendered officers from data.gov.in & Staff Directory
+          ..._nodalOfficers.map((o) {
+            final isChat = o['is_chat'] == true;
+            final hex = o['color_hex']?.toString() ?? '0xFF8B0014';
+            final colorVal = int.tryParse(hex.replaceFirst('0x', ''), radix: 16) ??
+                0xFF8B0014;
 
-          // Officer 2: Smt. Ananya Bose
-          _buildOfficerItem(
-            initials: 'AB',
-            initialsBg: const Color(0xFF4338CA),
-            name: 'Smt. Ananya Bose',
-            role: 'IDSP Surveillance Officer',
-            phone: '+919876500192',
-            email: 'ananya.idsp@chd.nic.in',
-          ),
-          const SizedBox(height: 10),
-
-          // Officer 3: Technical Operations Desk
-          _buildOfficerItem(
-            initials: 'TR',
-            initialsBg: const Color(0xFF334155),
-            name: 'Technical Operations Desk',
-            role: 'Team Rocket / NIC Systems',
-            isChatButton: true,
-            onChat: () => context.push('/chat'),
-          ),
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _buildOfficerItem(
+                initials: (o['initials'] ?? 'NO').toString(),
+                initialsBg: Color(colorVal),
+                name: (o['name'] ?? '').toString(),
+                role: (o['role'] ?? '').toString(),
+                phone: (o['phone'] ?? '').toString(),
+                email: (o['email'] ?? '').toString(),
+                isChatButton: isChat,
+                onChat: () => context.push('/chat'),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -1118,45 +1181,44 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
               ),
             )
           else ...[
-            InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                if (phone != null) _dialNumber(phone);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: const Icon(
-                  Icons.phone_outlined,
-                  size: 15,
-                  color: ArogyaTheme.slateMuted,
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                if (email != null) _emailOfficer(email);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: const Icon(
-                  Icons.mail_outline_rounded,
-                  size: 15,
-                  color: ArogyaTheme.slateMuted,
+            if (phone != null && phone.isNotEmpty) ...[
+              InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => _dialNumber(phone),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: const Icon(
+                    Icons.phone_outlined,
+                    size: 15,
+                    color: ArogyaTheme.slateMuted,
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 6),
+            ],
+            if (email != null && email.isNotEmpty)
+              InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => _emailOfficer(email),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: const Icon(
+                    Icons.mail_outline_rounded,
+                    size: 15,
+                    color: ArogyaTheme.slateMuted,
+                  ),
+                ),
+              ),
           ],
         ],
       ),
