@@ -17,7 +17,7 @@ class ArogyaTopShellBar extends ConsumerWidget {
   final int activeTabIndex;
 
   static const List<({IconData icon, String route, String label})> _tabs = [
-    (icon: Icons.home_rounded, route: '/home', label: 'Home'),
+    (icon: Icons.home_outlined, route: '/home', label: 'Home'),
     (icon: Icons.chat_bubble_outline_rounded, route: '/chat', label: 'Chat'),
     (icon: Icons.bar_chart_rounded, route: '/stats', label: 'Stats'),
     (icon: Icons.map_outlined, route: '/map', label: 'Map'),
@@ -26,93 +26,36 @@ class ArogyaTopShellBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pendingAsync = ref.watch(pendingWritesCountProvider);
-    final pendingCount = pendingAsync.valueOrNull ?? 0;
-
     return Container(
       color: ArogyaTheme.surfaceWhite,
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/logo/arogya_logo.png',
-                  width: 34,
-                  height: 34,
-                  errorBuilder: (_, _, _) => const SizedBox(width: 34),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      'Arogya Drishti',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: ArogyaTheme.primaryCrimson,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 16,
-                          ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      'developed and managed by Team Rocket',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: ArogyaTheme.slateMuted,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.1,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-              Semantics(
-                label: pendingCount > 0
-                    ? '$pendingCount offline records queued for sync'
-                    : 'All field records synced with asia-south1',
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: pendingCount > 0
-                        ? ArogyaTheme.triageAmberBg
-                        : ArogyaTheme.triageEmeraldBg,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        pendingCount > 0
-                            ? Icons.cloud_upload_outlined
-                            : Icons.cloud_done_rounded,
-                        size: 12,
-                        color: pendingCount > 0
-                            ? ArogyaTheme.triageAmberText
-                            : ArogyaTheme.triageEmeraldText,
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  'Arogya Drishti',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: ArogyaTheme.primaryCrimson,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 17.5,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        pendingCount > 0 ? '$pendingCount Q' : 'SYNC',
-                        style: TextStyle(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
-                          color: pendingCount > 0
-                              ? ArogyaTheme.triageAmberText
-                              : ArogyaTheme.triageEmeraldText,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  'developed and managed by Team Rocket',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: ArogyaTheme.slateMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(_tabs.length, (idx) {
@@ -130,21 +73,23 @@ class ArogyaTopShellBar extends ConsumerWidget {
                     }
                   },
                   child: Container(
-                    constraints: const BoxConstraints(minWidth: 52, minHeight: 40),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    constraints: const BoxConstraints(minWidth: 50, minHeight: 38),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
                           color: isSelected
                               ? ArogyaTheme.primaryCrimson
                               : Colors.transparent,
-                          width: 2.5,
+                          width: 2.2,
                         ),
                       ),
                     ),
                     child: Icon(
-                      tab.icon,
-                      size: 20,
+                      isSelected && idx == 0
+                          ? Icons.home_rounded
+                          : tab.icon,
+                      size: 22,
                       color: isSelected
                           ? ArogyaTheme.primaryCrimson
                           : ArogyaTheme.slateMuted,
