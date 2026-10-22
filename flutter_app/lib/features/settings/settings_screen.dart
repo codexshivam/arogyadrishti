@@ -56,6 +56,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final wardState = ref.watch(activeWardProvider);
     final pendingAsync = ref.watch(pendingOfflineWritesProvider);
     final pendingCount = pendingAsync.maybeWhen(
       data: (count) => count,
@@ -101,12 +102,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Kunal Yadav (+91 99155 49458)',
+                        wardState.officerName.isNotEmpty
+                            ? '${wardState.officerName} (${wardState.officerPhone})'
+                            : (wardState.officerPhone.isNotEmpty
+                                ? wardState.officerPhone
+                                : 'Not Signed In'),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Assigned Ward: Sector 22-B • LGD 04055001',
+                        wardState.lgdCode.isNotEmpty
+                            ? 'Assigned Ward: ${wardState.wardName} • LGD ${wardState.lgdCode}'
+                            : 'Authenticate via /auth to load assigned ward jurisdiction',
                         style: GoogleFonts.ibmPlexMono(
                           fontSize: 12,
                           color: ArogyaSpacing.onSurfaceVariant,
@@ -115,9 +122,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                   ),
                 ),
-                const StatusPillChip(
-                  label: 'VERIFIED DPI',
-                  color: ArogyaSpacing.riskSafe,
+                StatusPillChip(
+                  label: wardState.isAuthenticated ? 'VERIFIED DPI' : 'UNAUTHENTICATED',
+                  color: wardState.isAuthenticated
+                      ? ArogyaSpacing.riskSafe
+                      : ArogyaSpacing.riskModerate,
                 ),
               ],
             ),

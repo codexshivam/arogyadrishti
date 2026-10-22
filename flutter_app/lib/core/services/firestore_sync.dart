@@ -65,16 +65,16 @@ class ActiveWardNotifier extends StateNotifier<ActiveWardState> {
   ActiveWardNotifier()
       : super(
           const ActiveWardState(
-            lgdCode: '04055001',
-            wardName: 'Sector 22-B, Chandigarh',
-            district: 'Chandigarh',
-            latitude: 30.7333,
-            longitude: 76.7794,
-            officerUid: 'officer_9915549458',
-            officerName: 'Kunal Yadav',
-            officerPhone: '+91 99155 49458',
-            officerEmail: 'shivam@revlet.me',
-            isAuthenticated: true,
+            lgdCode: '',
+            wardName: '',
+            district: '',
+            latitude: 0.0,
+            longitude: 0.0,
+            officerUid: '',
+            officerName: '',
+            officerPhone: '',
+            officerEmail: '',
+            isAuthenticated: false,
             localeCode: 'en',
           ),
         );

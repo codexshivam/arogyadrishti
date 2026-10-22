@@ -1,5 +1,7 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,13 +20,14 @@ class AuthScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
-  final _phoneController = TextEditingController(text: '9915549458');
+  final _phoneController = TextEditingController();
   final List<TextEditingController> _otpControllers = List.generate(
     6,
-    (idx) => TextEditingController(text: <String>['5', '8', '2', '4', '1', '9'][idx]),
+    (_) => TextEditingController(),
   );
   bool _verifying = false;
   String? _verificationId;
+  ConfirmationResult? _webConfirmationResult;
 
   @override
   void dispose() {
@@ -48,25 +51,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
 
     try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: '+91$rawDigits',
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          debugPrint('Firebase Phone Auth note: ${e.message}');
-        },
-        codeSent: (String verId, int? resendToken) {
-          if (mounted) {
-            setState(() => _verificationId = verId);
-          }
-        },
-        codeAutoRetrievalTimeout: (String verId) {
-          _verificationId = verId;
-        },
-      );
-    } catch (_) {
-      // Continue to backend staff verification if Firebase Phone Auth is not active on emulator
+      if (kIsWeb) {
+        _webConfirmationResult =
+            await FirebaseAuth.instance.signInWithPhoneNumber('+91$rawDigits');
+      } else {
+        await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: '+91$rawDigits',
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            await FirebaseAuth.instance.signInWithCredential(credential);
+          },
+          verificationFailed: (FirebaseAuthException e) {
+            debugPrint('Firebase Phone Auth note: ${e.message}');
+          },
+          codeSent: (String verId, int? resendToken) {
+            if (mounted) {
+              setState(() => _verificationId = verId);
+            }
+          },
+          codeAutoRetrievalTimeout: (String verId) {
+            _verificationId = verId;
+          },
+        );
+      }
+    } catch (e) {
+      debugPrint('Phone auth dispatch note: $e');
     }
 
     if (!mounted) return;
@@ -93,35 +101,58 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     setState(() => _verifying = true);
     try {
       String uid = 'officer_$rawDigits';
-      if (_verificationId != null) {
+      User? firebaseUser;
+
+      if (kIsWeb) {
+        _webConfirmationResult ??=
+            await FirebaseAuth.instance.signInWithPhoneNumber('+91$rawDigits');
+        final userCred = await _webConfirmationResult!.confirm(otpCode);
+        firebaseUser = userCred.user;
+      } else if (_verificationId != null) {
+        final cred = PhoneAuthProvider.credential(
+          verificationId: _verificationId!,
+          smsCode: otpCode,
+        );
+        final userCred =
+            await FirebaseAuth.instance.signInWithCredential(cred);
+        firebaseUser = userCred.user;
+      }
+
+      if (firebaseUser != null) {
+        uid = firebaseUser.uid;
+      }
+
+      Map<String, dynamic> profile = <String, dynamic>{};
+      try {
+        final snap = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .get();
+        if (snap.exists && snap.data() != null) {
+          profile = snap.data()!;
+        }
+      } catch (_) {}
+
+      if (profile.isEmpty) {
         try {
-          final cred = PhoneAuthProvider.credential(
-            verificationId: _verificationId!,
-            smsCode: otpCode,
-          );
-          final userCred =
-              await FirebaseAuth.instance.signInWithCredential(cred);
-          if (userCred.user != null) {
-            uid = userCred.user!.uid;
-          }
+          final res = await ref.read(apiClientProvider).verifyStaff(
+                uid: uid,
+                phone: '+91$rawDigits',
+              );
+          profile = (res['officer_profile'] as Map<String, dynamic>?) ??
+              <String, dynamic>{};
         } catch (_) {}
       }
 
-      final res = await ref.read(apiClientProvider).verifyStaff(
-            uid: uid,
-            phone: '+91$rawDigits',
-          );
-      final profile =
-          (res['officer_profile'] as Map<String, dynamic>?) ?? <String, dynamic>{};
-
       ref.read(activeWardProvider.notifier).setOfficerSession(
             uid: uid,
-            name: (profile['name'] ?? 'Kunal Yadav').toString(),
+            name: (profile['name'] ?? firebaseUser?.displayName ?? '').toString(),
             phone: '+91 $rawDigits',
-            email: (profile['email'] ?? 'shivam@revlet.me').toString(),
-            lgdCode: (profile['assigned_lgd_code'] ?? '04055001').toString(),
-            wardName:
-                '${profile['ward_village'] ?? 'Sector 22-B'}, ${profile['district'] ?? 'Chandigarh'}',
+            email: (profile['email'] ?? firebaseUser?.email ?? '').toString(),
+            lgdCode: (profile['assigned_lgd_code'] ?? '').toString(),
+            wardName: profile['ward_village'] != null
+                ? '${profile['ward_village']}, ${profile['district'] ?? ''}'
+                : '',
           );
 
       if (!mounted) return;
@@ -134,7 +165,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         context,
         title: 'Staff Verification Failed',
         message:
-            'Phone +91$rawDigits is not pre-authorized in 3_Staff_Directory or backend unreachable.',
+            'Invalid OTP or phone +91$rawDigits is not pre-authorized ($e).',
         contentType: ContentType.failure,
       );
     }
