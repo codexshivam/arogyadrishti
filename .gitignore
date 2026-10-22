@@ -1,0 +1,54 @@
+# ---- Secrets (NEVER commit) ----
+*service*.json
+*-sa.json
+*credentials*.json
+*.pem
+*.p12
+*.key
+*.jks
+*.keystore
+key.properties
+.env
+.env.*
+!.env.example
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# ---- Flutter / Dart ----
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.iml
+.idea/
+**/android/.gradle/
+**/android/local.properties
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+debug-info/
+
+# ---- Firebase ----
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# ---- OS / editors ----
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
