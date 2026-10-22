@@ -572,7 +572,7 @@ class _ActionDispatchBottomSheetState
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        padding: const EdgeInsets.fromLTRB(22, 18, 22, 32),
         decoration: const BoxDecoration(
           color: ArogyaTheme.surfaceWhite,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -592,7 +592,7 @@ class _ActionDispatchBottomSheetState
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Container(
@@ -608,7 +608,7 @@ class _ActionDispatchBottomSheetState
                       color: ArogyaTheme.primaryCrimson,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -619,10 +619,11 @@ class _ActionDispatchBottomSheetState
                               : 'Send Emergency Outbreak Alert',
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
+                        const SizedBox(height: 3),
                         Text(
                           isVan
-                              ? 'Assigns nearest available unit via Google Maps Routes API v2 & 4_Van_Requests Sheet'
-                              : 'Notifies Village Officer & District CMO via Gmail TLS & 5_Alert_Logs Sheet',
+                              ? 'Assigns nearest available municipal vector control unit'
+                              : 'Notifies Village Health Officer and District CMO',
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: ArogyaTheme.slateMuted,
@@ -634,7 +635,7 @@ class _ActionDispatchBottomSheetState
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               if (_dispatchResult != null) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -660,8 +661,8 @@ class _ActionDispatchBottomSheetState
                           Expanded(
                             child: Text(
                               isVan
-                                  ? 'Van Assigned & Logged to 4_Van_Requests!'
-                                  : 'Emergency Alert Sent & Logged to 5_Alert_Logs!',
+                                  ? 'Van Assigned & Dispatched!'
+                                  : 'Emergency Outbreak Alert Sent!',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: ArogyaTheme.triageEmeraldText,
@@ -682,45 +683,52 @@ class _ActionDispatchBottomSheetState
                       ] else if (!isVan &&
                           _dispatchResult!['notified'] is Map) ...[
                         Text(
-                          'Emailed To: ${(_dispatchResult!['notified'] as Map)['village_officer_email']}',
+                          'Notified: ${(_dispatchResult!['notified'] as Map)['village_officer_email']}',
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          'District CMO CC: ${(_dispatchResult!['notified'] as Map)['district_rep_name']}',
+                          'District CMO: ${(_dispatchResult!['notified'] as Map)['district_rep_name']}',
                         ),
                       ],
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(_dispatchResult),
                   child: const Text('Done'),
                 ),
               ] else ...[
                 Text(
-                  'WARD / VILLAGE (FROM 3_STAFF_DIRECTORY)',
+                  'WARD / VILLAGE',
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedWard,
+                  isExpanded: true,
                   items: _wardOptions
                       .map(
-                        (w) =>
-                            DropdownMenuItem<String>(value: w, child: Text(w)),
+                        (w) => DropdownMenuItem<String>(
+                          value: w,
+                          child: Text(
+                            w,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
                       )
                       .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _selectedWard = val);
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Text(
-                  'TARGET GPS PIN SELECTOR',
+                  'TARGET GPS LOCATION',
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -758,12 +766,12 @@ class _ActionDispatchBottomSheetState
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Text(
-                  'FIELD SEVERITY & HABITAT NOTES',
+                  'FIELD NOTES & OBSERVATIONS',
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 TextField(
                   controller: _notesController,
                   maxLines: 2,
@@ -772,7 +780,7 @@ class _ActionDispatchBottomSheetState
                         'Describe positive containers or outbreak cluster...',
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 22),
                 ElevatedButton.icon(
                   onPressed: _submitting ? null : _submitDispatch,
                   icon: _submitting
@@ -791,10 +799,10 @@ class _ActionDispatchBottomSheetState
                         ),
                   label: Text(
                     _submitting
-                        ? 'Dispatching via Google Sheets & Routes API...'
+                        ? 'Dispatching request...'
                         : (isVan
                               ? 'Confirm & Dispatch Nearest Van'
-                              : 'Send Immediate Alert Email'),
+                              : 'Send Immediate Alert'),
                   ),
                 ),
               ],

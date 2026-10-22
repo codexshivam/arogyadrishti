@@ -247,11 +247,29 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF0F172A),
                           ),
+                          selectedItemBuilder: (context) {
+                            return _availableWards.map((w) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  w['ward_name'].toString(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                              );
+                            }).toList();
+                          },
                           items: _availableWards.map((w) {
                             return DropdownMenuItem<String>(
                               value: w['lgd_code'].toString(),
                               child: Text(
                                 w['ward_name'].toString(),
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             );
@@ -933,26 +951,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                               ),
                             ),
                             const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Recommended Epidemiological Interventions',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF0F172A),
-                                  ),
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  'Automated response protocol based on ${xLabels.isNotEmpty ? xLabels.last : 'W35'} indices',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0xFF64748B),
-                                  ),
-                                ),
-                              ],
+                            const Text(
+                              'Recommended Action',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0F172A),
+                              ),
                             ),
                           ],
                         ),

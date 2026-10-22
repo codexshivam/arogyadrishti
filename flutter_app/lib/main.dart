@@ -37,10 +37,12 @@ Future<void> main() async {
     // Initialize Firebase App Check for Android Play Integrity & debug provider
     if (!kIsWeb) {
       await FirebaseAppCheck.instance.activate(
-        androidProvider:
-            kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-        appleProvider:
-            kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+        androidProvider: kDebugMode
+            ? AndroidProvider.debug
+            : AndroidProvider.playIntegrity,
+        appleProvider: kDebugMode
+            ? AppleProvider.debug
+            : AppleProvider.deviceCheck,
       );
     }
     await FirestoreSyncService.configureOfflinePersistence(
@@ -138,26 +140,11 @@ final GoRouter arogyaRouter = GoRouter(
         documentType: 'terms',
       ),
     ),
-    GoRoute(
-      path: '/auth',
-      builder: (context, state) => const AuthScreen(),
-    ),
-    GoRoute(
-      path: '/home',
-      builder: (context, state) => const HomeScreen(),
-    ),
-    GoRoute(
-      path: '/chat',
-      builder: (context, state) => const ChatScreen(),
-    ),
-    GoRoute(
-      path: '/stats',
-      builder: (context, state) => const StatsScreen(),
-    ),
-    GoRoute(
-      path: '/map',
-      builder: (context, state) => const MapScreen(),
-    ),
+    GoRoute(path: '/auth', builder: (context, state) => const AuthScreen()),
+    GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+    GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
+    GoRoute(path: '/stats', builder: (context, state) => const StatsScreen()),
+    GoRoute(path: '/map', builder: (context, state) => const MapScreen()),
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
@@ -170,14 +157,8 @@ final GoRouter arogyaRouter = GoRouter(
       path: '/centers',
       builder: (context, state) => const CentersScreen(),
     ),
-    GoRoute(
-      path: '/vans',
-      builder: (context, state) => const VansScreen(),
-    ),
-    GoRoute(
-      path: '/scan',
-      builder: (context, state) => const ScanScreen(),
-    ),
+    GoRoute(path: '/vans', builder: (context, state) => const VansScreen()),
+    GoRoute(path: '/scan', builder: (context, state) => const ScanScreen()),
   ],
 );
 
@@ -217,11 +198,7 @@ class _ArogyaDrishtiAppState extends ConsumerState<ArogyaDrishtiApp> {
                 final last10 = rawPhone.length >= 10
                     ? rawPhone.substring(rawPhone.length - 10)
                     : rawPhone;
-                final candidateKeys = [
-                  'officer_$last10',
-                  '+91$last10',
-                  last10,
-                ];
+                final candidateKeys = ['officer_$last10', '+91$last10', last10];
                 for (final k in candidateKeys) {
                   final altSnap = await FirebaseFirestore.instance
                       .collection('users')
@@ -240,12 +217,17 @@ class _ArogyaDrishtiAppState extends ConsumerState<ArogyaDrishtiApp> {
               }
             } catch (_) {}
 
-            ref.read(activeWardProvider.notifier).setOfficerSession(
+            ref
+                .read(activeWardProvider.notifier)
+                .setOfficerSession(
                   uid: user.uid,
-                  name: (profile['name'] ?? user.displayName ?? 'Field Officer').toString(),
-                  phone: (profile['phone'] ?? user.phoneNumber ?? '').toString(),
+                  name: (profile['name'] ?? user.displayName ?? 'Field Officer')
+                      .toString(),
+                  phone: (profile['phone'] ?? user.phoneNumber ?? '')
+                      .toString(),
                   email: (profile['email'] ?? user.email ?? '').toString(),
-                  lgdCode: (profile['assigned_lgd_code'] ?? '0404400017').toString(),
+                  lgdCode: (profile['assigned_lgd_code'] ?? '0404400017')
+                      .toString(),
                   wardName: profile['ward_village'] != null
                       ? '${profile['ward_village']}, ${profile['district'] ?? ''}'
                       : 'Sector 22-B, Chandigarh',
@@ -269,7 +251,7 @@ class _ArogyaDrishtiAppState extends ConsumerState<ArogyaDrishtiApp> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: ArogyaTheme.whiteSystemUiOverlay,
       child: MaterialApp.router(
-        title: 'Arogya — Arogya Drishti Vector Surveillance DPI',
+        title: 'Arogya Drishti',
         debugShowCheckedModeBanner: false,
         theme: ArogyaTheme.lightTheme(),
         routerConfig: arogyaRouter,

@@ -71,6 +71,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _selectedWardLgd = '0404400014';
   String _selectedWardName = 'Ward 14 – Dhanas';
   String _selectedTreatment = 'Temephos 50% EC Applied';
+  String _searchFilter = '';
 
   bool _locating = false;
   bool _savingLog = false;
@@ -239,13 +240,200 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void _openAccountDetailsSheet(Map<String, dynamic> currentProfile) {
+    final uid = _getEffectiveUid();
+    final wardState = ref.read(activeWardProvider);
+    final nameCtrl = TextEditingController(
+      text: currentProfile['name']?.toString() ??
+          (wardState.officerName.isNotEmpty ? wardState.officerName : 'Shivam Yadav'),
+    );
+    final emailCtrl = TextEditingController(
+      text: currentProfile['email']?.toString() ??
+          (wardState.officerEmail.isNotEmpty ? wardState.officerEmail : 'academyxshivam@gmail.com'),
+    );
+    final phoneCtrl = TextEditingController(
+      text: currentProfile['phone']?.toString() ??
+          (wardState.officerPhone.isNotEmpty ? wardState.officerPhone : '+91 99155 49458'),
+    );
+    final wardCtrl = TextEditingController(
+      text: currentProfile['assigned_ward']?.toString() ?? _selectedWardName,
+    );
+    bool saving = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            return Container(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Update Account Details',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          icon: const Icon(Icons.close_rounded, size: 20),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: nameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Full Name',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.person_outline_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Government Email',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.mail_outline_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: 'Mobile Number',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.phone_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: wardCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Assigned Ward / Jurisdiction',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.location_city_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF8B0000),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: saving
+                            ? null
+                            : () async {
+                                setSheetState(() => saving = true);
+                                final newName = nameCtrl.text.trim();
+                                final newEmail = emailCtrl.text.trim();
+                                final newPhone = phoneCtrl.text.trim();
+                                final newWard = wardCtrl.text.trim();
+                                final initial =
+                                    newName.isNotEmpty ? newName[0].toUpperCase() : 'S';
+
+                                final updatePayload = {
+                                  'name': newName,
+                                  'email': newEmail,
+                                  'phone': newPhone,
+                                  'assigned_ward': newWard,
+                                  'avatar_initials': initial,
+                                  'updated_at': FieldValue.serverTimestamp(),
+                                };
+
+                                try {
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(uid)
+                                      .set(updatePayload, SetOptions(merge: true));
+
+                                  await ref
+                                      .read(apiClientProvider)
+                                      .updateUserProfile(uid, {
+                                    'name': newName,
+                                    'email': newEmail,
+                                    'phone': newPhone,
+                                    'assigned_ward': newWard,
+                                  });
+
+                                  if (ctx.mounted) {
+                                    Navigator.of(ctx).pop();
+                                  }
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Account details updated successfully'),
+                                      ),
+                                    );
+                                  }
+                                } catch (_) {
+                                  setSheetState(() => saving = false);
+                                }
+                              },
+                        child: saving
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Save Details',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _handleLogout() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Confirm Logout'),
         content: const Text(
-          'Are you sure you want to end your active officer surveillance session?',
+          'Are you sure you want to log out?',
         ),
         actions: [
           TextButton(
@@ -392,7 +580,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         wardState.officerPhone;
                     final assignedJurisdiction =
                         userData['assigned_ward']?.toString() ??
-                            'Arogya Drishti | Chandigarh';
+                            'Chandigarh UT';
 
                     return Container(
                       width: double.infinity,
@@ -465,7 +653,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  onPressed: () => context.push('/settings'),
+                                  onPressed: () => _openAccountDetailsSheet(userData),
                                   child: const Text(
                                     'Account Settings',
                                     style: TextStyle(
@@ -537,7 +725,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              'Location: Arogya Drishti, $_selectedWardName',
+                              'Location: $_selectedWardName',
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -556,10 +744,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               height: 42,
                               child: TextField(
                                 controller: _searchController,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _searchFilter = val;
+                                  });
+                                },
                                 onSubmitted: (val) {
                                   if (val.trim().isNotEmpty) {
                                     setState(() {
                                       _selectedWardName = val.trim();
+                                      _searchFilter = '';
                                     });
                                     ref.read(homeViewModelProvider.notifier)
                                         .setSearchQuery(val.trim());
@@ -571,6 +765,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     size: 18,
                                     color: Color(0xFF64748B),
                                   ),
+                                  suffixIcon: _searchFilter.isNotEmpty
+                                      ? IconButton(
+                                          icon: const Icon(
+                                            Icons.close_rounded,
+                                            size: 16,
+                                            color: Color(0xFF64748B),
+                                          ),
+                                          onPressed: () {
+                                            _searchController.clear();
+                                            setState(() => _searchFilter = '');
+                                          },
+                                        )
+                                      : null,
                                   hintText:
                                       'Search city, sector, or ward...',
                                   hintStyle: const TextStyle(
@@ -644,6 +851,108 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ],
                       ),
+                      if (_searchFilter.trim().isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 220),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x140F172A),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Builder(
+                              builder: (context) {
+                                final query = _searchFilter.trim().toLowerCase();
+                                final matches = _availableWards.where((w) {
+                                  final name = (w['ward_name'] ?? '').toString().toLowerCase();
+                                  final lgd = (w['lgd_code'] ?? '').toString();
+                                  return name.contains(query) || lgd.contains(query);
+                                }).toList();
+
+                                if (matches.isEmpty) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Center(
+                                      child: Text(
+                                        'No locations found for "$_searchFilter"',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return ListView.separated(
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.zero,
+                                  itemCount: matches.length,
+                                  separatorBuilder: (_, _) => const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                                  itemBuilder: (context, idx) {
+                                    final match = matches[idx];
+                                    final wardName = match['ward_name']?.toString() ?? '';
+                                    final lgd = match['lgd_code']?.toString() ?? '';
+                                    final lat = (match['lat'] as num?)?.toDouble() ?? 30.7333;
+                                    final lng = (match['lng'] as num?)?.toDouble() ?? 76.7794;
+
+                                    return ListTile(
+                                      dense: true,
+                                      visualDensity: VisualDensity.compact,
+                                      leading: const Icon(
+                                        Icons.location_on_outlined,
+                                        size: 18,
+                                        color: Color(0xFF8B0000),
+                                      ),
+                                      title: Text(
+                                        wardName,
+                                        style: const TextStyle(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF0F172A),
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        'LGD: $lgd',
+                                        style: const TextStyle(
+                                          fontSize: 10.5,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedWardLgd = lgd;
+                                          _selectedWardName = wardName;
+                                          _searchFilter = '';
+                                          _searchController.clear();
+                                        });
+                                        ref.read(activeWardProvider.notifier).updateWard(
+                                          lgdCode: lgd,
+                                          wardName: wardName,
+                                          district: 'Chandigarh',
+                                          latitude: lat,
+                                          longitude: lng,
+                                        );
+                                        ref.read(homeViewModelProvider.notifier).setSearchQuery(wardName);
+                                        FocusScope.of(context).unfocus();
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

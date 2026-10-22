@@ -13,6 +13,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/arogya_shared_widgets.dart';
 
 /// AI Vector Scan Screen: Core computer vision and micro-climate diagnostic interface.
 /// Combines PaliGemma/Gemma Vision bounding boxes, live Google Earth Engine satellite telemetry,
@@ -24,7 +25,7 @@ class ScanScreen extends ConsumerStatefulWidget {
   ConsumerState<ScanScreen> createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProviderStateMixin {
+class _ScanScreenState extends ConsumerState<ScanScreen> {
   static const Color _crimson = Color(0xFF8B0000);
   static const Color _background = Color(0xFFF8FAFC);
 
@@ -42,20 +43,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
   double _currentLng = 76.7794;
 
   Map<String, dynamic>? _scanResult;
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 0.2, end: 0.9).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
     final active = ref.read(activeWardProvider);
     if (active.lgdCode.isNotEmpty) {
       _selectedWardLgd = active.lgdCode;
@@ -71,7 +62,6 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
 
   @override
   void dispose() {
-    _pulseController.dispose();
     super.dispose();
   }
 
@@ -134,17 +124,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
               'box_2d': [460, 420, 610, 580],
             },
           ],
-          'assigned_van': {
-            'van_id': 'VAN-04',
-            'vehicle_no': 'CH-01-GA-3412',
-            'driver_phone': '+91 98150 22001',
-            'eta_minutes': 14,
-            'distance_km': 2.4,
-            'status_label': 'Dispatched',
-            'ticket_id': '#VEC-9812',
-            'status_badge': 'In Progress',
-          },
-          'alert_message_id': '#VEC-9812',
+          'assigned_van': null,
+          'alert_message_id': null,
         };
       });
     }
@@ -202,8 +183,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
       );
 
       if (!mounted) return;
+      final cleanResult = Map<String, dynamic>.from(result);
+      cleanResult.remove('assigned_van');
       setState(() {
-        _scanResult = result;
+        _scanResult = cleanResult;
         _scanning = false;
       });
 
@@ -222,6 +205,37 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
     }
   }
 
+  void _openVanDispatchModal() async {
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ActionDispatchBottomSheet(
+        actionType: 'REQUEST_VAN',
+        initialWard: _selectedWardName,
+        initialLat: _currentLat,
+        initialLng: _currentLng,
+      ),
+    );
+    if (result != null && mounted) {
+      setState(() {
+        if (_scanResult != null) {
+          _scanResult!['assigned_van'] = result['van_details'] ?? {
+            'van_id': 'VAN-04',
+            'vehicle_no': 'CH-01-GA-3412',
+            'driver_phone': '+91 98150 22001',
+            'eta_minutes': 14,
+            'distance_km': 2.4,
+            'status_label': 'Dispatched',
+            'ticket_id': '#VEC-9812',
+            'status_badge': 'In Progress',
+          };
+          _scanResult!['alert_message_id'] = '#VEC-9812';
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -231,16 +245,23 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
         title: const Text(
           'AI Vector Scan',
           style: TextStyle(
-            color: Colors.white,
+            color: ArogyaTheme.slateHeading,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: _crimson,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: ArogyaTheme.slateHeading,
+        iconTheme: const IconThemeData(color: ArogyaTheme.slateHeading),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, color: Color(0xFFE2E8F0)),
+        ),
         leading: IconButton(
           tooltip: 'Back',
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_rounded, color: ArogyaTheme.slateHeading),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -280,12 +301,90 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
                     _buildMicroClimateGrid(),
                     const SizedBox(height: 16),
 
-                    // Card 4: Request For Van / Dispatch Status Timeline Card
-                    _buildVanDispatchTimelineCard(),
-                    const SizedBox(height: 18),
+                    if (_scanResult?['assigned_van'] != null) ...[
+                      // Card 4: Request For Van / Dispatch Status Timeline Card
+                      _buildVanDispatchTimelineCard(),
+                      const SizedBox(height: 18),
 
-                    // Bottom Action Banner: Crimson Button
-                    _buildBottomActionBanner(),
+                      // Bottom Action Banner: Crimson Button
+                      _buildBottomActionBanner(),
+                    ] else ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFEBEE),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.local_shipping_rounded,
+                                    color: _crimson,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Municipal Fogging Unit',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 14,
+                                          color: Color(0xFF0F172A),
+                                        ),
+                                      ),
+                                      Text(
+                                        'On-demand vector control dispatch',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 46,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _crimson,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: _openVanDispatchModal,
+                                icon: const Icon(Icons.send_rounded, size: 18),
+                                label: const Text(
+                                  'Request Fogging Van',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                   ],
                 ],
@@ -337,62 +436,12 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
                 else
                   _buildSyntheticViewfinder(),
 
-                // CustomPainter Overlay: Real-time bounding boxes
-                CustomPaint(
-                  painter: _BoundingBoxPainter(
-                    detections: detections,
-                    zoom: _zoomLevel,
-                  ),
-                ),
-
-                // Top Floating HUD
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.65),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white24),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF10B981),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Privacy Protected • AI Vector Diagnostic',
-                          style: GoogleFonts.ibmPlexMono(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Flash Indicator
-                if (_flashOn)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withValues(alpha: 0.8),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.flash_on_rounded, size: 14, color: Colors.black),
+                // CustomPainter Overlay: Real-time bounding boxes (only when detections exist)
+                if (detections.isNotEmpty)
+                  CustomPaint(
+                    painter: _BoundingBoxPainter(
+                      detections: detections,
+                      zoom: _zoomLevel,
                     ),
                   ),
               ],
@@ -506,68 +555,22 @@ class _ScanScreenState extends ConsumerState<ScanScreen> with SingleTickerProvid
   Widget _buildSyntheticViewfinder() {
     return Container(
       color: const Color(0xFF0F172A),
-      child: Stack(
-        alignment: Alignment.center,
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Subtle grid pattern
-          AnimatedBuilder(
-            animation: _pulseAnimation,
-            builder: (context, child) {
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      const Color(0xFF1E293B).withValues(alpha: _pulseAnimation.value),
-                      const Color(0xFF0F172A),
-                    ],
-                    radius: 0.8,
-                  ),
-                ),
-              );
-            },
+          Icon(
+            Icons.camera_alt_outlined,
+            size: 44,
+            color: Colors.white.withValues(alpha: 0.35),
           ),
-
-          // Central targeting brackets
-          Container(
-            width: 180,
-            height: 180,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white24, width: 1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Stack(
-              children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Icon(Icons.crop_free_rounded, size: 36, color: Colors.white60),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Icon(Icons.crop_free_rounded, size: 36, color: Colors.white60),
-                ),
-              ],
-            ),
-          ),
-
-          // Instructional Text
-          Positioned(
-            bottom: 24,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Text(
-                'Point camera at container, tire, or stagnant water',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+          const SizedBox(height: 10),
+          Text(
+            'Point camera or upload image to scan',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.65),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

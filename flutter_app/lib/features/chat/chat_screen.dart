@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -219,48 +220,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         top: false,
         child: Column(
           children: [
-            // Dynamic Active Ward Context Strip
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF1F5F9),
-                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF16A34A),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'AI Copilot Live • Context: ${wardState.wardName} (${wardState.lgdCode})',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF475569),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const Text(
-                    'NCVBDC Assistant',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: _crimson,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             // Message Stream List
             Expanded(
               child: ListView.separated(
@@ -291,12 +250,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              (msg['text'] ?? '').toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13.5,
-                                height: 1.4,
+                            MarkdownBody(
+                              data: (msg['text'] ?? '').toString(),
+                              selectable: true,
+                              styleSheet: MarkdownStyleSheet(
+                                p: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.5,
+                                  height: 1.4,
+                                ),
+                                strong: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                listBullet: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.5,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -377,12 +347,29 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            SelectableText(
-                              (msg['text'] ?? '').toString(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF1E293B),
-                                height: 1.45,
+                            MarkdownBody(
+                              data: (msg['text'] ?? '').toString(),
+                              selectable: true,
+                              styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                                p: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF1E293B),
+                                  height: 1.45,
+                                ),
+                                strong: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0F172A),
+                                ),
+                                listBullet: const TextStyle(
+                                  color: _crimson,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                code: const TextStyle(
+                                  backgroundColor: Color(0xFFF1F5F9),
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ],

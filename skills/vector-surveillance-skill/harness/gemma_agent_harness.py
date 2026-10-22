@@ -239,9 +239,9 @@ class GemmaAgentHarness:
             f"{self.skill_markdown}\n\n"
             "Live tool execution outputs for this turn:\n"
             f"{tool_context_json}\n\n"
-            "Respond concisely in the same language as the officer (English, Hindi/Hinglish, or Punjabi) "
-            "with exact NCVBDC chemical dosages (e.g. Temephos 50% EC @ 1 ppm = 1 ml per 1,000 L, "
-            "Bti 5–10 g/m², Pyrethrum 2% 1:19 dilution) and cite the live indices/satellite telemetry above."
+            "IMPORTANT: Keep your reply SHORT, CONCISE, and direct (maximum 50-60 words or 2-3 bullet points). Do NOT output long essays. "
+            "Respond in the same language as the officer (English, Hindi/Hinglish, or Punjabi). "
+            "Cite only key live indices (BI/CI) and the essential field action/chemical dosage (Temephos 50% EC @ 1 ml/1,000 L, Bti @ 5–10 g/m²)."
         )
 
         settings = self.executor.settings
@@ -359,29 +359,17 @@ class GemmaAgentHarness:
 
         if lang in ("hi", "hi-Latn"):
             base = (
-                f"**{ward_village} — NCVBDC तत्काल प्रोटोकॉल (Actionable Field Protocol):**\n"
-                f"• **लाइव सूचकांक (Live Indices):** Breteau Index (BI) = **{bi}**, Container Index (CI) = **{ci}%**, House Index (HI) = **{hi}%** (WHO महामारी सीमा BI > 20 से ऊपर)।\n"
-                f"• **1. भौतिक स्रोत उन्मूलन (Physical Source Reduction):** ठहरे हुए पानी को तुरंत खाली करें; टायरों में छेद करें या छत के नीचे रखें।\n"
-                f"• **2. रासायनिक लार्वासाइड (Temephos 50% EC & Bti):** कूलर और ओवरहेड टैंकों में **Temephos 50% EC @ 1 ppm (प्रति 1,000 लीटर पानी में 1 ml)** डालें, या नालियों/गड्ढों में **Bti Granules @ 5–10 g प्रति वर्ग मीटर (m²)** का छिड़काव करें।\n"
-                f"• **3. 100m परिधि फॉगिंग (Perimeter Surveillance):** 24 घंटे के भीतर **Pyrethrum 2% Extract (1:19 केरोसिन अनुपात)** से थर्मल/ULV फॉगिंग करें।"
+                f"**{ward_village} तत्काल प्रोटोकॉल:**\n"
+                f"• **लाइव सूचकांक:** BI = **{bi}**, CI = **{ci}%**, HI = **{hi}%**।\n"
+                f"• **कार्रवाई:** पानी खाली करें। कूलर/टैंक में **Temephos 50% EC (1 ml/1,000 L)** या नालियों में **Bti (5–10 g/m²)** डालें।"
             )
         else:
-            climate_line = (
-                f" Satellite LST is **{lst}°C** with **{rain} mm** 14-day rainfall."
-                if lst is not None
-                else ""
-            )
-            van_line = (
-                f"\n• **Fogging Van Dispatched:** Vehicle **{van_metrics.get('vehicle_no')}** (Driver: {van_metrics.get('driver_name')}) is en route — ETA **{van_metrics.get('eta_minutes')} mins** ({van_metrics.get('distance_km')} km)."
-                if van_metrics
-                else ""
-            )
+            climate_line = f" LST: **{lst}°C**." if lst is not None else ""
+            van_line = f" Van **{van_metrics.get('vehicle_no')}** en route (ETA {van_metrics.get('eta_minutes')}m)." if van_metrics else ""
             base = (
-                f"**Actionable Field Protocol — {ward_village}:**\n"
-                f"• **Live Surveillance Telemetry:** Container Index (CI) is **{ci}%**, Breteau Index (BI) is **{bi}** (exceeds WHO/NCVBDC critical threshold of 20), and House Index (HI) is **{hi}%**.{climate_line}\n"
-                f"• **1. Physical Source Reduction:** Drain stagnant water immediately; puncture, slash, or store discarded tires under a covered shed within 24 hours.\n"
-                f"• **2. Chemical Larvicidal Treatment:** Apply **Temephos 50% EC @ 1 ppm (1 ml per 1,000 L)** in overhead tanks/coolers or **Bti Granules (5–10 g per m² water surface area)** in open drains.\n"
-                f"• **3. 100m Perimeter Surveillance:** Schedule **Pyrethrum 2% ULV thermal fogging (1:19 kerosene dilution)** across adjacent residential blocks within 24 hours.{van_line}"
+                f"**Action Protocol — {ward_village}:**\n"
+                f"• **Live Indices:** BI = **{bi}**, CI = **{ci}%**, HI = **{hi}%**.{climate_line}\n"
+                f"• **Field Action:** Drain standing water. Apply **Temephos 50% EC @ 1 ml/1,000 L** (tanks/coolers) or **Bti @ 5–10 g/m²** (drains).{van_line}"
             )
         return base
 

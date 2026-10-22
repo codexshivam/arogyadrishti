@@ -39,7 +39,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Confirm Logout'),
         content: const Text(
-          'Are you sure you want to end your active officer surveillance session?',
+          'Are you sure you want to log out?',
         ),
         actions: [
           TextButton(
@@ -99,11 +99,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void _openEditProfileSheet(Map<String, dynamic> currentProfile) {
     final uid = _getEffectiveUid();
+    final wardState = ref.read(activeWardProvider);
     final nameCtrl = TextEditingController(
-      text: currentProfile['name']?.toString() ?? 'Shivam Yadav',
+      text: currentProfile['name']?.toString() ??
+          (wardState.officerName.isNotEmpty ? wardState.officerName : 'Shivam Yadav'),
     );
     final emailCtrl = TextEditingController(
-      text: currentProfile['email']?.toString() ?? 'academyxshivam@gmail.com',
+      text: currentProfile['email']?.toString() ??
+          (wardState.officerEmail.isNotEmpty ? wardState.officerEmail : 'academyxshivam@gmail.com'),
+    );
+    final phoneCtrl = TextEditingController(
+      text: currentProfile['phone']?.toString() ??
+          (wardState.officerPhone.isNotEmpty ? wardState.officerPhone : '+91 99155 49458'),
+    );
+    final wardCtrl = TextEditingController(
+      text: currentProfile['assigned_ward']?.toString() ?? wardState.wardName,
     );
     bool saving = false;
 
@@ -125,118 +135,147 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Edit Officer Profile',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF0F172A),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Update Account Details',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0F172A),
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        icon: const Icon(Icons.close_rounded, size: 20),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: nameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Full Name',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person_outline_rounded),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Government Email',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.mail_outline_rounded),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B0000),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        IconButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          icon: const Icon(Icons.close_rounded, size: 20),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: nameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Full Name',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.person_outline_rounded),
                       ),
-                      onPressed: saving
-                          ? null
-                          : () async {
-                              setSheetState(() => saving = true);
-                              final newName = nameCtrl.text.trim();
-                              final newEmail = emailCtrl.text.trim();
-                              final initial =
-                                  newName.isNotEmpty ? newName[0].toUpperCase() : 'S';
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Government Email',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.mail_outline_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: 'Mobile Number',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.phone_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: wardCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Assigned Ward / Jurisdiction',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.location_city_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF8B0000),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: saving
+                            ? null
+                            : () async {
+                                setSheetState(() => saving = true);
+                                final newName = nameCtrl.text.trim();
+                                final newEmail = emailCtrl.text.trim();
+                                final newPhone = phoneCtrl.text.trim();
+                                final newWard = wardCtrl.text.trim();
+                                final initial =
+                                    newName.isNotEmpty ? newName[0].toUpperCase() : 'S';
 
-                              final updatePayload = {
-                                'name': newName,
-                                'email': newEmail,
-                                'avatar_initials': initial,
-                                'updated_at': FieldValue.serverTimestamp(),
-                              };
-
-                              try {
-                                await FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(uid)
-                                    .set(updatePayload, SetOptions(merge: true));
-
-                                await ref
-                                    .read(apiClientProvider)
-                                    .updateUserProfile(uid, {
+                                final updatePayload = {
                                   'name': newName,
                                   'email': newEmail,
-                                });
+                                  'phone': newPhone,
+                                  'assigned_ward': newWard,
+                                  'avatar_initials': initial,
+                                  'updated_at': FieldValue.serverTimestamp(),
+                                };
 
-                                if (ctx.mounted) {
-                                  Navigator.of(ctx).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Profile updated successfully'),
-                                    ),
-                                  );
+                                try {
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(uid)
+                                      .set(updatePayload, SetOptions(merge: true));
+
+                                  await ref
+                                      .read(apiClientProvider)
+                                      .updateUserProfile(uid, {
+                                    'name': newName,
+                                    'email': newEmail,
+                                    'phone': newPhone,
+                                    'assigned_ward': newWard,
+                                  });
+
+                                  if (ctx.mounted) {
+                                    Navigator.of(ctx).pop();
+                                  }
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Account details updated successfully'),
+                                      ),
+                                    );
+                                  }
+                                } catch (_) {
+                                  setSheetState(() => saving = false);
                                 }
-                              } catch (_) {
-                                setSheetState(() => saving = false);
-                              }
-                            },
-                      child: saving
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+                              },
+                        child: saving
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Save Details',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                            )
-                          : const Text(
-                              'Save Changes',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -406,21 +445,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Container(
-                              width: 34,
-                              height: 34,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
+                            TextButton.icon(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFF8B0000),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
-                              child: IconButton(
-                                padding: EdgeInsets.zero,
-                                iconSize: 18,
-                                icon: const Icon(
-                                  Icons.edit_outlined,
-                                  color: Color(0xFF8B0000),
-                                ),
-                                onPressed: () => _openEditProfileSheet(userData),
+                              onPressed: () => _openEditProfileSheet(userData),
+                              icon: const Icon(Icons.edit_outlined, size: 14),
+                              label: const Text(
+                                'Account Settings',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                               ),
                             ),
                           ],

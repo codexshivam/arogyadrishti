@@ -371,16 +371,23 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         title: const Text(
           'Support & Escalations',
           style: TextStyle(
-            color: Colors.white,
+            color: ArogyaTheme.slateHeading,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: _crimson,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: ArogyaTheme.slateHeading,
+        iconTheme: const IconThemeData(color: ArogyaTheme.slateHeading),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, color: Color(0xFFE2E8F0)),
+        ),
         leading: IconButton(
           tooltip: 'Back',
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_rounded, color: ArogyaTheme.slateHeading),
           onPressed: () {
             if (context.canPop()) {
               context.pop();

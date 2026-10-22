@@ -107,25 +107,31 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
       backgroundColor: ArogyaTheme.backgroundCanvas,
       appBar: AppBar(
         systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
-        backgroundColor: ArogyaTheme.primaryCrimson,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: ArogyaTheme.slateHeading,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, color: Color(0xFFE2E8F0)),
+        ),
         title: Text(
           widget.title,
           style: GoogleFonts.plusJakartaSans(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: ArogyaTheme.slateHeading,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+            icon: const Icon(Icons.refresh_rounded, color: ArogyaTheme.slateHeading),
             tooltip: 'Reload Document',
             onPressed: _loadDocument,
           ),
           IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.white),
+            icon: const Icon(Icons.share_outlined, color: ArogyaTheme.slateHeading),
             tooltip: 'Share Document',
             onPressed: _shareDocument,
           ),
