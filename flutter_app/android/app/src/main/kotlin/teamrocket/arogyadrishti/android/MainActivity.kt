@@ -1,4 +1,4 @@
-package `in`.teamrocket.arogya_drishti
+package teamrocket.arogyadrishti.android
 
 import io.flutter.embedding.android.FlutterActivity
 

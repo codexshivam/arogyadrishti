@@ -37,7 +37,16 @@ class ArogyaTopShellBar extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const SizedBox(width: 48),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/logo/arogya_logo.png',
+                  width: 34,
+                  height: 34,
+                  errorBuilder: (_, _, _) => const SizedBox(width: 34),
+                ),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   children: [

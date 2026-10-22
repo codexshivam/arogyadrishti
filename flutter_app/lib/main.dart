@@ -10,6 +10,7 @@ import 'features/centers/centers_screen.dart';
 import 'features/chat/chat_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/map/map_screen.dart';
+import 'features/privacy/privacy_policy_screen.dart';
 import 'features/scan/scan_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/stats/stats_screen.dart';
@@ -30,8 +31,12 @@ Future<void> main() async {
 }
 
 final GoRouter arogyaRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/auth',
   routes: [
+    GoRoute(
+      path: '/privacy',
+      builder: (context, state) => const PrivacyPolicyScreen(),
+    ),
     GoRoute(
       path: '/auth',
       builder: (context, state) => const AuthScreen(),
@@ -81,7 +86,7 @@ class ArogyaDrishtiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Arogya Drishti — NCVBDC Vector Surveillance DPI',
+      title: 'Arogya — Arogya Drishti Vector Surveillance DPI',
       debugShowCheckedModeBanner: false,
       theme: ArogyaTheme.lightTheme(),
       routerConfig: arogyaRouter,

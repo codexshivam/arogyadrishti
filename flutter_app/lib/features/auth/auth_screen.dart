@@ -152,18 +152,84 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Officer Sign In',
-                    style: Theme.of(context).textTheme.displaySmall,
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/logo/arogya_logo.png',
+                          width: 54,
+                          height: 54,
+                          errorBuilder: (_, _, _) => const Icon(
+                            Icons.health_and_safety_rounded,
+                            size: 48,
+                            color: ArogyaTheme.primaryCrimson,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Officer Sign In',
+                              style: Theme.of(context).textTheme.displaySmall,
+                            ),
+                            Text(
+                              'Arogya • teamrocket.arogyadrishti.android',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: ArogyaTheme.primaryCrimson,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
                     'Access restricted to verified field epidemiologists, sanitary inspectors, and district health nodal teams.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: ArogyaTheme.slateMuted,
                         ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: ArogyaTheme.surfaceWhite,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: ArogyaTheme.borderHairline),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.privacy_tip_outlined,
+                          color: ArogyaTheme.primaryCrimson,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'Review our Privacy Policy & Phone Verification Data Terms before signing in.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => context.push('/privacy'),
+                          child: const Text(
+                            'Privacy Policy',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(20),

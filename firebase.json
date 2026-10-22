@@ -7,6 +7,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
+    "site": "teamrocketnp",
     "public": "flutter_app/build/web",
     "ignore": [
       "firebase.json",
@@ -15,11 +16,12 @@
     ],
     "rewrites": [
       {
-        "source": "/api/**",
-        "run": {
-          "serviceId": "arogya-drishti-api",
-          "region": "asia-south1"
-        }
+        "source": "/privacy",
+        "destination": "/privacy.html"
+      },
+      {
+        "source": "/privacy-policy",
+        "destination": "/privacy.html"
       },
       {
         "source": "**",
