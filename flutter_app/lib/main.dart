@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/services/firestore_sync.dart';
+import 'core/services/telemetry_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/centers/centers_screen.dart';
@@ -27,6 +28,7 @@ Future<void> main() async {
     await FirestoreSyncService.configureOfflinePersistence(
       firebaseInitialized: true,
     );
+    await ArogyaTelemetryService.initialize();
   } catch (_) {
     // Runs with FastAPI Cloud Run backend when Firebase client options are not injected on desktop tests
   }
@@ -35,6 +37,9 @@ Future<void> main() async {
 
 final GoRouter arogyaRouter = GoRouter(
   initialLocation: '/auth',
+  observers: <NavigatorObserver>[
+    ArogyaTelemetryService.createNavigationObserver(),
+  ],
   routes: [
     GoRoute(
       path: '/privacy',

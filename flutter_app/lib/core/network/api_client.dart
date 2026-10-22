@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../services/telemetry_service.dart';
+
 /// Base backend URL (defaults to Cloud Run asia-south1 or local uvicorn port 8080).
 const String kDefaultBackendBaseUrl = String.fromEnvironment(
   'AROGYA_API_BASE_URL',
@@ -83,6 +85,7 @@ class ArogyaApiClient {
         },
       ),
     );
+    _dio.interceptors.add(FirebasePerformanceAndCrashlyticsDioInterceptor());
   }
 
   final String baseUrl;
@@ -117,21 +120,38 @@ class ArogyaApiClient {
   }) async {
     final idem =
         idempotencyKey ?? 'idem-${DateTime.now().millisecondsSinceEpoch}';
-    final resp = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/dispatch-action',
-      data: <String, dynamic>{
-        'officer_uid': officerUid,
-        'action_type': actionType,
-        'ward_village': wardVillage,
-        'district_lgd': districtLgd,
-        'latitude': latitude,
-        'longitude': longitude,
-        'notes': notes,
-        'idempotency_key': idem,
+    return ArogyaTelemetryService.traceOperation(
+      'arogya_dispatch_action',
+      () async {
+        final resp = await _dio.post<Map<String, dynamic>>(
+          '/api/v1/dispatch-action',
+          data: <String, dynamic>{
+            'officer_uid': officerUid,
+            'action_type': actionType,
+            'ward_village': wardVillage,
+            'district_lgd': districtLgd,
+            'latitude': latitude,
+            'longitude': longitude,
+            'notes': notes,
+            'idempotency_key': idem,
+          },
+          options: Options(headers: <String, String>{'Idempotency-Key': idem}),
+        );
+        await ArogyaTelemetryService.logEvent(
+          'dispatch_action',
+          parameters: <String, Object>{
+            'action_type': actionType,
+            'ward_village': wardVillage,
+            'lgd_code': districtLgd,
+          },
+        );
+        return resp.data ?? <String, dynamic>{};
       },
-      options: Options(headers: <String, String>{'Idempotency-Key': idem}),
+      attributes: <String, String>{
+        'action_type': actionType,
+        'lgd_code': districtLgd,
+      },
     );
-    return resp.data ?? <String, dynamic>{};
   }
 
   Future<Map<String, dynamic>> fetchCenters({
@@ -291,11 +311,26 @@ class ArogyaApiClient {
         contentType: DioMediaType('image', 'png'),
       ),
     });
-    final resp = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/scan-breeding-site',
-      data: formData,
+    return ArogyaTelemetryService.traceOperation(
+      'arogya_scan_breeding_site',
+      () async {
+        final resp = await _dio.post<Map<String, dynamic>>(
+          '/api/v1/scan-breeding-site',
+          data: formData,
+        );
+        await ArogyaTelemetryService.logEvent(
+          'breeding_site_scanned',
+          parameters: <String, Object>{
+            'lgd_code': effectiveLgd,
+            'ward_name': wardName ?? 'Sector 22-B, Chandigarh',
+          },
+        );
+        return resp.data ?? <String, dynamic>{};
+      },
+      attributes: <String, String>{
+        'lgd_code': effectiveLgd,
+      },
     );
-    return resp.data ?? <String, dynamic>{};
   }
 
   Future<Map<String, dynamic>> submitSupportTicket({

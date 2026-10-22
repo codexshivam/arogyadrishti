@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'telemetry_service.dart';
+
 /// Selected Ward / LGD state across the app.
 class ActiveWardState {
   const ActiveWardState({
@@ -109,6 +111,18 @@ class ActiveWardNotifier extends StateNotifier<ActiveWardState> {
       lgdCode: lgdCode,
       wardName: wardName,
       isAuthenticated: true,
+    );
+    ArogyaTelemetryService.setOfficerContext(
+      officerUid: uid,
+      lgdCode: lgdCode,
+      wardName: wardName,
+    );
+    ArogyaTelemetryService.logEvent(
+      'officer_sign_in',
+      parameters: <String, Object>{
+        'lgd_code': lgdCode,
+        'ward_name': wardName,
+      },
     );
   }
 

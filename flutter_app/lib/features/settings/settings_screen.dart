@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/services/firestore_sync.dart';
+import '../../core/services/telemetry_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arogya_shared_widgets.dart';
 
@@ -267,6 +268,67 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   subtitle: const Text('Sentinel-2 NDWI & MODIS LST summaries'),
                   value: _geeWeeklyDigest,
                   onChanged: (v) => setState(() => _geeWeeklyDigest = v),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // DPDP Act 2023 Legal Disclosures
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ArogyaSpacing.surfaceLowest,
+              borderRadius: BorderRadius.circular(ArogyaSpacing.cardRadius),
+              boxShadow: ArogyaTheme.ambientElevation,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Firebase Observability & Telemetry',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const StatusPillChip(
+                      label: 'ACTIVE',
+                      color: ArogyaSpacing.riskSafe,
+                      icon: Icons.monitor_heart_rounded,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '• Firebase Analytics: Real-time GoRouter screen views & NCVBDC event tracking.\n'
+                  '• Firebase Crashlytics: Fatal & non-fatal exception reporting with ward LGD context.\n'
+                  '• Firebase Performance: Dio HTTP latency metrics & custom AI scan traces.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      await ArogyaTelemetryService.sendVerificationPulse(
+                        lgdCode: '04055001',
+                      );
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: ArogyaSpacing.riskSafe,
+                          content: Text(
+                            'Sent Analytics event, Performance trace & Crashlytics non-fatal verification pulse!',
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.bug_report_outlined),
+                    label: const Text(
+                      'Send Analytics, Performance & Crashlytics Pulse',
+                    ),
+                  ),
                 ),
               ],
             ),
