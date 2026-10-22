@@ -749,13 +749,10 @@ class DataFusionEngine:
                     comp_score = fw["composite_risk_score"]
                     gt = fw["gee_telemetry"]
 
-                    # Universal CC to academyxshivam@gmail.com
-                    cc_recipient = "academyxshivam@gmail.com"
-
                     try:
                         receipt = mailer.send_emergency_alert(
                             to_email=officer_email,
-                            cc_email=cc_recipient,
+                            cc_email=None,
                             ward_village=fw["ward_name"],
                             lat=fw["lat"],
                             lng=fw["lng"],

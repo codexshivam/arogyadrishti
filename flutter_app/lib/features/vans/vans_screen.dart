@@ -6,6 +6,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
@@ -537,11 +538,12 @@ class _VansScreenState extends ConsumerState<VansScreen> {
                 const SizedBox(height: 10),
 
                 if (_loading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF8B0000),
+                  Skeletonizer(
+                    enabled: true,
+                    child: Column(
+                      children: List.generate(
+                        3,
+                        (_) => _buildSkeletonVanCard(),
                       ),
                     ),
                   )
@@ -915,6 +917,96 @@ class _VansScreenState extends ConsumerState<VansScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonVanCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'CH-01-GA-4920',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Sector 17 Municipal Depot',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'AVAILABLE',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Driver: Rakesh Kumar',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+              ),
+              Text(
+                'ETA: 8 mins (2.4 km)',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

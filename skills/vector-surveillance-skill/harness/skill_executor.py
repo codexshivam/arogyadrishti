@@ -251,7 +251,7 @@ class SkillExecutor:
 
         receipt = get_email_alert_client().send_emergency_alert(
             to_email=contact.village_officer_email,
-            cc_email=contact.district_rep_email,
+            cc_email=None,
             ward_village=ward_village,
             lat=float(lat),
             lng=float(lng),

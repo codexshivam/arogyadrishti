@@ -8,7 +8,7 @@ import smtplib
 import uuid
 from datetime import UTC, datetime
 from email.message import EmailMessage
-from email.utils import make_msgid
+from email.utils import formataddr, make_msgid
 from functools import lru_cache
 from typing import Any
 
@@ -223,13 +223,26 @@ def build_arogya_drishti_email_html(
               </tr>
             </table>
 
-            <!-- Horizontal Satellite Telemetry Display -->
-            <div style="padding:12px 14px;background-color:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:16px;font-size:11.5px;color:#334155;line-height:1.6;">
-              <strong>Google Earth Engine Satellite Telemetry:</strong><br>
-              Land Surface Temp (MODIS LST): <strong>{lst_celsius:.1f} °C</strong> &nbsp;|&nbsp;
-              Stagnant Water (Sentinel-2 NDWI): <strong>{ndwi:.3f}</strong><br>
-              14-Day Cumulative Rain (NASA GPM): <strong>{rain_14d_mm:.1f} mm</strong> &nbsp;|&nbsp;
-              Composite Risk Score: <strong style="color:{theme['accent_color']};">{composite_score:.1f} / 100</strong>
+            <!-- Vertical Satellite Telemetry Display (No GEE header, vertical format) -->
+            <div style="padding:14px 16px;background-color:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:16px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12px;color:#334155;line-height:1.6;">
+                <tr>
+                  <td style="padding:5px 0;color:#64748B;font-weight:600;width:55%;">Land Surface Temp (MODIS LST):</td>
+                  <td style="padding:5px 0;font-weight:700;color:#0F172A;">{lst_celsius:.1f} &deg;C</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 0;border-top:1px solid #F1F5F9;color:#64748B;font-weight:600;">Stagnant Water (Sentinel-2 NDWI):</td>
+                  <td style="padding:5px 0;border-top:1px solid #F1F5F9;font-weight:700;color:#0F172A;">{ndwi:.3f}</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 0;border-top:1px solid #F1F5F9;color:#64748B;font-weight:600;">14-Day Cumulative Rain (NASA GPM):</td>
+                  <td style="padding:5px 0;border-top:1px solid #F1F5F9;font-weight:700;color:#0F172A;">{rain_14d_mm:.1f} mm</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 0;border-top:1px solid #F1F5F9;color:#64748B;font-weight:600;">Composite Risk Score:</td>
+                  <td style="padding:5px 0;border-top:1px solid #F1F5F9;font-weight:800;color:{theme['accent_color']};">{composite_score:.1f} / 100</td>
+                </tr>
+              </table>
             </div>
 
             <!-- AI Protocol -->
@@ -244,13 +257,29 @@ def build_arogya_drishti_email_html(
             </div>
 
             {van_section_html}
+
+            <!-- Helpline Contact -->
+            <div style="margin-top:16px;padding:12px 14px;background-color:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;color:#334155;">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#475569;letter-spacing:0.5px;">Emergency Technical Support &amp; Helpline</div>
+              <div style="font-size:13px;font-weight:700;color:#0F172A;margin-top:3px;">
+                Toll-Free 24/7 Helpline: <span style="color:#B71C1C;">1800-11-8328</span>
+              </div>
+              <div style="font-size:11.5px;color:#64748B;margin-top:2px;">
+                Email: <a href="mailto:support@arogyadrishti.in" style="color:#B71C1C;text-decoration:underline;">support@arogyadrishti.in</a> &nbsp;|&nbsp; NCVBDC Surveillance Cell
+              </div>
+            </div>
           </td>
         </tr>
 
         <!-- Footer -->
         <tr>
-          <td style="background-color:#F8FAFC;padding:14px 26px;border-top:1px solid #E2E8F0;font-size:11px;color:#64748B;text-align:center;">
-            Arogya Drishti App | Powered by Team Rocket
+          <td style="background-color:#F8FAFC;padding:16px 26px;border-top:1px solid #E2E8F0;font-size:11px;color:#64748B;text-align:center;line-height:1.5;">
+            <p style="margin:0 0 6px 0;font-size:11px;color:#64748B;">
+              This email was sent for the purpose of real-time vector surveillance, early epidemic warning, and rapid containment coordination under the National Vector Borne Disease Control Programme (NCVBDC) guidelines.
+            </p>
+            <div style="font-weight:600;color:#475569;">
+              ArogyaDrishti App | Powered by Team Rocket
+            </div>
           </td>
         </tr>
       </table>
@@ -308,12 +337,11 @@ def build_ticket_assignment_email_html(
     lng: float | None = None,
 ) -> tuple[str, str]:
     """Build responsive zero-blue crimson HTML email for escalation ticket assignment."""
-    subject = f"ArogyaDrishti - Ticket [{ticket_id}] Assigned: {category} in {ward_name}"
+    subject = "Ticket assigned to you - Arogya Drishti"
 
-    maps_link = ""
+    maps_url = ""
     if lat is not None and lng is not None and abs(lat) > 0.1 and abs(lng) > 0.1:
         maps_url = f"https://www.google.com/maps/search/?api=1&query={lat},{lng}"
-        maps_link = f' (<a href="{maps_url}" style="color:#FEE2E2;text-decoration:underline;font-weight:600;">Open in Google Maps</a>)'
 
     html_body = f"""
     <!DOCTYPE html>
@@ -323,15 +351,14 @@ def build_ticket_assignment_email_html(
         <!-- Header (Crimson Zero-Blue) -->
         <tr>
           <td style="background-color:#7F1D1D;padding:22px 26px;color:#FFFFFF;">
-            <div style="display:inline-block;padding:4px 10px;background-color:#FEE2E2;color:#991B1B;font-size:11px;font-weight:800;border-radius:4px;letter-spacing:0.6px;">
-              SUPPORT ESCALATION &bull; {severity_sla.upper()}
-            </div>
-            <h1 style="margin:10px 0 4px 0;font-size:20px;font-weight:700;color:#FFFFFF;">
+            <h1 style="margin:0 0 10px 0;font-size:20px;font-weight:700;color:#FFFFFF;">
               Arogya Drishti — Field Ticket Assignment
             </h1>
-            <p style="margin:0;font-size:13px;color:#F1F5F9;">
-              Ticket ID: <strong>{ticket_id}</strong> &nbsp;|&nbsp; <strong>{ward_name}</strong>{maps_link}
-            </p>
+            <div style="font-size:13px;color:#F1F5F9;line-height:1.6;">
+              <div>Ticket ID: <strong>{ticket_id}</strong></div>
+              <div><strong>{ward_name}</strong></div>
+              {f'<div><a href="{maps_url}" style="color:#FEE2E2;text-decoration:underline;font-weight:600;">Open in Google Maps</a></div>' if maps_url else ''}
+            </div>
           </td>
         </tr>
 
@@ -374,13 +401,29 @@ def build_ticket_assignment_email_html(
             <p style="margin:0;font-size:12px;color:#64748B;line-height:1.4;">
               Please initiate on-ground verification or dispatch vector response personnel according to standard operating procedures. Update the ticket status in the Arogya Drishti portal once resolved.
             </p>
+
+            <!-- Helpline Contact -->
+            <div style="margin-top:16px;padding:12px 14px;background-color:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;color:#334155;">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#475569;letter-spacing:0.5px;">Emergency Technical Support &amp; Helpline</div>
+              <div style="font-size:13px;font-weight:700;color:#0F172A;margin-top:3px;">
+                Toll-Free 24/7 Helpline: <span style="color:#991B1B;">1800-11-8328</span>
+              </div>
+              <div style="font-size:11.5px;color:#64748B;margin-top:2px;">
+                Email: <a href="mailto:support@arogyadrishti.in" style="color:#991B1B;text-decoration:underline;">support@arogyadrishti.in</a> &nbsp;|&nbsp; NCVBDC Grievance Redressal
+              </div>
+            </div>
           </td>
         </tr>
 
         <!-- Footer -->
         <tr>
-          <td style="background-color:#F8FAFC;padding:14px 26px;border-top:1px solid #E2E8F0;font-size:11px;color:#64748B;text-align:center;">
-            Arogya Drishti App | Powered by Team Rocket
+          <td style="background-color:#F8FAFC;padding:16px 26px;border-top:1px solid #E2E8F0;font-size:11px;color:#64748B;text-align:center;line-height:1.5;">
+            <p style="margin:0 0 6px 0;font-size:11px;color:#64748B;">
+              This email was sent for the purpose of vector surveillance field escalation, grievance redressal, and rapid municipal action under NCVBDC guidelines.
+            </p>
+            <div style="font-weight:600;color:#475569;">
+              ArogyaDrishti App | Powered by Team Rocket
+            </div>
           </td>
         </tr>
       </table>
@@ -442,23 +485,8 @@ class EmailAlertClient:
         mx_host = verify_email_and_mx(to_email)
         to_norm = to_email.strip().lower()
 
-        # Send strictly To assigned officer; CC only if explicit supervisor/rep designated (no blind team broadcasts)
-        cc_candidates: list[str] = []
-        if cc_email and cc_email.strip():
-            for part in cc_email.split(","):
-                cand = part.strip()
-                if cand and cand not in cc_candidates and cand.lower() != to_norm:
-                    cc_candidates.append(cand)
-
+        # User directive: In alert email sent, don't include CC
         cc_verified: list[str] = []
-        for cand in cc_candidates:
-            if cand.lower() == to_norm or cand.lower() in [c.lower() for c in cc_verified]:
-                continue
-            try:
-                verify_email_and_mx(cand)
-                cc_verified.append(cand)
-            except Exception as mx_err:
-                logger.warning("Skipping unverified CC candidate %s: %s", cand, mx_err)
 
         if not self.settings.smtp_user or not self.settings.smtp_password:
             raise EmailDispatchException(
@@ -509,20 +537,26 @@ class EmailAlertClient:
         msg_id = make_msgid(domain="arogyadrishti.in")
         msg = EmailMessage()
         msg["Subject"] = subject
-        msg["From"] = self.settings.smtp_user or self.settings.alert_from_address
+        from_email = self.settings.smtp_user or self.settings.alert_from_address or "alerts@arogyadrishti.in"
+        msg["From"] = formataddr(("ArogyaDrishti App", from_email))
         msg["To"] = to_email.strip()
-        if cc_verified:
-            msg["Cc"] = ", ".join(cc_verified)
+        # Strictly no CC in alert emails
         msg["Message-ID"] = msg_id
 
         msg.set_content(
             f"{subject}\n\n"
             f"Jurisdiction: {ward_village} (LGD: {lgd_code})\n"
             f"Breteau Index: {breteau_index:.1f} | HI: {hi:.1f}% | CI: {ci:.1f}%\n"
+            f"Land Surface Temp: {lst_celsius if lst_celsius is not None else 28.5:.1f} °C\n"
+            f"Stagnant Water (NDWI): {ndwi if ndwi is not None else -0.22:.3f}\n"
+            f"14-Day Cumulative Rain: {rain_14d_mm if rain_14d_mm is not None else 65.0:.1f} mm\n"
             f"Composite Risk Score: {comp_score:.1f} / 100\n"
             f"Coordinates: ({lat}, {lng})\n"
             f"Protocol: {rec}\n"
-            f"Notes: {notes}\n"
+            f"Notes: {notes}\n\n"
+            f"Helpline: 1800-11-8328 | Email: support@arogyadrishti.in\n\n"
+            f"Note: This email was sent for the purpose of real-time vector surveillance, early epidemic warning, and rapid containment coordination under NCVBDC guidelines.\n"
+            f"ArogyaDrishti App | Powered by Team Rocket\n"
         )
         msg.add_alternative(html_body, subtype="html")
 
@@ -536,18 +570,16 @@ class EmailAlertClient:
                 f"SMTP TLS delivery failed for {to_email}: {exc}"
             ) from exc
 
-        all_recipients = [to_email.strip()] + cc_verified
+        all_recipients = [to_email.strip()]
         logger.info(
-            "Dispatched alert to primary %s and %d CC recipients: %s",
+            "Dispatched alert to primary %s (no CC recipients as configured)",
             to_email.strip(),
-            len(cc_verified),
-            ", ".join(cc_verified),
         )
 
         return EmailDeliveryReceipt(
             message_id=msg_id.strip("<>") or str(uuid.uuid4()),
             to_email=to_email.strip(),
-            cc_email=", ".join(cc_verified) if cc_verified else None,
+            cc_email=None,
             recipients=all_recipients,
             mx_verified=True,
             mx_host=mx_host,
@@ -614,7 +646,8 @@ class EmailAlertClient:
         msg_id = make_msgid(domain="arogyadrishti.in")
         msg = EmailMessage()
         msg["Subject"] = subject
-        msg["From"] = self.settings.smtp_user or self.settings.alert_from_address
+        from_email = self.settings.smtp_user or self.settings.alert_from_address or "alerts@arogyadrishti.in"
+        msg["From"] = formataddr(("ArogyaDrishti App", from_email))
         msg["To"] = to_email
         if cc_verified:
             msg["Cc"] = ", ".join(cc_verified)
@@ -622,11 +655,16 @@ class EmailAlertClient:
 
         msg.set_content(
             f"{subject}\n\n"
-            f"Assigned Officer: {assigned_officer_name} ({to_email})\n"
+            f"Ticket ID: {ticket_id}\n"
             f"Jurisdiction: {ward_name}\n"
+            f"Assigned Officer: {assigned_officer_name} ({to_email})\n"
+            f"Category: {category}\n"
             f"Severity / SLA: {severity_sla}\n"
-            f"Logged At (UTC): {now_utc}\n"
-            f"Notes: {observation_notes}\n"
+            f"Logged At (UTC): {now_utc}\n\n"
+            f"Observation Notes:\n{observation_notes}\n\n"
+            f"Helpline: 1800-11-8328 | Email: support@arogyadrishti.in\n\n"
+            f"Note: This email was sent for the purpose of vector surveillance field escalation, grievance redressal, and rapid municipal action under NCVBDC guidelines.\n"
+            f"ArogyaDrishti App | Powered by Team Rocket\n"
         )
         msg.add_alternative(html_body, subtype="html")
 
@@ -686,7 +724,8 @@ def send_ward_operational_email(
 
     msg = EmailMessage()
     msg["Subject"] = subject
-    msg["From"] = settings.alert_from_address or settings.smtp_user or "alerts@arogyadrishti.in"
+    from_email = settings.alert_from_address or settings.smtp_user or "alerts@arogyadrishti.in"
+    msg["From"] = formataddr(("ArogyaDrishti App", from_email))
     msg["To"] = cleaned_email
 
     msg.set_content("Please view this email in an HTML-compatible client.")

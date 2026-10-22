@@ -241,13 +241,10 @@ async def dispatch_morning_digests_pipeline() -> dict[str, Any]:
             rain = float(sc.gee_rain_14d_mm or 65.0)
             risk_tier = sc.risk_tier or determine_risk_tier(bi, bi * 2.2)
 
-            # Universal CC to academyxshivam@gmail.com
-            cc_recipient = "academyxshivam@gmail.com"
-
             try:
                 receipt = mailer.send_emergency_alert(
                     to_email=to_email,
-                    cc_email=cc_recipient,
+                    cc_email=None,
                     ward_village=ward_name,
                     lat=sc.centroid_lat or 30.7333,
                     lng=sc.centroid_lng or 76.7794,

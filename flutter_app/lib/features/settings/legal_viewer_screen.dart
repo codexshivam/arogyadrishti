@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
@@ -29,8 +28,6 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
   bool _isLoading = true;
   String _markdownContent = '';
   String? _errorMessage;
-  String _dataSource = 'Local Asset';
-  String _lastUpdated = 'October 23, 2026';
 
   String get _assetPath {
     if (widget.documentType.toLowerCase().contains('term')) {
@@ -65,10 +62,6 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
 
       if (response['status'] == 'SUCCESS' && response['markdown'] != null) {
         loadedMarkdown = response['markdown'] as String;
-        _dataSource = 'Sovereign Cloud (asia-south1)';
-        if (response['last_updated'] != null) {
-          _lastUpdated = response['last_updated'].toString();
-        }
       }
     } catch (_) {
       // Backend unavailable or network offline; smoothly proceed to asset fallback
@@ -78,7 +71,6 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
     if (loadedMarkdown == null || loadedMarkdown.trim().isEmpty) {
       try {
         loadedMarkdown = await rootBundle.loadString(_assetPath);
-        _dataSource = 'Bundled Encrypted Asset';
       } catch (assetErr) {
         _errorMessage = 'Failed to load document: $assetErr';
       }
@@ -89,15 +81,6 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
         _markdownContent = loadedMarkdown ?? '';
         _isLoading = false;
       });
-    }
-  }
-
-  void _shareDocument() {
-    if (_markdownContent.isNotEmpty) {
-      Share.share(
-        'Arogya Drishti — ${widget.title}\n\n$_markdownContent',
-        subject: 'Arogya Drishti ${widget.title} (DPDP Act 2023)',
-      );
     }
   }
 
@@ -124,24 +107,6 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
             color: ArogyaTheme.slateHeading,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.refresh_rounded,
-              color: ArogyaTheme.slateHeading,
-            ),
-            tooltip: 'Reload Document',
-            onPressed: _loadDocument,
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.share_outlined,
-              color: ArogyaTheme.slateHeading,
-            ),
-            tooltip: 'Share Document',
-            onPressed: _shareDocument,
-          ),
-        ],
       ),
       body: _buildBody(),
     );
@@ -269,18 +234,6 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
                       ),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Source: $_dataSource • Updated: $_lastUpdated',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: ArogyaTheme.slateMuted,
-                  ),
                 ),
               ),
             ],

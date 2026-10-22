@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
@@ -652,11 +653,12 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
                 const SizedBox(height: 10),
 
                 if (_loading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF8B0000),
+                  Skeletonizer(
+                    enabled: true,
+                    child: Column(
+                      children: List.generate(
+                        3,
+                        (_) => _buildSkeletonCenterCard(),
                       ),
                     ),
                   )
@@ -1008,6 +1010,96 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonCenterCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Govt Multi-Specialty Hospital',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Sector 16, Chandigarh • 1.8 km',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  '24x7 Open',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Rapid Test Kits: 240 units',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+              ),
+              Text(
+                'Free Beds: 12 available',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

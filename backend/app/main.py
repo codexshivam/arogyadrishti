@@ -386,7 +386,14 @@ def update_user_profile(
     payload: dict[str, Any] = Body(...),
     db: firestore.Client = Depends(get_firestore_db),
 ) -> dict[str, Any]:
-    """Updates user profile name/email/phone and syncs to Google Sheets Tab 3_Staff_Directory."""
+    """Updates user profile name/email and syncs to Google Sheets Tab 3_Staff_Directory."""
+    # Disallow updating mobile number and assigned ward
+    payload.pop("phone", None)
+    payload.pop("assigned_ward", None)
+    payload.pop("assigned_lgd_code", None)
+    payload.pop("ward_village", None)
+    payload.pop("lgd_code", None)
+
     if "name" in payload and payload["name"]:
         payload["avatar_initials"] = payload["name"].strip()[0].upper()
     payload["updated_at"] = datetime.now(UTC).isoformat()
@@ -608,16 +615,9 @@ def handle_dispatch_action(
         if contacts.village_officer_email and contacts.village_officer_email.strip()
         else contacts.district_rep_email.strip()
     )
-    target_cc_email = (
-        contacts.district_rep_email.strip()
-        if contacts.district_rep_email
-        and contacts.district_rep_email.strip()
-        and contacts.district_rep_email.strip().lower() != target_to_email.lower()
-        else None
-    )
     receipt = get_email_alert_client().send_emergency_alert(
         to_email=target_to_email,
-        cc_email=target_cc_email,
+        cc_email=None,  # No CC per alert email policy
         ward_village=payload.ward_village,
         lat=payload.latitude,
         lng=payload.longitude,
@@ -830,16 +830,9 @@ async def scan_breeding_site(
                 if contact.village_officer_email and contact.village_officer_email.strip()
                 else contact.district_rep_email.strip()
             )
-            target_cc_email = (
-                contact.district_rep_email.strip()
-                if contact.district_rep_email
-                and contact.district_rep_email.strip()
-                and contact.district_rep_email.strip().lower() != target_to_email.lower()
-                else None
-            )
             receipt = mailer.send_emergency_alert(
                 to_email=target_to_email,
-                cc_email=target_cc_email,
+                cc_email=None,  # No CC per alert email policy
                 ward_village=contact.ward_or_village or ward_name,
                 lat=lat,
                 lng=lng,

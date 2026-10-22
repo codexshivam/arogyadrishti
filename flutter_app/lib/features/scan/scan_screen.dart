@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +24,8 @@ class ScanScreen extends ConsumerStatefulWidget {
   ConsumerState<ScanScreen> createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends ConsumerState<ScanScreen> {
+class _ScanScreenState extends ConsumerState<ScanScreen>
+    with SingleTickerProviderStateMixin {
   static const Color _crimson = Color(0xFF8B0000);
   static const Color _background = Color(0xFFF8FAFC);
 
@@ -44,9 +44,29 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
   Map<String, dynamic>? _scanResult;
 
+  late AnimationController _resultsAnimController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
   @override
   void initState() {
     super.initState();
+    _resultsAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _resultsAnimController,
+      curve: Curves.easeOutCubic,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.08),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _resultsAnimController,
+      curve: Curves.easeOutCubic,
+    ));
+
     final active = ref.read(activeWardProvider);
     if (active.lgdCode.isNotEmpty) {
       _selectedWardLgd = active.lgdCode;
@@ -56,81 +76,14 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       _currentLat = active.latitude;
       _currentLng = active.longitude;
     }
-
-    _loadLatestScanOrHydrate();
   }
 
   @override
   void dispose() {
+    _resultsAnimController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadLatestScanOrHydrate() async {
-    try {
-      final snap = await FirebaseFirestore.instance
-          .collection('ai_scans')
-          .orderBy('created_at', descending: true)
-          .limit(1)
-          .get();
-
-      if (snap.docs.isNotEmpty && mounted) {
-        setState(() {
-          _scanResult = snap.docs.first.data();
-        });
-        return;
-      }
-    } catch (_) {}
-
-    // Default hydrated scan telemetry for Chandigarh field demo
-    if (mounted && _scanResult == null) {
-      setState(() {
-        _scanResult = {
-          'scan_id': 'SCAN-VEC-9812-CHD',
-          'primary_classification': 'Uncovered Drum / Storage Tank',
-          'container_or_water_body_type': 'Open Drum',
-          'water_turbidity_and_organic_matter': 'Turbid Organic',
-          'water_type': 'Turbid Organic',
-          'risk_tier': 'CRITICAL',
-          'composite_risk_score': 0.91,
-          'stagnant_water_matrix_pct': 96,
-          'larval_density_estimate': 'High Alert (35–45/500ml)',
-          'estimated_larval_stage': 'Instar II-III',
-          'probable_vector_species': ['Aedes aegypti', 'Aedes albopictus'],
-          'recommended_intervention':
-              'Immediate thermal fogging & Abate (Temephos 50% EC) larvicide application within 2 hours.',
-          'larvicide_dosage_protocol':
-              'Temephos 50% EC @ 1 ppm (1ml per 1000L)',
-          'gee_telemetry': {
-            'lst_celsius': 31.4,
-            'ndwi': 0.48,
-            'ndvi': 0.32,
-            'rain_14d_mm': 42.6,
-            'rain_72h_mm': 21.0,
-            'environmental_suitability_score': 0.89,
-          },
-          'detections': [
-            {
-              'label': 'Uncovered Drum',
-              'confidence': 0.92,
-              'box_2d': [120, 160, 780, 840],
-            },
-            {
-              'label': 'Larvae Detected',
-              'confidence': 0.88,
-              'box_2d': [340, 310, 640, 680],
-            },
-            {
-              'label': 'Aedes aegypti',
-              'confidence': 0.91,
-              'box_2d': [460, 420, 610, 580],
-            },
-          ],
-          'assigned_van': null,
-          'alert_message_id': null,
-        };
-      });
-    }
-  }
 
   Uint8List _generateSampleFieldPng() {
     const base64Png =
@@ -192,6 +145,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         _scanResult = cleanResult;
         _scanning = false;
       });
+      _resultsAnimController.forward(from: 0.0);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -303,102 +257,39 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                     _buildScanningState()
                   else if (_error != null)
                     _buildErrorState()
-                  else ...[
-                    // Card 2: Vector Risk Assessment Card
-                    _buildVectorRiskAssessmentCard(),
-                    const SizedBox(height: 16),
-
-                    // Card 3: 4-Metric Micro-Climate Grid
-                    _buildMicroClimateGrid(),
-                    const SizedBox(height: 16),
-
-                    if (_scanResult?['assigned_van'] != null) ...[
-                      // Card 4: Request For Van / Dispatch Status Timeline Card
-                      _buildVanDispatchTimelineCard(),
-                      const SizedBox(height: 18),
-
-                      // Bottom Action Banner: Crimson Button
-                      _buildBottomActionBanner(),
-                    ] else ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                        ),
+                  else if (_scanResult != null && _imageBytes != null)
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFFEBEE),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(
-                                    Icons.local_shipping_rounded,
-                                    color: _crimson,
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Municipal Fogging Unit',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 14,
-                                          color: Color(0xFF0F172A),
-                                        ),
-                                      ),
-                                      Text(
-                                        'On-demand vector control dispatch',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Color(0xFF64748B),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 14),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 46,
-                              child: ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _crimson,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                onPressed: _openVanDispatchModal,
-                                icon: const Icon(Icons.send_rounded, size: 18),
-                                label: const Text(
-                                  'Request Fogging Van',
-                                  style: TextStyle(
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // Card 2: Vector Risk Assessment Card
+                            _buildVectorRiskAssessmentCard(),
+                            const SizedBox(height: 16),
+
+                            // Card 3: 4-Metric Micro-Climate Grid
+                            _buildMicroClimateGrid(),
+                            const SizedBox(height: 16),
+
+                            if (_scanResult?['assigned_van'] != null) ...[
+                              // Card 4: Request For Van / Dispatch Status Timeline Card
+                              _buildVanDispatchTimelineCard(),
+                              const SizedBox(height: 18),
+
+                              // Bottom Action Banner: Crimson Button
+                              _buildBottomActionBanner(),
+                            ] else ...[
+                              _buildRequestVanCard(),
+                            ],
+                            const SizedBox(height: 24),
                           ],
                         ),
                       ),
-                    ],
-                    const SizedBox(height: 24),
-                  ],
+                    )
+                  else
+                    _buildEmptyCameraInstructionCard(),
                 ],
               ),
             ),
@@ -446,8 +337,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 else
                   _buildSyntheticViewfinder(),
 
-                // CustomPainter Overlay: Real-time bounding boxes (only when detections exist)
-                if (detections.isNotEmpty)
+                // CustomPainter Overlay: Real-time bounding boxes (only when image is scanned and detections exist)
+                if (_imageBytes != null && detections.isNotEmpty)
                   CustomPaint(
                     painter: _BoundingBoxPainter(
                       detections: detections,
@@ -607,6 +498,138 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
               color: Colors.white.withValues(alpha: 0.65),
               fontSize: 12,
               fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyCameraInstructionCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF8B0000).withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.camera_alt_outlined,
+              size: 28,
+              color: _crimson,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Ready to Scan Breeding Site',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Point camera at suspected standing water, discard containers, or coolers to run real-time vector identification, instar triage, and micro-climate analysis.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xFF64748B),
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequestVanCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEBEE),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.local_shipping_rounded,
+                  color: _crimson,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Municipal Fogging Unit',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                    Text(
+                      'On-demand vector control dispatch',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _crimson,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: _openVanDispatchModal,
+              icon: const Icon(Icons.send_rounded, size: 18),
+              label: const Text(
+                'Request Fogging Van',
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         ],

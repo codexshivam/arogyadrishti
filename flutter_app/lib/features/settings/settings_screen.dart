@@ -185,20 +185,81 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: phoneCtrl,
-                      keyboardType: TextInputType.phone,
+                      enabled: false,
                       decoration: const InputDecoration(
                         labelText: 'Mobile Number',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.phone_outlined),
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.only(right: 12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.lock_rounded,
+                                size: 16,
+                                color: Color(0xFF64748B),
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Verified',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFF1F5F9),
+                        helperText:
+                            'Mobile number is verified and non-editable',
+                        helperStyle: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF64748B),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: wardCtrl,
+                      enabled: false,
                       decoration: const InputDecoration(
                         labelText: 'Assigned Ward / Jurisdiction',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.location_city_outlined),
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.only(right: 12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.lock_rounded,
+                                size: 16,
+                                color: Color(0xFF64748B),
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Assigned',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFF1F5F9),
+                        helperText:
+                            'Ward allocation is statutory and non-editable',
+                        helperStyle: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF64748B),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -219,8 +280,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 setSheetState(() => saving = true);
                                 final newName = nameCtrl.text.trim();
                                 final newEmail = emailCtrl.text.trim();
-                                final newPhone = phoneCtrl.text.trim();
-                                final newWard = wardCtrl.text.trim();
                                 final initial = newName.isNotEmpty
                                     ? newName[0].toUpperCase()
                                     : 'S';
@@ -228,8 +287,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 final updatePayload = {
                                   'name': newName,
                                   'email': newEmail,
-                                  'phone': newPhone,
-                                  'assigned_ward': newWard,
                                   'avatar_initials': initial,
                                   'updated_at': FieldValue.serverTimestamp(),
                                 };
@@ -246,11 +303,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   await ref
                                       .read(apiClientProvider)
                                       .updateUserProfile(uid, {
-                                        'name': newName,
-                                        'email': newEmail,
-                                        'phone': newPhone,
-                                        'assigned_ward': newWard,
-                                      });
+                                    'name': newName,
+                                    'email': newEmail,
+                                  });
+
+                                  ref
+                                      .read(activeWardProvider.notifier)
+                                      .setOfficerSession(
+                                        uid: uid,
+                                        name: newName,
+                                        phone: phoneCtrl.text.trim(),
+                                        email: newEmail,
+                                        lgdCode: wardState.lgdCode,
+                                        wardName: wardCtrl.text.trim(),
+                                      );
 
                                   if (ctx.mounted) {
                                     Navigator.of(ctx).pop();

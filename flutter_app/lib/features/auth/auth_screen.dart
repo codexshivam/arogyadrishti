@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +12,7 @@ import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arogya_shared_widgets.dart';
+import '../settings/legal_viewer_screen.dart';
 
 /// Screen 6: Welcome / Officer Sign-In & OTP Verification (`/auth`).
 class AuthScreen extends ConsumerStatefulWidget {
@@ -455,7 +455,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         color: ArogyaTheme.slateHeading,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10.5),
                     Text(
                       'Access restricted to verified field epidemiologists, sanitary inspectors, and district health nodal teams.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -809,45 +809,75 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                           // Privacy Policy & Terms of Services text
                           Center(
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  color: ArogyaTheme.slateMuted,
-                                  height: 1.5,
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                const Text(
+                                  'By signing into ArogyaDrishti app, you agree to our ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: ArogyaTheme.slateMuted,
+                                    height: 1.5,
+                                  ),
                                 ),
-                                children: [
-                                  const TextSpan(
-                                    text:
-                                        'By signing into ArogyaDrishti app, you agree to our\n',
-                                  ),
-                                  TextSpan(
-                                    text: 'Privacy Policy',
-                                    style: const TextStyle(
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => const LegalViewerScreen(
+                                          title: 'Privacy Policy',
+                                          documentType: 'privacy',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Privacy Policy',
+                                    style: TextStyle(
+                                      fontSize: 12,
                                       color: ArogyaTheme.primaryCrimsonDark,
                                       fontWeight: FontWeight.w700,
                                       decoration: TextDecoration.underline,
                                     ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () =>
-                                          context.push('/privacy-policy'),
                                   ),
-                                  const TextSpan(text: ' and '),
-                                  TextSpan(
-                                    text: 'Terms of Services',
-                                    style: const TextStyle(
+                                ),
+                                const Text(
+                                  ' and ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: ArogyaTheme.slateMuted,
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => const LegalViewerScreen(
+                                          title: 'Terms of Service',
+                                          documentType: 'terms',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Terms of Services',
+                                    style: TextStyle(
+                                      fontSize: 12,
                                       color: ArogyaTheme.primaryCrimsonDark,
                                       fontWeight: FontWeight.w700,
                                       decoration: TextDecoration.underline,
                                     ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () =>
-                                          context.push('/terms-of-service'),
                                   ),
-                                  const TextSpan(text: '.'),
-                                ],
-                              ),
+                                ),
+                                const Text(
+                                  '.',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: ArogyaTheme.slateMuted,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -898,78 +928,60 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 25),
 
-                    // Proper Looking Helpdesk Card
-                    InkWell(
-                      borderRadius: BorderRadius.circular(14),
-                      onTap: () => context.push('/support'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 11,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x060F172A),
-                              blurRadius: 10,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFEBEE),
-                                borderRadius: BorderRadius.circular(10),
+                    // Trouble signing in? | Helpdesk: 1800-11-8328 (aligned to end)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        InkWell(
+                          onTap: () => context.push('/support'),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.help_outline_rounded,
+                                size: 15,
+                                color: ArogyaTheme.slateMuted,
                               ),
-                              child: const Icon(
+                              SizedBox(width: 5),
+                              Text(
+                                'Trouble signing in?',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: ArogyaTheme.slateMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () => context.push('/support'),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
                                 Icons.support_agent_rounded,
-                                color: ArogyaTheme.primaryCrimson,
-                                size: 20,
+                                size: 15,
+                                color: ArogyaTheme.primaryCrimsonDark,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'NCVBDC Technical Helpdesk',
-                                    style: TextStyle(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: ArogyaTheme.slateHeading,
-                                    ),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    'Toll-Free 24/7 • 1800-11-VECTOR • Support',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: ArogyaTheme.slateMuted,
-                                    ),
-                                  ),
-                                ],
+                              SizedBox(width: 5),
+                              Text(
+                                'Helpdesk: 1800-11-8328',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: ArogyaTheme.primaryCrimsonDark,
+                                ),
                               ),
-                            ),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 13,
-                              color: ArogyaTheme.slateMuted,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 22),
 
                     Center(
                       child: Text(

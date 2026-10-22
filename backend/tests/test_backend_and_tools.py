@@ -365,9 +365,10 @@ def test_support_ticket_assignment_and_email_template() -> None:
         lng=76.7794,
     )
 
-    assert "TICK-TEST-001" in subject
-    assert "Ward 17" in subject
-    assert "Arogya Drishti App | Powered by Team Rocket" in html
+    assert subject == "Ticket assigned to you - Arogya Drishti"
+    assert "TICK-TEST-001" in html
+    assert "Ward 17" in html
+    assert "ArogyaDrishti App | Powered by Team Rocket" in html
     assert "#7F1D1D" in html  # Crimson header
     assert "google.com/maps" in html
     # Zero-blue color policy verification: no blue colors

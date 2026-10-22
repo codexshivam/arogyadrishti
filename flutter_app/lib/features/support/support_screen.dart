@@ -471,7 +471,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         : [
             {
               'title': 'NCDC Vector Control Room',
-              'subtitle': '1800-11-VECTOR',
+              'subtitle': '1800-11-8328',
               'number': '1800118328',
               'badge': 'NATIONAL',
               'is_primary': true,

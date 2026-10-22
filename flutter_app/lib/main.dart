@@ -96,7 +96,12 @@ final GoRouter arogyaRouter = GoRouter(
     final bool loggedIn = _isUserAuthenticated();
     final String path = state.uri.path;
     final bool isPublicRoute =
-        path == '/auth' || path == '/privacy' || path == '/privacy-policy';
+        path == '/auth' ||
+        path == '/privacy' ||
+        path == '/privacy-policy' ||
+        path == '/terms' ||
+        path == '/terms-of-service' ||
+        path == '/support';
 
     // Strict Zero-Trust Security Gate:
     // If not authenticated, unprivileged users are never allowed on protected screens.

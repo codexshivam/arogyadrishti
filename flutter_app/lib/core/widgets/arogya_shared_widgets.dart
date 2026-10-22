@@ -62,7 +62,7 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
   ];
 
   @override
-  Size get preferredSize => const Size.fromHeight(96);
+  Size get preferredSize => const Size.fromHeight(104);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -74,7 +74,7 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
       centerTitle: true,
       automaticallyImplyLeading: false,
       systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
-      toolbarHeight: 48,
+      toolbarHeight: 56,
       title: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -87,7 +87,7 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
               letterSpacing: 0.2,
             ),
           ),
-          const SizedBox(height: 1),
+          const SizedBox(height: 5),
           Text(
             'developed and managed by Team Rocket',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -100,10 +100,10 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
         ],
       ),
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(46),
+        preferredSize: const Size.fromHeight(48),
         child: Container(
           color: Colors.white,
-          padding: const EdgeInsets.only(bottom: 2),
+          padding: const EdgeInsets.only(bottom: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(_tabs.length, (idx) {
@@ -123,11 +123,11 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
                   child: Container(
                     constraints: const BoxConstraints(
                       minWidth: 54,
-                      minHeight: 44,
+                      minHeight: 48,
                     ),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       border: Border(
@@ -531,7 +531,6 @@ class _ActionDispatchBottomSheetState
     'Sector 16',
     'Sector 45',
   ];
-  Map<String, dynamic>? _dispatchResult;
 
   @override
   void initState() {
@@ -579,6 +578,7 @@ class _ActionDispatchBottomSheetState
   Future<void> _submitDispatch() async {
     setState(() => _submitting = true);
     final wardState = ref.read(activeWardProvider);
+    final isVan = widget.actionType == 'REQUEST_VAN';
     try {
       final result = await ref
           .read(apiClientProvider)
@@ -592,10 +592,15 @@ class _ActionDispatchBottomSheetState
             notes: _notesController.text.trim(),
           );
       if (!mounted) return;
-      setState(() {
-        _submitting = false;
-        _dispatchResult = result;
-      });
+      showArogyaToast(
+        context,
+        title: isVan ? 'Van Dispatched' : 'Alert Sent',
+        message: isVan
+            ? 'Municipal fogging van assigned and dispatched for $_selectedWard.'
+            : 'Emergency outbreak alert transmitted successfully.',
+        backgroundColor: const Color(0xFF10B981),
+      );
+      Navigator.of(context).pop(result);
     } catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);
@@ -655,99 +660,20 @@ class _ActionDispatchBottomSheetState
                   ),
                   const SizedBox(width: 14),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isVan
-                              ? 'Request Municipal Fogging Van'
-                              : 'Send Emergency Outbreak Alert',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          isVan
-                              ? 'Assigns nearest available municipal vector control unit'
-                              : 'Notifies Village Health Officer and District CMO',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: ArogyaTheme.slateMuted,
-                                fontSize: 12,
-                              ),
-                        ),
-                      ],
+                    child: Text(
+                      isVan
+                          ? 'Request Municipal Fogging Van'
+                          : 'Send Emergency Outbreak Alert',
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              if (_dispatchResult != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: ArogyaTheme.triageEmeraldBg,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: ArogyaTheme.triageEmeraldText.withValues(
-                        alpha: 0.3,
-                      ),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.verified_rounded,
-                            color: ArogyaTheme.triageEmeraldText,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              isVan
-                                  ? 'Van Assigned & Dispatched!'
-                                  : 'Emergency Outbreak Alert Sent!',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: ArogyaTheme.triageEmeraldText,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (isVan && _dispatchResult!['van_details'] is Map) ...[
-                        Text(
-                          'Vehicle: ${(_dispatchResult!['van_details'] as Map)['vehicle_no']} · Driver: ${(_dispatchResult!['van_details'] as Map)['driver_name']}',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          'Live Traffic ETA: ${(_dispatchResult!['van_details'] as Map)['eta_minutes']} mins (${(_dispatchResult!['van_details'] as Map)['distance_km']} km)',
-                        ),
-                      ] else if (!isVan &&
-                          _dispatchResult!['notified'] is Map) ...[
-                        Text(
-                          'Notified: ${(_dispatchResult!['notified'] as Map)['village_officer_email']}',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          'District CMO: ${(_dispatchResult!['notified'] as Map)['district_rep_name']}',
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(_dispatchResult),
-                  child: const Text('Done'),
-                ),
-              ] else ...[
-                Text(
-                  'WARD / VILLAGE',
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
+              Text(
+                'WARD / VILLAGE',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedWard,
@@ -850,7 +776,6 @@ class _ActionDispatchBottomSheetState
                               : 'Send Immediate Alert'),
                   ),
                 ),
-              ],
             ],
           ),
         ),
