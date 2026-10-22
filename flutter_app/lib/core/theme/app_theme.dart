@@ -149,7 +149,7 @@ class ArogyaTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryCrimson,
           foregroundColor: surfaceWhite,
-          minimumSize: const Size.fromHeight(48),
+          minimumSize: const Size(64, 48),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -164,7 +164,7 @@ class ArogyaTheme {
         style: OutlinedButton.styleFrom(
           backgroundColor: surfaceWhite,
           foregroundColor: slateHeading,
-          minimumSize: const Size.fromHeight(48),
+          minimumSize: const Size(64, 48),
           side: const BorderSide(color: inputBorder, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
