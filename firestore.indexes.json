@@ -1,0 +1,33 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "field_logs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "lgd_code",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "support_tickets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ward_lgd_code",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

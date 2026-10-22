@@ -1,0 +1,32 @@
+rules_version = '2';
+
+// Arogya Drishti — Cloud Storage Security Rules (asia-south1 Mumbai)
+// Enforces authenticated image-only uploads <= 10MB for breeding-site scans.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAuthorizedStaff() {
+      return isAuthenticated() &&
+        request.auth.token.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'];
+    }
+
+    function isValidBreedingScanImage() {
+      return request.resource != null &&
+        request.resource.size <= 10 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+
+    match /scans/{lgdCode}/{scanFile} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthorizedStaff() && isValidBreedingScanImage();
+      allow delete: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

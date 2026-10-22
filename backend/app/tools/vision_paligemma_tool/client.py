@@ -304,14 +304,36 @@ class VisionPaliGemmaClient:
             '"detections": [{"label": str, "confidence": float, "box_2d": [ymin, xmin, ymax, xmax]}]}'
         )
 
-        # 1. Try self-hosted Open-Weight Gemma 4 vLLM endpoint if configured
+        # 1. Try Open-Weight Gemma 4 / Vertex AI OpenAI-compatible endpoint if configured
         if self.settings.gemma_endpoint_url:
             try:
+                base_ep = self.settings.gemma_endpoint_url.rstrip("/")
+                chat_url = (
+                    f"{base_ep}/chat/completions"
+                    if base_ep.endswith("/openapi")
+                    else f"{base_ep}/v1/chat/completions"
+                )
+                headers: dict[str, str] = {}
+                model_for_ep = self.settings.gemma_model_id
+                if "googleapis.com" in base_ep:
+                    import google.auth.transport.requests
+
+                    creds = self._get_gcp_credentials()
+                    if hasattr(creds, "with_scopes"):
+                        creds = creds.with_scopes(
+                            ["https://www.googleapis.com/auth/cloud-platform"]
+                        )
+                    creds.refresh(google.auth.transport.requests.Request())
+                    headers["Authorization"] = f"Bearer {creds.token}"
+                    if "gemma" in model_for_ep.lower():
+                        model_for_ep = "google/gemini-2.5-flash"
+
                 with httpx.Client(timeout=15.0) as client:
                     resp = client.post(
-                        f"{self.settings.gemma_endpoint_url.rstrip('/')}/v1/chat/completions",
+                        chat_url,
+                        headers=headers,
                         json={
-                            "model": self.settings.gemma_model_id,
+                            "model": model_for_ep,
                             "messages": [
                                 {
                                     "role": "user",

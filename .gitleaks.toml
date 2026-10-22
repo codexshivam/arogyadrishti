@@ -1,0 +1,14 @@
+title = "Arogya Drishti Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Ignore untracked local .env and compiled Flutter build artifacts"
+paths = [
+  '''^backend/\.env$''',
+  '''^\.env$''',
+  '''^flutter_app/build/.*''',
+  '''^\.venv/.*''',
+  '''^\.dart_tool/.*''',
+]

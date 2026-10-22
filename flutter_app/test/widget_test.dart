@@ -1,30 +1,54 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:arogya_drishti/core/theme/app_theme.dart';
+import 'package:arogya_drishti/core/widgets/arogya_shared_widgets.dart';
+import 'package:arogya_drishti/features/auth/auth_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:arogya_drishti/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets(
+    'Arogya Drishti shared clinical widgets & WHO Breteau Index gauge render accurately',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            theme: ArogyaTheme.lightTheme(),
+            home: const Scaffold(
+              body: Column(
+                children: [
+                  StatusPillChip(
+                    label: 'CRITICAL ZONE',
+                    color: ArogyaSpacing.riskCritical,
+                  ),
+                  VectorDensityGauge(breteauIndex: 28.5),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      expect(find.text('CRITICAL ZONE'), findsOneWidget);
+      expect(find.textContaining('BI: 28.5'), findsOneWidget);
+      expect(find.text('CRITICAL (>20)'), findsOneWidget);
+    },
+  );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets(
+    'AuthScreen renders NCVBDC role selector and DPDP Act 2023 badge',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            theme: ArogyaTheme.lightTheme(),
+            home: const AuthScreen(),
+          ),
+        ),
+      );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+      expect(find.text('Officer Sign In'), findsOneWidget);
+      expect(find.text('Statutory Surveillance Notice'), findsOneWidget);
+      expect(find.text('Verify & Access Portal'), findsOneWidget);
+    },
+  );
 }

@@ -1,0 +1,669 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model — Arogya Drishti (NCVBDC / IHIP / DPDP 2023)
+// ===============================================================
+//
+// This security rules file enforces role-based access control (RBAC),
+// Local Government Directory (LGD) ward jurisdiction scoping, strict
+// schema/type/bounds validation, and DPDP Act 2023 data minimization.
+//
+// Custom JWT Claims (request.auth.token):
+//   - role: string in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN']
+//   - lgd_code / assigned_lgd_code: string (1..32 chars) - Officer's assigned ward LGD code
+//
+// Collection: wards/{lgdCode}
+// Document ID: {lgdCode} (official LGD ward code, e.g. '04055001')
+// Fields:
+//   - lgd_code: string (required, immutable, 1..32 chars, must equal lgdCode)
+//   - ward_name: string (required, 1..120 chars)
+//   - house_index_pct: number (required, 0..100)
+//   - container_index_pct: number (required, 0..100)
+//   - breteau_index: number (required, 0..500)
+//   - district: string (optional, 1..100 chars)
+//   - state: string (optional, 1..100 chars)
+//   - composite_risk_score: number (optional, 0..1)
+//   - risk_tier: string (optional, in ['LOW', 'MODERATE', 'HIGH', 'CRITICAL', 'SAFE', 'HIGH RISK'])
+//   - lst_celsius: number (optional, -50..70)
+//   - ndwi: number (optional, -1..1)
+//   - ndvi: number (optional, -1..1)
+//   - rainfall_14d_mm: number (optional, 0..5000)
+//   - latitude: number (optional, -90..90)
+//   - longitude: number (optional, -180..180)
+//   - geohash: string (optional, 1..16 chars)
+//   - updated_at: timestamp (optional)
+//   - updated_by: string (optional, 1..128 chars)
+//
+// Subcollection: wards/{lgdCode}/weekly_series/{weekId}
+// Document ID: {weekId} (ISO week identifier, e.g. '2026-W42' or 'W1')
+// Fields:
+//   - week_id: string (optional, immutable, 1..32 chars)
+//   - week_label: string (required, 1..32 chars)
+//   - lgd_code: string (required, immutable, must equal lgdCode)
+//   - hi: number (required, 0..100)
+//   - ci: number (required, 0..100)
+//   - bi: number (required, 0..500)
+//   - rainfall_mm: number (optional, 0..5000)
+//   - houses_inspected: int (optional, 0..100000)
+//   - houses_positive: int (optional, 0..100000)
+//   - containers_checked: int (optional, 0..500000)
+//   - containers_positive: int (optional, 0..500000)
+//   - larvicidal_treatment: string (optional, 1..100 chars)
+//   - recorded_by_uid: string (optional, immutable, 1..128 chars)
+//   - updated_at: timestamp (optional)
+//
+// Collection: field_logs/{logId}
+// Document ID: {logId}
+// Fields:
+//   - log_id: string (optional, immutable, 1..64 chars)
+//   - officer_uid: string (optional, immutable, 1..128 chars)
+//   - officer_name: string (optional, 1..120 chars)
+//   - lgd_code: string (required, immutable, 1..32 chars)
+//   - ward_village: string (optional, 1..120 chars)
+//   - larvicidal_treatment: string (optional, 1..100 chars)
+//   - houses_inspected: int (optional, 1..100000)
+//   - houses_positive: int (optional, 0..100000)
+//   - containers_checked: int (optional, 1..500000)
+//   - containers_positive: int (optional, 0..500000)
+//   - breteau_index: number (required or via computed_bi, 0..500)
+//   - computed_bi: number (optional/alias, 0..500)
+//   - computed_hi: number (optional, 0..100)
+//   - computed_ci: number (optional, 0..100)
+//   - house_index_pct: number (optional, 0..100)
+//   - container_index_pct: number (optional, 0..100)
+//   - latitude: number (optional, -90..90)
+//   - longitude: number (optional, -180..180)
+//   - geohash: string (optional, 1..16 chars)
+//   - timestamp: timestamp (optional, immutable)
+//   - notes: string (optional, 0..500 chars)
+//   - FORBIDDEN PII FIELDS (DPDP Act 2023): ['aadhaar', 'pan_number', 'patient_name', 'phone_number']
+//
+// Collection: support_tickets/{ticketId}
+// Document ID: {ticketId}
+// Fields:
+//   - ticket_id: string (required, immutable, 1..64 chars)
+//   - ward_lgd_code: string (required, immutable, 1..32 chars)
+//   - category: string (required, immutable, 1..120 chars)
+//   - severity: string (required, immutable, in ['LOW', 'MODERATE', 'HIGH', 'CRITICAL', 'Critical (2h SLA)', 'High (6h SLA)', 'Standard (24h SLA)'])
+//   - status: string (required, in ['OPEN', 'DISPATCH SENT', 'IN_PROGRESS', 'RESOLVED', 'ESCALATED', 'CLOSED'])
+//   - officer_uid: string (optional, immutable, 1..128 chars)
+//   - ward_village: string (optional, immutable, 1..120 chars)
+//   - lgd_code: string (optional, immutable, 1..32 chars)
+//   - severity_sla: string (optional, immutable, 1..64 chars)
+//   - observation_notes: string (optional, immutable, 1..1000 chars)
+//   - assigned_nodal_officer: string (optional, 1..120 chars)
+//   - created_at: timestamp (optional, immutable)
+//   - created_at_utc: string (optional, immutable, 1..64 chars)
+//   - updated_at: timestamp (optional)
+//
+// Collection: users/{userId}
+// Document ID: {userId} (Firebase Auth UID)
+// Fields:
+//   - uid: string (required, immutable, must equal userId)
+//   - name: string (required, 1..120 chars)
+//   - role: string (required, immutable for non-admin, in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'])
+//   - assigned_lgd_code: string (required, 1..32 chars)
+//   - ward_village: string (optional, 1..120 chars)
+//   - district: string (optional, 1..100 chars)
+//   - state: string (optional, 1..100 chars)
+//   - email: string (optional, 3..254 chars) - PII protected (owner/admin read only)
+//   - phone: string (optional, 3..32 chars) - PII protected (owner/admin read only)
+//   - district_rep_name: string (optional, 1..120 chars)
+//   - district_rep_phone: string (optional, 3..32 chars)
+//   - district_rep_email: string (optional, 3..254 chars)
+//   - verified_at_utc: string (optional, 1..64 chars)
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the user is authenticated via Firebase Auth
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the resource by UID path parameter
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check if user is owner based on document's officer_uid or uid field
+    function isDocOwner() {
+      return isAuthenticated() && (
+        ('uid' in resource.data && request.auth.uid == resource.data.uid) ||
+        ('officer_uid' in resource.data && request.auth.uid == resource.data.officer_uid)
+      );
+    }
+
+    // Verify UID / officer_uid hasn't been tampered with on create
+    function uidUnchanged() {
+      return (!('uid' in request.resource.data) || request.resource.data.uid == request.auth.uid) &&
+             (!('officer_uid' in request.resource.data) || request.resource.data.officer_uid == request.auth.uid);
+    }
+
+    // Ensure uid / officer_uid field is not modified on update
+    function uidNotModified() {
+      return (!('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid) &&
+             (!('officer_uid' in request.resource.data) || request.resource.data.officer_uid == resource.data.officer_uid);
+    }
+
+    // Validate required fields exist on the incoming document
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Validate that the document contains only the allowed fields (prevents schema pollution)
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Validate that immutable fields have not been modified during an update
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // Validate string length bounds (prevents 1MB payload DoS)
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+             request.resource.data[field].size() >= minLen &&
+             request.resource.data[field].size() <= maxLen;
+    }
+
+    // Validate optional string field (if present, must be string within [minLen, maxLen])
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) || (
+        request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen
+      );
+    }
+
+    // Validate optional number field within [minVal, maxVal]
+    function isValidOptionalNumber(field, minVal, maxVal) {
+      return !(field in request.resource.data) || (
+        request.resource.data[field] is number &&
+        request.resource.data[field] >= minVal &&
+        request.resource.data[field] <= maxVal
+      );
+    }
+
+    // Validate optional integer field within [minVal, maxVal]
+    function isValidOptionalInt(field, minVal, maxVal) {
+      return !(field in request.resource.data) || (
+        request.resource.data[field] is int &&
+        request.resource.data[field] >= minVal &&
+        request.resource.data[field] <= maxVal
+      );
+    }
+
+    // Validate optional timestamp field
+    function isValidOptionalTimestamp(field) {
+      return !(field in request.resource.data) || request.resource.data[field] is timestamp;
+    }
+
+    // ===============================================================
+    // RBAC & Jurisdiction Helpers (Custom Claims Only — Never Client Data)
+    // ===============================================================
+
+    // Check if the authenticated user holds one of the recognized NCVBDC staff roles
+    function isAuthorizedRole() {
+      return isAuthenticated() &&
+             'role' in request.auth.token &&
+             request.auth.token.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'];
+    }
+
+    // Supervisory medical/district/admin roles (Medical Officer, Nodal Officer, Admin)
+    function isSupervisorRole() {
+      return isAuthenticated() &&
+             'role' in request.auth.token &&
+             request.auth.token.role in ['MO', 'NODAL_OFFICER', 'ADMIN'];
+    }
+
+    // High-privilege audit governance roles (Nodal Officer or Admin)
+    function isNodalOrAdmin() {
+      return isAuthenticated() &&
+             'role' in request.auth.token &&
+             request.auth.token.role in ['NODAL_OFFICER', 'ADMIN'];
+    }
+
+    // System Administrator role
+    function isAdmin() {
+      return isAuthenticated() &&
+             'role' in request.auth.token &&
+             request.auth.token.role == 'ADMIN';
+    }
+
+    // Check if user's custom JWT claim matches the target ward LGD code
+    function isAssignedToLgd(lgdCode) {
+      return isAuthenticated() &&
+             lgdCode is string &&
+             lgdCode.size() >= 1 &&
+             lgdCode.size() <= 32 && (
+               ('lgd_code' in request.auth.token && request.auth.token.lgd_code == lgdCode) ||
+               ('assigned_lgd_code' in request.auth.token && request.auth.token.assigned_lgd_code == lgdCode)
+             );
+    }
+
+    // DPDP Act 2023 Data Minimization: strictly forbid raw citizen PII keys
+    function hasNoForbiddenPiiFields(data) {
+      return !data.keys().hasAny(['aadhaar', 'pan_number', 'patient_name', 'phone_number']);
+    }
+
+    // ===============================================================
+    // Domain Validators (Called in BOTH create and update rules)
+    // ===============================================================
+
+    // Validate wards/{lgdCode} aggregate document
+    function isValidWard(data, lgdCode) {
+      let requiredFields = [
+        'lgd_code',
+        'ward_name',
+        'house_index_pct',
+        'container_index_pct',
+        'breteau_index'
+      ];
+      let allowedFields = [
+        'lgd_code',
+        'ward_name',
+        'house_index_pct',
+        'container_index_pct',
+        'breteau_index',
+        'district',
+        'state',
+        'composite_risk_score',
+        'risk_tier',
+        'lst_celsius',
+        'ndwi',
+        'ndvi',
+        'rainfall_14d_mm',
+        'latitude',
+        'longitude',
+        'geohash',
+        'updated_at',
+        'updated_by'
+      ];
+      return hasRequiredFields(requiredFields) &&
+             hasOnlyAllowedFields(allowedFields) &&
+             hasNoForbiddenPiiFields(data) &&
+             data.lgd_code is string &&
+             data.lgd_code == lgdCode &&
+             data.lgd_code.size() >= 1 &&
+             data.lgd_code.size() <= 32 &&
+             data.ward_name is string &&
+             data.ward_name.size() >= 1 &&
+             data.ward_name.size() <= 120 &&
+             data.house_index_pct is number &&
+             data.house_index_pct >= 0 &&
+             data.house_index_pct <= 100 &&
+             data.container_index_pct is number &&
+             data.container_index_pct >= 0 &&
+             data.container_index_pct <= 100 &&
+             data.breteau_index is number &&
+             data.breteau_index >= 0 &&
+             data.breteau_index <= 500 &&
+             isValidOptionalString('district', 1, 100) &&
+             isValidOptionalString('state', 1, 100) &&
+             isValidOptionalNumber('composite_risk_score', 0, 1) &&
+             (!( 'risk_tier' in data ) || (
+               data.risk_tier is string &&
+               data.risk_tier in ['LOW', 'MODERATE', 'HIGH', 'CRITICAL', 'SAFE', 'HIGH RISK']
+             )) &&
+             isValidOptionalNumber('lst_celsius', -50, 70) &&
+             isValidOptionalNumber('ndwi', -1, 1) &&
+             isValidOptionalNumber('ndvi', -1, 1) &&
+             isValidOptionalNumber('rainfall_14d_mm', 0, 5000) &&
+             isValidOptionalNumber('latitude', -90, 90) &&
+             isValidOptionalNumber('longitude', -180, 180) &&
+             isValidOptionalString('geohash', 1, 16) &&
+             isValidOptionalTimestamp('updated_at') &&
+             isValidOptionalString('updated_by', 1, 128);
+    }
+
+    // Validate wards/{lgdCode}/weekly_series/{weekId} entomological series record
+    function isValidWeeklySeries(data, lgdCode, weekId) {
+      let requiredFields = ['lgd_code', 'week_label', 'hi', 'ci', 'bi'];
+      let allowedFields = [
+        'week_id',
+        'week_label',
+        'lgd_code',
+        'hi',
+        'ci',
+        'bi',
+        'rainfall_mm',
+        'houses_inspected',
+        'houses_positive',
+        'containers_checked',
+        'containers_positive',
+        'larvicidal_treatment',
+        'recorded_by_uid',
+        'updated_at'
+      ];
+      return hasRequiredFields(requiredFields) &&
+             hasOnlyAllowedFields(allowedFields) &&
+             hasNoForbiddenPiiFields(data) &&
+             data.lgd_code is string &&
+             data.lgd_code == lgdCode &&
+             data.lgd_code.size() >= 1 &&
+             data.lgd_code.size() <= 32 &&
+             data.week_label is string &&
+             data.week_label.size() >= 1 &&
+             data.week_label.size() <= 32 &&
+             (!('week_id' in data) || (data.week_id is string && data.week_id == weekId && data.week_id.size() >= 1 && data.week_id.size() <= 32)) &&
+             data.hi is number && data.hi >= 0 && data.hi <= 100 &&
+             data.ci is number && data.ci >= 0 && data.ci <= 100 &&
+             data.bi is number && data.bi >= 0 && data.bi <= 500 &&
+             isValidOptionalNumber('rainfall_mm', 0, 5000) &&
+             isValidOptionalInt('houses_inspected', 0, 100000) &&
+             isValidOptionalInt('houses_positive', 0, 100000) &&
+             isValidOptionalInt('containers_checked', 0, 500000) &&
+             isValidOptionalInt('containers_positive', 0, 500000) &&
+             isValidOptionalString('larvicidal_treatment', 1, 100) &&
+             isValidOptionalString('recorded_by_uid', 1, 128) &&
+             isValidOptionalTimestamp('updated_at');
+    }
+
+    // Validate field_logs/{logId} ground inspection document
+    function isValidFieldLog(data) {
+      let allowedFields = [
+        'log_id',
+        'officer_uid',
+        'officer_name',
+        'lgd_code',
+        'ward_village',
+        'larvicidal_treatment',
+        'houses_inspected',
+        'houses_positive',
+        'containers_checked',
+        'containers_positive',
+        'breteau_index',
+        'computed_hi',
+        'computed_ci',
+        'computed_bi',
+        'house_index_pct',
+        'container_index_pct',
+        'latitude',
+        'longitude',
+        'geohash',
+        'timestamp',
+        'notes'
+      ];
+      let hasValidBi = (
+        ('breteau_index' in data && data.breteau_index is number && data.breteau_index >= 0 && data.breteau_index <= 500) ||
+        ('computed_bi' in data && data.computed_bi is number && data.computed_bi >= 0 && data.computed_bi <= 500)
+      ) &&
+      (!('breteau_index' in data) || (data.breteau_index is number && data.breteau_index >= 0 && data.breteau_index <= 500)) &&
+      (!('computed_bi' in data) || (data.computed_bi is number && data.computed_bi >= 0 && data.computed_bi <= 500));
+
+      return hasRequiredFields(['lgd_code']) &&
+             hasOnlyAllowedFields(allowedFields) &&
+             !data.keys().hasAny(['aadhaar', 'pan_number', 'patient_name', 'phone_number']) &&
+             data.lgd_code is string &&
+             data.lgd_code.size() >= 1 &&
+             data.lgd_code.size() <= 32 &&
+             hasValidBi &&
+             isValidOptionalString('log_id', 1, 64) &&
+             isValidOptionalString('officer_uid', 1, 128) &&
+             isValidOptionalString('officer_name', 1, 120) &&
+             isValidOptionalString('ward_village', 1, 120) &&
+             isValidOptionalString('larvicidal_treatment', 1, 100) &&
+             isValidOptionalInt('houses_inspected', 1, 100000) &&
+             isValidOptionalInt('houses_positive', 0, 100000) &&
+             isValidOptionalInt('containers_checked', 1, 500000) &&
+             isValidOptionalInt('containers_positive', 0, 500000) &&
+             isValidOptionalNumber('computed_hi', 0, 100) &&
+             isValidOptionalNumber('computed_ci', 0, 100) &&
+             isValidOptionalNumber('house_index_pct', 0, 100) &&
+             isValidOptionalNumber('container_index_pct', 0, 100) &&
+             isValidOptionalNumber('latitude', -90, 90) &&
+             isValidOptionalNumber('longitude', -180, 180) &&
+             isValidOptionalString('geohash', 1, 16) &&
+             isValidOptionalTimestamp('timestamp') &&
+             isValidOptionalString('notes', 0, 500);
+    }
+
+    // Validate support_tickets/{ticketId} escalation ticket document
+    function isValidSupportTicket(data) {
+      let requiredFields = [
+        'ticket_id',
+        'ward_lgd_code',
+        'category',
+        'severity',
+        'status'
+      ];
+      let allowedFields = [
+        'ticket_id',
+        'ward_lgd_code',
+        'category',
+        'severity',
+        'status',
+        'officer_uid',
+        'ward_village',
+        'lgd_code',
+        'severity_sla',
+        'observation_notes',
+        'assigned_nodal_officer',
+        'created_at',
+        'created_at_utc',
+        'updated_at'
+      ];
+      let validSeverities = [
+        'LOW',
+        'MODERATE',
+        'HIGH',
+        'CRITICAL',
+        'Critical (2h SLA)',
+        'High (6h SLA)',
+        'Standard (24h SLA)'
+      ];
+      let validStatuses = [
+        'OPEN',
+        'DISPATCH SENT',
+        'IN_PROGRESS',
+        'RESOLVED',
+        'ESCALATED',
+        'CLOSED'
+      ];
+      return hasRequiredFields(requiredFields) &&
+             hasOnlyAllowedFields(allowedFields) &&
+             hasNoForbiddenPiiFields(data) &&
+             data.ticket_id is string &&
+             data.ticket_id.size() >= 1 &&
+             data.ticket_id.size() <= 64 &&
+             data.ward_lgd_code is string &&
+             data.ward_lgd_code.size() >= 1 &&
+             data.ward_lgd_code.size() <= 32 &&
+             data.category is string &&
+             data.category.size() >= 1 &&
+             data.category.size() <= 120 &&
+             data.severity is string &&
+             data.severity in validSeverities &&
+             data.status is string &&
+             data.status in validStatuses &&
+             isValidOptionalString('officer_uid', 1, 128) &&
+             isValidOptionalString('ward_village', 1, 120) &&
+             isValidOptionalString('lgd_code', 1, 32) &&
+             isValidOptionalString('severity_sla', 1, 64) &&
+             isValidOptionalString('observation_notes', 1, 1000) &&
+             isValidOptionalString('assigned_nodal_officer', 1, 120) &&
+             isValidOptionalTimestamp('created_at') &&
+             isValidOptionalString('created_at_utc', 1, 64) &&
+             isValidOptionalTimestamp('updated_at');
+    }
+
+    // Validate users/{userId} staff profile document (PII-isolated to owner & Nodal/Admin)
+    function isValidUserProfile(data, userId) {
+      let requiredFields = ['uid', 'name', 'role', 'assigned_lgd_code'];
+      let allowedFields = [
+        'uid',
+        'name',
+        'email',
+        'phone',
+        'ward_village',
+        'district',
+        'state',
+        'assigned_lgd_code',
+        'district_rep_name',
+        'district_rep_phone',
+        'district_rep_email',
+        'role',
+        'verified_at_utc'
+      ];
+      return hasRequiredFields(requiredFields) &&
+             hasOnlyAllowedFields(allowedFields) &&
+             data.uid is string &&
+             data.uid == userId &&
+             data.uid.size() >= 1 &&
+             data.uid.size() <= 128 &&
+             data.name is string &&
+             data.name.size() >= 1 &&
+             data.name.size() <= 120 &&
+             data.role is string &&
+             data.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'] &&
+             data.assigned_lgd_code is string &&
+             data.assigned_lgd_code.size() >= 1 &&
+             data.assigned_lgd_code.size() <= 32 &&
+             isValidOptionalString('email', 3, 254) &&
+             isValidOptionalString('phone', 3, 32) &&
+             isValidOptionalString('ward_village', 1, 120) &&
+             isValidOptionalString('district', 1, 100) &&
+             isValidOptionalString('state', 1, 100) &&
+             isValidOptionalString('district_rep_name', 1, 120) &&
+             isValidOptionalString('district_rep_phone', 3, 32) &&
+             isValidOptionalString('district_rep_email', 3, 254) &&
+             isValidOptionalString('verified_at_utc', 1, 64);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // 1. Ward Telemetry & Aggregates: wards/{lgdCode}
+    match /wards/{lgdCode} {
+      // Authenticated users can read aggregate ward entomological telemetry (contains no PII)
+      allow read: if isAuthenticated();
+
+      // Only MO, NODAL_OFFICER, ADMIN, or an authorized staff member assigned to {lgdCode}
+      // can create or update ward aggregates with valid schema fields
+      allow create: if isAuthenticated() &&
+                    (isSupervisorRole() || (isAuthorizedRole() && isAssignedToLgd(lgdCode))) &&
+                    isValidWard(request.resource.data, lgdCode);
+
+      allow update: if isAuthenticated() &&
+                    (isSupervisorRole() || (isAuthorizedRole() && isAssignedToLgd(lgdCode))) &&
+                    isValidWard(request.resource.data, lgdCode) &&
+                    areImmutableFieldsUnchanged(['lgd_code']);
+
+      allow delete: if false;
+
+      // 2. Weekly Entomological Series: wards/{lgdCode}/weekly_series/{weekId}
+      match /weekly_series/{weekId} {
+        // Authenticated users can read weekly series trends
+        allow read: if isAuthenticated();
+
+        // Only ASHA (for their assigned lgdCode), MO, NODAL_OFFICER, or ADMIN can create/update
+        allow create: if isAuthenticated() &&
+                      (isSupervisorRole() || (isAuthorizedRole() && request.auth.token.role == 'ASHA' && isAssignedToLgd(lgdCode))) &&
+                      isValidWeeklySeries(request.resource.data, lgdCode, weekId);
+
+        allow update: if isAuthenticated() &&
+                      (isSupervisorRole() || (isAuthorizedRole() && request.auth.token.role == 'ASHA' && isAssignedToLgd(lgdCode))) &&
+                      isValidWeeklySeries(request.resource.data, lgdCode, weekId) &&
+                      areImmutableFieldsUnchanged(['lgd_code', 'week_id', 'recorded_by_uid']);
+
+        allow delete: if false;
+      }
+    }
+
+    // 3. Field Inspection Logs (DPDP Act 2023 Minimization + Immutable Audit Trail): field_logs/{logId}
+    match /field_logs/{logId} {
+      // Authenticated users can read field logs in their jurisdiction or if role in ['MO', 'NODAL_OFFICER', 'ADMIN']
+      allow read: if isAuthenticated() && (
+        isSupervisorRole() ||
+        isAssignedToLgd(resource.data.lgd_code)
+      );
+
+      // Authenticated ASHA, MO, NODAL_OFFICER, or ADMIN can create field_logs with valid schema,
+      // Breteau Index in [0, 500], jurisdiction match for ASHA, and zero raw citizen PII fields
+      allow create: if isAuthorizedRole() &&
+                    (isSupervisorRole() || isAssignedToLgd(request.resource.data.lgd_code)) &&
+                    uidUnchanged() &&
+                    isValidFieldLog(request.resource.data);
+
+      // Field logs are immutable audit records: restrict update to NODAL_OFFICER or ADMIN
+      // while still enforcing full schema validation and immutable identity/timestamp fields
+      allow update: if isNodalOrAdmin() &&
+                    isValidFieldLog(request.resource.data) &&
+                    areImmutableFieldsUnchanged(['log_id', 'officer_uid', 'lgd_code', 'timestamp']);
+
+      // Disallow deletion of epidemiological audit records
+      allow delete: if false;
+    }
+
+    // 4. Support & Outbreak Escalation Tickets: support_tickets/{ticketId}
+    match /support_tickets/{ticketId} {
+      // Authenticated users can read escalation tickets (contains no citizen PII)
+      allow read: if isAuthenticated();
+
+      // Authenticated users can create tickets with required schema validation
+      allow create: if isAuthenticated() &&
+                    uidUnchanged() &&
+                    isValidSupportTicket(request.resource.data);
+
+      // Only MO, NODAL_OFFICER, or ADMIN can update ticket status (and optional assigned_nodal_officer / updated_at);
+      // all core ticket metadata fields are locked against modification
+      allow update: if isSupervisorRole() &&
+                    isValidSupportTicket(request.resource.data) &&
+                    uidNotModified() &&
+                    areImmutableFieldsUnchanged([
+                      'ticket_id',
+                      'ward_lgd_code',
+                      'category',
+                      'severity',
+                      'officer_uid',
+                      'ward_village',
+                      'lgd_code',
+                      'severity_sla',
+                      'observation_notes',
+                      'created_at',
+                      'created_at_utc'
+                    ]);
+
+      // Deletion of escalation tickets is forbidden
+      allow delete: if false;
+    }
+
+    // 5. Officer Profiles (Contains Officer Phone/Email PII — Strict Owner or Nodal/Admin Access Only)
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isNodalOrAdmin();
+
+      // Prevent privilege escalation: only ADMIN can assign/modify roles, or user can create profile matching their verified JWT role claim
+      allow create: if isAuthenticated() &&
+                    isValidUserProfile(request.resource.data, userId) && (
+                      isAdmin() ||
+                      (isOwner(userId) &&
+                       'role' in request.auth.token &&
+                       request.resource.data.role == request.auth.token.role &&
+                       isAssignedToLgd(request.resource.data.assigned_lgd_code))
+                    );
+
+      allow update: if isAuthenticated() &&
+                    isValidUserProfile(request.resource.data, userId) && (
+                      isAdmin() ||
+                      (isOwner(userId) &&
+                       areImmutableFieldsUnchanged(['uid', 'role', 'assigned_lgd_code']))
+                    );
+
+      allow delete: if false;
+    }
+
+    // 6. Default Deny for all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
