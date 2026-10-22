@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,46 +24,64 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     <String, dynamic>{
       'role': 'assistant',
       'sender': 'Dr. Arogya',
-      'time': '10:41 AM',
-      'text': 'Greetings! How can I assist you today?',
+      'time': 'Just now',
+      'text':
+          'Greetings! I am Dr. Arogya, your AI Vector Surveillance Copilot. How can I assist your field operations today?',
       'tool_cards': <Map<String, dynamic>>[],
     },
-    <String, dynamic>{
-      'role': 'user',
-      'time': '10:42 AM',
-      'text':
-          'Found 14 discarded tires with stagnant rainwater behind Community Center, Ward 14. 6 contain active pupae/larvae. What is the immediate protocol?',
-    },
-    <String, dynamic>{
-      'role': 'assistant',
-      'sender': 'Dr. Arogya',
-      'time': '10:42 AM',
-      'text':
-          'Multimodal vision & NCVBDC Vector Surveillance Skill executed for your sector:',
-      'tool_cards': <Map<String, dynamic>>[
-        <String, dynamic>{
-          'card_type': 'ENTOMOLOGICAL_INDICES',
-          'title': 'Actionable Field Protocol',
-          'metrics': <String, dynamic>{
-            'container_index_pct': 42.8,
-            'breteau_index': 34.0,
-            'house_index_pct': 14.2,
-            'who_risk_tier': 'High Risk Tier 1',
-          },
-        },
-        <String, dynamic>{
-          'card_type': 'VISION_RESULT',
-          'title': 'Visual Identification Result',
-          'metrics': <String, dynamic>{
-            'confidence_pct': 98.2,
-            'species': 'Aedes aegypti (Stegomyia)',
-            'summary':
-                'Multimodal vision verified Aedes aegypti IV-instar larvae. Prominent siphon tube angle detected. Immediate pyriproxyfen or temephos application advised.',
-          },
-        },
-      ],
-    },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChatHistory();
+  }
+
+  Future<void> _loadChatHistory() async {
+    final wardState = ref.read(activeWardProvider);
+    final uid = wardState.officerUid.isNotEmpty
+        ? wardState.officerUid
+        : 'officer_kunal_04055001';
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('chat_sessions')
+          .doc(uid)
+          .collection('messages')
+          .orderBy('timestamp', descending: false)
+          .limit(30)
+          .get();
+
+      if (snap.docs.isNotEmpty && mounted) {
+        final List<Map<String, dynamic>> loaded = [];
+        for (final doc in snap.docs) {
+          final data = doc.data();
+          final isUser = data['role'] == 'user';
+          loaded.add({
+            'role': data['role'] ?? 'assistant',
+            'sender': isUser
+                ? (wardState.officerName.isNotEmpty
+                    ? wardState.officerName
+                    : 'Field Officer')
+                : (data['model_used'] != null
+                    ? 'Dr. Arogya (${data['model_used']})'
+                    : 'Dr. Arogya'),
+            'time': 'Recent',
+            'text': (data['text'] ?? '').toString(),
+            'tool_cards': (data['tool_cards'] as List<dynamic>? ?? <dynamic>[])
+                .cast<Map<String, dynamic>>(),
+          });
+        }
+        if (loaded.isNotEmpty && mounted) {
+          setState(() {
+            _messages.clear();
+            _messages.addAll(loaded);
+          });
+        }
+      }
+    } catch (_) {
+      // Clean initial greeting remains on fresh sessions
+    }
+  }
 
   @override
   void dispose() {
@@ -113,10 +132,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         _sending = false;
         _messages.add(<String, dynamic>{
           'role': 'assistant',
-          'sender': 'Dr. Arogya (Offline Skill Cache)',
+          'sender': 'Dr. Arogya',
           'time': 'Now',
           'text':
-              'NCVBDC Standard Protocol for ${wardState.wardName}:\n• Apply Temephos 50% EC @ 1 ppm (1 ml per 1,000 L) in overhead tanks/coolers.\n• Broadcast Bti Granules @ 5–10 g/m² in open drains.\n• Schedule 100m perimeter ULV Pyrethrum 2% fogging within 24h.',
+              'Unable to reach AI copilot service ($e). Please check your network connection and retry.',
           'tool_cards': <Map<String, dynamic>>[],
         });
       });
@@ -141,10 +160,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const ArogyaTopShellBar(activeTabIndex: 1),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            const ArogyaTopShellBar(activeTabIndex: 1),
             Expanded(
               child: ListView.separated(
                 controller: _scrollController,

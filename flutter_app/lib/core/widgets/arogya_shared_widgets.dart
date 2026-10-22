@@ -1,5 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -7,17 +8,15 @@ import '../network/api_client.dart';
 import '../services/firestore_sync.dart';
 import '../theme/app_theme.dart';
 
-/// Top brand header + 5-tab navigation bar matching `ui_design.png` (Home, Chat, Stats, Map, Settings).
-class ArogyaTopShellBar extends ConsumerWidget {
-  const ArogyaTopShellBar({
-    super.key,
-    required this.activeTabIndex,
-  });
+/// Top brand header + 5-tab navigation bar matching `ui_design.png` (Home, Chat, Stats, Map, Settings)
+/// implemented as an [AppBar] widget with white background and dark system UI overlay icons.
+class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
+  const ArogyaTopShellBar({super.key, required this.activeTabIndex});
 
   final int activeTabIndex;
 
   static const List<({IconData icon, String route, String label})> _tabs = [
-    (icon: Icons.home_outlined, route: '/home', label: 'Home'),
+    (icon: Icons.home_rounded, route: '/home', label: 'Home'),
     (icon: Icons.chat_bubble_outline_rounded, route: '/chat', label: 'Chat'),
     (icon: Icons.bar_chart_rounded, route: '/stats', label: 'Stats'),
     (icon: Icons.map_outlined, route: '/map', label: 'Map'),
@@ -25,38 +24,55 @@ class ArogyaTopShellBar extends ConsumerWidget {
   ];
 
   @override
+  Size get preferredSize => const Size.fromHeight(92);
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      color: ArogyaTheme.surfaceWhite,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Column(
+    return AppBar(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: true,
+      automaticallyImplyLeading: false,
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        systemNavigationBarDividerColor: Colors.white,
+      ),
+      toolbarHeight: 50,
+      title: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Center(
-            child: Column(
-              children: [
-                Text(
-                  'Arogya Drishti',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: ArogyaTheme.primaryCrimson,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 17.5,
-                      ),
+          Text(
+            'Arogya Drishti',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: ArogyaTheme.primaryCrimson,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'developed and managed by Team Rocket',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: ArogyaTheme.slateMuted,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-              ],
-            ),
           ),
-          const SizedBox(height: 12),
-          Row(
+          const SizedBox(height: 1),
+          Text(
+            'developed and managed by Team Rocket',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: ArogyaTheme.slateMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.1,
+                ),
+          ),
+        ],
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(42),
+        child: Container(
+          color: Colors.white,
+          padding: const EdgeInsets.only(bottom: 2),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(_tabs.length, (idx) {
               final tab = _tabs[idx];
@@ -73,23 +89,27 @@ class ArogyaTopShellBar extends ConsumerWidget {
                     }
                   },
                   child: Container(
-                    constraints: const BoxConstraints(minWidth: 50, minHeight: 38),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    constraints: const BoxConstraints(
+                      minWidth: 52,
+                      minHeight: 40,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
                           color: isSelected
                               ? ArogyaTheme.primaryCrimson
                               : Colors.transparent,
-                          width: 2.2,
+                          width: 2.5,
                         ),
                       ),
                     ),
                     child: Icon(
-                      isSelected && idx == 0
-                          ? Icons.home_rounded
-                          : tab.icon,
-                      size: 22,
+                      tab.icon,
+                      size: 20,
                       color: isSelected
                           ? ArogyaTheme.primaryCrimson
                           : ArogyaTheme.slateMuted,
@@ -99,7 +119,7 @@ class ArogyaTopShellBar extends ConsumerWidget {
               );
             }),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -121,7 +141,9 @@ class TriageBadge extends StatelessWidget {
     final upper = severity.toUpperCase();
     Color bg = ArogyaTheme.triageRedBg;
     Color fg = ArogyaTheme.triageRedText;
-    if (upper.contains('MOD') || upper.contains('SUSP') || upper.contains('PEND')) {
+    if (upper.contains('MOD') ||
+        upper.contains('SUSP') ||
+        upper.contains('PEND')) {
       bg = ArogyaTheme.triageAmberBg;
       fg = ArogyaTheme.triageAmberText;
     } else if (upper.contains('LOW') ||
@@ -209,7 +231,10 @@ class VectorDensityGauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = (clearCount + pendingCount + activeOutbreakCount).clamp(1, 9999);
+    final total = (clearCount + pendingCount + activeOutbreakCount).clamp(
+      1,
+      9999,
+    );
     final bi = breteauIndex;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,10 +250,10 @@ class VectorDensityGauge extends StatelessWidget {
               Text(
                 bi > 20.0 ? 'CRITICAL (>20)' : 'WITHIN LIMIT (<=20)',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: bi > 20.0
-                          ? ArogyaTheme.primaryCrimson
-                          : const Color(0xFF16A34A),
-                    ),
+                  color: bi > 20.0
+                      ? ArogyaTheme.primaryCrimson
+                      : const Color(0xFF16A34A),
+                ),
               ),
             ],
           ),
@@ -249,7 +274,10 @@ class VectorDensityGauge extends StatelessWidget {
                   child: Container(color: const Color(0xFFF59E0B)),
                 ),
                 Expanded(
-                  flex: ((activeOutbreakCount / total) * 100).round().clamp(1, 100),
+                  flex: ((activeOutbreakCount / total) * 100).round().clamp(
+                    1,
+                    100,
+                  ),
                   child: Container(color: ArogyaTheme.primaryCrimson),
                 ),
               ],
@@ -271,8 +299,8 @@ class VectorDensityGauge extends StatelessWidget {
             Text(
               '$activeOutbreakCount Active Outbreak',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: ArogyaTheme.primaryCrimson,
-                  ),
+                color: ArogyaTheme.primaryCrimson,
+              ),
             ),
           ],
         ),
@@ -460,8 +488,8 @@ class _ActionDispatchBottomSheetState
   void initState() {
     super.initState();
     final wardState = ref.read(activeWardProvider);
-    _selectedWard = widget.initialWard ??
-        wardState.wardName.split(',').first.trim();
+    _selectedWard =
+        widget.initialWard ?? wardState.wardName.split(',').first.trim();
     if (!_wardOptions.contains(_selectedWard)) {
       _wardOptions = <String>[_selectedWard, ..._wardOptions];
     }
@@ -503,7 +531,9 @@ class _ActionDispatchBottomSheetState
     setState(() => _submitting = true);
     final wardState = ref.read(activeWardProvider);
     try {
-      final result = await ref.read(apiClientProvider).dispatchAction(
+      final result = await ref
+          .read(apiClientProvider)
+          .dispatchAction(
             officerUid: wardState.officerUid,
             actionType: widget.actionType,
             wardVillage: _selectedWard,
@@ -589,7 +619,8 @@ class _ActionDispatchBottomSheetState
                           isVan
                               ? 'Assigns nearest available unit via Google Maps Routes API v2 & 4_Van_Requests Sheet'
                               : 'Notifies Village Officer & District CMO via Gmail TLS & 5_Alert_Logs Sheet',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
                                 color: ArogyaTheme.slateMuted,
                                 fontSize: 12,
                               ),
@@ -607,7 +638,9 @@ class _ActionDispatchBottomSheetState
                     color: ArogyaTheme.triageEmeraldBg,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: ArogyaTheme.triageEmeraldText.withValues(alpha: 0.3),
+                      color: ArogyaTheme.triageEmeraldText.withValues(
+                        alpha: 0.3,
+                      ),
                     ),
                   ),
                   child: Column(
@@ -642,7 +675,8 @@ class _ActionDispatchBottomSheetState
                         Text(
                           'Live Traffic ETA: ${(_dispatchResult!['van_details'] as Map)['eta_minutes']} mins (${(_dispatchResult!['van_details'] as Map)['distance_km']} km)',
                         ),
-                      ] else if (!isVan && _dispatchResult!['notified'] is Map) ...[
+                      ] else if (!isVan &&
+                          _dispatchResult!['notified'] is Map) ...[
                         Text(
                           'Emailed To: ${(_dispatchResult!['notified'] as Map)['village_officer_email']}',
                           style: const TextStyle(fontWeight: FontWeight.w700),
@@ -669,10 +703,8 @@ class _ActionDispatchBottomSheetState
                   initialValue: _selectedWard,
                   items: _wardOptions
                       .map(
-                        (w) => DropdownMenuItem<String>(
-                          value: w,
-                          child: Text(w),
-                        ),
+                        (w) =>
+                            DropdownMenuItem<String>(value: w, child: Text(w)),
                       )
                       .toList(),
                   onChanged: (val) {
@@ -732,7 +764,8 @@ class _ActionDispatchBottomSheetState
                   controller: _notesController,
                   maxLines: 2,
                   decoration: const InputDecoration(
-                    hintText: 'Describe positive containers or outbreak cluster...',
+                    hintText:
+                        'Describe positive containers or outbreak cluster...',
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -756,8 +789,8 @@ class _ActionDispatchBottomSheetState
                     _submitting
                         ? 'Dispatching via Google Sheets & Routes API...'
                         : (isVan
-                            ? 'Confirm & Dispatch Nearest Van'
-                            : 'Send Immediate Alert Email'),
+                              ? 'Confirm & Dispatch Nearest Van'
+                              : 'Send Immediate Alert Email'),
                   ),
                 ),
               ],

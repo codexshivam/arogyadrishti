@@ -1,6 +1,7 @@
 import 'package:arogya_drishti/core/theme/app_theme.dart';
 import 'package:arogya_drishti/core/widgets/arogya_shared_widgets.dart';
 import 'package:arogya_drishti/features/auth/auth_screen.dart';
+import 'package:arogya_drishti/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -51,4 +52,35 @@ void main() {
       expect(find.text('Verify & Access Portal'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'ArogyaTopShellBar renders as an AppBar with white background and dark overlay',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            theme: ArogyaTheme.lightTheme(),
+            home: const Scaffold(
+              appBar: ArogyaTopShellBar(activeTabIndex: 0),
+              body: Center(child: Text('Content')),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(AppBar), findsOneWidget);
+      expect(find.text('Arogya Drishti'), findsOneWidget);
+      expect(find.text('developed and managed by Team Rocket'), findsOneWidget);
+      expect(find.byIcon(Icons.home_rounded), findsOneWidget);
+
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.backgroundColor, equals(Colors.white));
+      expect(appBar.systemOverlayStyle?.statusBarColor, equals(Colors.white));
+      expect(appBar.systemOverlayStyle?.statusBarIconBrightness, equals(Brightness.dark));
+    },
+  );
+
+  test('arogyaRouter protects routes and initial location is /auth', () {
+    expect(arogyaRouter.routeInformationProvider.value.uri.path, equals('/auth'));
+  });
 }
