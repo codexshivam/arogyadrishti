@@ -8,20 +8,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/telemetry_service.dart';
 
-/// Resolves backend base URL dynamically depending on environment and platform.
+/// Resolves backend base URL: fully pinned to production backend in all builds (debug & release).
 String resolveBackendBaseUrl() {
   const fromEnv = String.fromEnvironment('AROGYA_API_BASE_URL');
   if (fromEnv.isNotEmpty) return fromEnv;
   if (kIsWeb) {
     final host = Uri.base.host;
-    if (kDebugMode && (host == 'localhost' || host == '127.0.0.1')) {
-      return 'http://localhost:8080';
+    if (host.isNotEmpty &&
+        (host.contains('arogya.shivm.co') ||
+            host.contains('web.app') ||
+            host.contains('firebaseapp.com'))) {
+      return '';
     }
-    // In production (https://arogya.shivm.co), empty base URL routes to current origin
-    // where Firebase Hosting rewrites /api/** to Cloud Run in asia-south1.
-    return '';
   }
-  // Android & iOS mobile clients route directly to production backend HTTPS gateway
+  // Production sovereign HTTPS endpoint in Mumbai (asia-south1) via Firebase CDN & Cloud Run
   return 'https://arogya.shivm.co';
 }
 
@@ -111,6 +111,55 @@ class ArogyaApiClient {
     return resp.data ?? <String, dynamic>{};
   }
 
+  Future<Map<String, dynamic>> fetchUserProfile(String uid) async {
+    final resp =
+        await _dio.get<Map<String, dynamic>>('/api/v1/users/$uid/profile');
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> updateUserPreferences(
+    String uid,
+    Map<String, dynamic> preferences,
+  ) async {
+    final resp = await _dio.patch<Map<String, dynamic>>(
+      '/api/v1/users/$uid/preferences',
+      data: preferences,
+    );
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> updateUserProfile(
+    String uid,
+    Map<String, dynamic> profile,
+  ) async {
+    final resp = await _dio.patch<Map<String, dynamic>>(
+      '/api/v1/users/$uid/profile',
+      data: profile,
+    );
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> logout({String? uid}) async {
+    final resp = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/auth/logout',
+      data: <String, dynamic>{'uid': uid},
+    );
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> fetchAppMetadata() async {
+    final resp = await _dio.get<Map<String, dynamic>>('/api/v1/app/metadata');
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> fetchLegalDocument({required String doc}) async {
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/config/legal',
+      queryParameters: <String, dynamic>{'doc': doc},
+    );
+    return resp.data ?? <String, dynamic>{};
+  }
+
   Future<Map<String, dynamic>> dispatchAction({
     required String officerUid,
     required String actionType,
@@ -162,6 +211,7 @@ class ArogyaApiClient {
     required double lng,
     double radiusKm = 25.0,
     String? facilityType,
+    String? search,
   }) async {
     final query = <String, dynamic>{
       'lat': lat,
@@ -170,6 +220,9 @@ class ArogyaApiClient {
     };
     if (facilityType != null && facilityType != 'All') {
       query['facility_type'] = facilityType;
+    }
+    if (search != null && search.trim().isNotEmpty) {
+      query['search'] = search.trim();
     }
     final resp = await _dio.get<Map<String, dynamic>>(
       '/api/v1/centers',
@@ -181,11 +234,13 @@ class ArogyaApiClient {
   Future<Map<String, dynamic>> fetchVans({
     required double lat,
     required double lng,
+    double radiusKm = 25.0,
     String? wardOrDistrict,
   }) async {
     final query = <String, dynamic>{
       'lat': lat,
       'lng': lng,
+      'radius_km': radiusKm,
     };
     if (wardOrDistrict != null) {
       query['ward_or_district'] = wardOrDistrict;
@@ -209,18 +264,49 @@ class ArogyaApiClient {
     return resp.data ?? <String, dynamic>{};
   }
 
+  Future<Map<String, dynamic>> fetchLocationsWards() async {
+    final resp =
+        await _dio.get<Map<String, dynamic>>('/api/v1/locations/wards');
+    return resp.data ?? <String, dynamic>{};
+  }
+
   Future<Map<String, dynamic>> fetchWardStats({
-    String lgdCode = '04055001',
+    String lgdCode = '0404400017',
     int weeks = 8,
   }) async {
     final resp = await _dio.get<Map<String, dynamic>>(
-      '/api/v1/stats',
+      '/api/v1/stats/ward/$lgdCode',
       queryParameters: <String, dynamic>{
-        'lgd_code': lgdCode,
         'weeks': weeks,
       },
     );
     return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> fetchMapSurveillance({String? wardId}) async {
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/map/surveillance',
+      queryParameters:
+          wardId != null ? <String, dynamic>{'ward_id': wardId} : null,
+    );
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> fetchMapGisData({String? wardId}) async {
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/map/gis-data',
+      queryParameters:
+          wardId != null ? <String, dynamic>{'ward_id': wardId} : null,
+    );
+    return resp.data ?? <String, dynamic>{};
+  }
+
+  String getExportReportUrl({
+    required String wardId,
+    int weeks = 8,
+    String format = 'pdf',
+  }) {
+    return '$baseUrl/api/v1/stats/export-report?ward_id=$wardId&weeks=$weeks&format=$format';
   }
 
   Future<Map<String, dynamic>> getWardStats(String lgdCode) =>
@@ -290,18 +376,21 @@ class ArogyaApiClient {
     String? wardLgd,
     String? lgdCode,
     String? wardName,
+    String? officerUid,
     int housesInspected = 100,
     int positiveHouses = 26,
     int containersInspected = 180,
     int positiveContainers = 29,
   }) async {
     final effectiveLon = lng ?? lon ?? 76.7794;
-    final effectiveLgd = wardLgd ?? lgdCode ?? '04055001';
+    final effectiveLgd = wardLgd ?? lgdCode ?? '0404400017';
     final formData = FormData.fromMap(<String, dynamic>{
       'lat': lat.toString(),
       'lng': effectiveLon.toString(),
       'lon': effectiveLon.toString(),
       'ward_lgd': effectiveLgd,
+      'ward_id': effectiveLgd,
+      'officer_uid': officerUid ?? 'officer_9915549455',
       'lgd_code': effectiveLgd,
       'ward_name': wardName ?? 'Sector 22-B, Chandigarh',
       'houses_inspected': housesInspected.toString(),
@@ -366,12 +455,14 @@ class ArogyaApiClient {
     required String category,
     required String severity,
     required String description,
+    String? officerUid,
+    String? wardVillage,
   }) =>
       submitSupportTicket(
-        officerUid: 'ASHA-CHD-101',
+        officerUid: officerUid ?? 'officer_9915549455',
         category: category,
         severitySla: severity,
-        wardVillage: 'Sector 22-B',
+        wardVillage: wardVillage ?? 'Ward $wardLgdCode',
         lgdCode: wardLgdCode,
         observationNotes: description,
       );

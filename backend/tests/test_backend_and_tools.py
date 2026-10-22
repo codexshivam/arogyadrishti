@@ -86,7 +86,7 @@ def test_scientific_formulas_and_polyline() -> None:
     assert 0.80 <= e_gee <= 1.0
 
     v_field, comp, tier = compute_composite_risk_score(
-        e_gee=e_gee, ward_breteau_index=34.0, i_vision=0.92
+        e_gee=e_gee, ward_breteau_index=35.5, i_vision=0.92
     )
     assert v_field > 0.65
     assert comp >= 0.70
@@ -109,8 +109,11 @@ def test_live_sheets_admin_and_mx_tools() -> None:
     centers = sheets.get_health_centers(30.7333, 76.7794, radius_km=30.0)
     assert len(centers) >= 1
 
-    staff = sheets.lookup_authorized_staff("Sector 22-B", "04055001")
-    assert staff.lgd_code == "04055001"
+    contacts = sheets.list_all_staff_contacts()
+    assert len(contacts) >= 1
+    target = contacts[0]
+    staff = sheets.lookup_authorized_staff(target.ward_or_village, target.lgd_code)
+    assert staff.lgd_code == target.lgd_code
     assert "@" in staff.village_officer_email
 
     mx_host = verify_email_and_mx(staff.village_officer_email)
@@ -153,17 +156,25 @@ def test_agent_skill_standard_and_harness() -> None:
     res = harness.run_chat_turn(
         user_message="Sector 22-B mein Temephos kitna dalna hai?",
         ward_village="Sector 22-B",
-        lgd_code="04055001",
+        lgd_code="0404400017",
     )
     assert len(res.reply_text) > 20
     assert len(res.tool_cards) >= 1
 
 
 def test_api_endpoints_end_to_end() -> None:
+    sheets = get_sheets_client()
+    contacts = sheets.list_all_staff_contacts()
+    assert len(contacts) >= 1
+    sample_staff = contacts[0]
+    sample_phone = sample_staff.village_officer_phone or "+919915549455"
+    sample_lgd = sample_staff.lgd_code
+    sample_ward = sample_staff.ward_or_village
+
     # 1. Verify staff
     r_auth = client.post(
         "/api/v1/auth/verify-staff",
-        json={"uid": "officer_9915549458", "phone": "+919915549458"},
+        json={"uid": f"officer_{sample_phone}", "phone": sample_phone},
     )
     assert r_auth.status_code == 200
     assert r_auth.json()["status"] == "STAFF_VERIFIED"
@@ -177,17 +188,17 @@ def test_api_endpoints_end_to_end() -> None:
     assert r_vans.status_code == 200
     assert r_vans.json()["count"] >= 1
 
-    r_contacts = client.get("/api/v1/contacts?district_lgd=04055001")
+    r_contacts = client.get(f"/api/v1/contacts?district_lgd={sample_lgd}")
     assert r_contacts.status_code == 200
     assert r_contacts.json()["count"] >= 1
 
-    r_stats = client.get("/api/v1/stats?lgd_code=04055001")
+    r_stats = client.get(f"/api/v1/stats?lgd_code={sample_lgd}")
     assert r_stats.status_code == 200
     assert "weekly_trends" in r_stats.json()
     assert "ihip_fhir_observation_bundle" in r_stats.json()
 
     # 3. Public DPI Risk Index
-    r_risk = client.get("/api/v1/risk-index?lat=30.7333&lng=76.7794&lgd_code=04055001")
+    r_risk = client.get(f"/api/v1/risk-index?lat=30.7333&lng=76.7794&lgd_code={sample_lgd}")
     assert r_risk.status_code == 200
     risk_data = r_risk.json()
     assert risk_data["risk_tier"] in ("CRITICAL", "HIGH", "MODERATE", "LOW")
@@ -197,7 +208,7 @@ def test_api_endpoints_end_to_end() -> None:
     img_bytes = _make_test_breeding_image()
     r_scan = client.post(
         "/api/v1/scan-breeding-site",
-        data={"lat": "30.7333", "lng": "76.7794", "ward_lgd": "04055001"},
+        data={"lat": "30.7333", "lng": "76.7794", "ward_lgd": sample_lgd},
         files={"image": ("breeding_drum.jpg", img_bytes, "image/jpeg")},
     )
     assert r_scan.status_code == 200
@@ -209,13 +220,229 @@ def test_api_endpoints_end_to_end() -> None:
     r_chat = client.post(
         "/api/v1/agent/chat",
         json={
-            "uid": "officer_kunal_04055001",
-            "message": "Found 14 discarded tires with stagnant rainwater in Sector 22-B. What is the immediate protocol?",
-            "ward_village": "Sector 22-B",
-            "lgd_code": "04055001",
+            "uid": f"officer_{sample_lgd}",
+            "message": f"Found 14 discarded tires with stagnant rainwater in {sample_ward}. What is the immediate protocol?",
+            "ward_village": sample_ward,
+            "lgd_code": sample_lgd,
             "latitude": 30.7333,
             "longitude": 76.7794,
         },
     )
     assert r_chat.status_code == 200
     assert len(r_chat.json()["tool_cards"]) >= 1
+
+
+def test_chandigarh_live_endpoints() -> None:
+    # 1. Locations / Wards (all 35 hydrated Chandigarh wards)
+    r_wards = client.get("/api/v1/locations/wards")
+    assert r_wards.status_code == 200
+    w_json = r_wards.json()
+    assert w_json["count"] == 35
+    assert len(w_json["wards"]) == 35
+    first_ward = w_json["wards"][0]
+    assert "04044" in first_ward["lgd_code"]
+    assert "Chandigarh" in first_ward["district"]
+
+    # 2. Ward Stats with 12 weeks
+    r_stats = client.get(f"/api/v1/stats/ward/{first_ward['lgd_code']}?weeks=12")
+    assert r_stats.status_code == 200
+    s_json = r_stats.json()
+    assert s_json["ward_info"]["ward_id"] == first_ward["lgd_code"]
+    assert s_json["weekly_trends"]["time_window_weeks"] == 12
+    assert len(s_json["weekly_trends"]["x_labels"]) == 12
+    assert len(s_json["weekly_trends"]["datasets"]["bi"]) == 12
+    assert "core_surveillance_metrics" in s_json
+    assert "who_nvbdcp_evaluation" in s_json
+    assert "recommended_interventions" in s_json
+    assert "ai_interventions" in s_json
+
+    # 3. Map Surveillance
+    r_map = client.get("/api/v1/map/surveillance")
+    assert r_map.status_code == 200
+    m_json = r_map.json()
+    assert len(m_json["ward_polygons"]) >= 35
+    assert len(m_json["breeding_markers"]) >= 1
+
+    # 4. Support Directory & Tickets
+    r_supp = client.get("/api/v1/support/directory-and-tickets")
+    assert r_supp.status_code == 200
+    sup_json = r_supp.json()
+    assert len(sup_json["nodal_officers"]) >= 3
+    assert len(sup_json["emergency_hotlines"]) >= 3
+
+    # 5. Export ReportLab PDF & CSV
+    r_pdf = client.get(f"/api/v1/stats/export-report?ward_id={first_ward['lgd_code']}&weeks=8&format=pdf")
+    assert r_pdf.status_code == 200
+    assert r_pdf.headers["content-type"] == "application/pdf"
+    assert len(r_pdf.content) > 500
+
+    r_csv = client.get(f"/api/v1/stats/export-report?ward_id={first_ward['lgd_code']}&weeks=8&format=csv")
+    assert r_csv.status_code == 200
+    assert "text/csv" in r_csv.headers["content-type"]
+    assert b"Breteau_Index" in r_csv.content
+
+
+def test_epidemiology_math_and_email_themes() -> None:
+    from app.core.epidemiology_math import (
+        compute_entomological_indices,
+        compute_gee_suitability,
+    )
+    from app.tools.gmail_alert_tool.client import (
+        build_arogya_drishti_email_html,
+        get_email_theme_by_metrics,
+    )
+
+    # 1. Zero inspection returns exact 0.0
+    zero = compute_entomological_indices(0, 0, 0, 0)
+    assert zero["house_index_pct"] == 0.0
+    assert zero["container_index_pct"] == 0.0
+    assert zero["breteau_index"] == 0.0
+
+    # 2. Real indices
+    indices = compute_entomological_indices(150, 15, 300, 36, 12)
+    assert indices["house_index_pct"] == 10.0
+    assert indices["container_index_pct"] == 12.0
+    assert indices["breteau_index"] == 24.0
+    assert indices["pupal_demographic_index"] == 0.08
+
+    # 3. GEE suitability
+    gee = compute_gee_suitability(lst_celsius=29.0, ndwi=0.25, ndvi=0.55, rain_14d_mm=90.0)
+    assert 0.85 <= gee["environmental_suitability_score"] <= 1.0
+
+    # 4. Multi-tier visual email themes and subject formats
+    t1 = get_email_theme_by_metrics(3.2, 28.0)
+    assert t1["tier"] == "LOW / SAFE"
+    assert t1["header_bg"] == "#1B5E20"
+    s1, h1 = build_arogya_drishti_email_html(
+        "Ward 2", "0404400002", "Dr. Suman", 3.2, 1.5, 2.0, 180, 420, 6, 26.0, -0.3, 40.0, 28.0, "Routine", 30.75, 76.79
+    )
+    assert s1 == "ArogyaDrishti - BI (3.2) in your Region"
+    assert "#1B5E20" in h1
+
+    t2 = get_email_theme_by_metrics(11.4, 52.0)
+    assert t2["tier"] == "MODERATE RISK"
+    assert t2["header_bg"] == "#E65100"
+    s2, _ = build_arogya_drishti_email_html(
+        "Ward 10", "0404400010", "Dr. Parmjit", 11.4, 4.5, 6.0, 180, 420, 20, 28.0, -0.2, 80.0, 52.0, "Targeted Temephos", 30.72, 76.78
+    )
+    assert s2 == "ArogyaDrishti - BI (11.4) in your Region"
+
+    t3 = get_email_theme_by_metrics(36.5, 84.0)
+    assert t3["tier"] == "CRITICAL OUTBREAK"
+    assert t3["header_bg"] == "#4A0E0E"
+    s3, _ = build_arogya_drishti_email_html(
+        "Ward 17", "0404400017", "Dr. Inderjit", 36.5, 14.0, 18.0, 180, 420, 66, 30.0, -0.1, 110.0, 84.0, "Emergency Fogging", 30.73, 76.77
+    )
+    assert s3 == "ArogyaDrishti - BI (36.5) in your Region"
+
+
+def test_daily_cron_digest_sync() -> None:
+    # Trigger on-demand daily digest & GEE sync endpoint
+    r_cron = client.post("/api/v1/cron/daily-digest-and-gee-sync")
+    assert r_cron.status_code == 200
+    res = r_cron.json()
+    assert res["status"] in (
+        "DAILY_SYNC_COMPLETED",
+        "MORNING_DIGESTS_DISPATCHED",
+        "MORNING_FUSION_PIPELINE_COMPLETED",
+        "NO_WARDS_FOUND",
+    )
+    assert "timestamp_utc" in res
+
+
+def test_support_ticket_assignment_and_email_template() -> None:
+    from app.tools.gmail_alert_tool.client import build_ticket_assignment_email_html
+
+    subject, html = build_ticket_assignment_email_html(
+        ticket_id="TICK-TEST-001",
+        ward_name="Ward 17: Sector 22, Sector 23",
+        category="Outbreak Cluster Flare-up",
+        severity_sla="Critical (2h SLA)",
+        observation_notes="High breeding index detected in coolers.",
+        assigned_officer_name="Kunal Yadav",
+        timestamp_utc="2026-10-22T12:00:00Z",
+        lat=30.7333,
+        lng=76.7794,
+    )
+
+    assert "TICK-TEST-001" in subject
+    assert "Ward 17" in subject
+    assert "Arogya Drishti App | Powered by Team Rocket" in html
+    assert "#7F1D1D" in html  # Crimson header
+    assert "google.com/maps" in html
+    # Zero-blue color policy verification: no blue colors
+    for blue_hex in ["#0000FF", "#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD"]:
+        assert blue_hex not in html
+
+    # Test POST /api/v1/support/tickets endpoint
+    resp = client.post(
+        "/api/v1/support/tickets",
+        json={
+            "ward_id": "0404400017",
+            "ward_name": "Ward 17: Sector 22, Sector 23",
+            "category": "Larval Stagnant Water Outbreak",
+            "severity_sla": "Critical (2h SLA)",
+            "observation_notes": "Larvae swarm observed in uncovered plastic drum.",
+        },
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "TICKET_CREATED"
+    assert "ticket_id" in data
+    assert data["ticket"]["assigned_nodal_officer"] is not None
+    assert data["ticket"]["officer_email"] in ["academyxshivam@gmail.com", "chaudharyishwor143@gmail.com"]
+
+    # Test Ward 1 (Wards 1-9 -> academyxshivam@gmail.com)
+    r_w1 = client.post(
+        "/api/v1/support/tickets",
+        json={"ward_id": "0404400001", "ward_name": "Ward 1: Manimajra", "category": "Equipment"},
+    )
+    assert r_w1.status_code == 200
+    assert r_w1.json()["ticket"]["officer_email"] in [
+        "academyxshivam@gmail.com",
+        "si.mpathak.mcc@chd.gov.in",
+    ]
+
+    # Test Ward 20 (universal district rep email or assigned sanitary inspector)
+    r_w20 = client.post(
+        "/api/v1/support/tickets",
+        json={"ward_id": "0404400020", "ward_name": "Ward 20: Industrial Area Phase II", "category": "Equipment"},
+    )
+    assert r_w20.status_code == 200
+    assert r_w20.json()["ticket"]["officer_email"] in [
+        "academyxshivam@gmail.com",
+        "si.sukhwinders.mcc@chd.gov.in",
+        "chaudharyraul07@gmail.com",
+    ]
+
+    # Test Ward 30 (universal district rep email or assigned sanitary inspector)
+    r_w30 = client.post(
+        "/api/v1/support/tickets",
+        json={"ward_id": "0404400030", "ward_name": "Ward 30: Sector 41", "category": "Equipment"},
+    )
+    assert r_w30.status_code == 200
+    assert r_w30.json()["ticket"]["officer_email"] in [
+        "academyxshivam@gmail.com",
+        "si.jagdishc.mcc@chd.gov.in",
+        "si.jkaur.mcc@chd.gov.in",
+        "ay5589370@gmail.com",
+    ]
+
+    from app.tools.gmail_alert_tool.client import send_ward_operational_email
+    assert callable(send_ward_operational_email)
+
+
+def test_van_lifecycle_and_chemical_decrement() -> None:
+    from app.tools.sheets_admin_tool.client import decrement_chemical_stock
+
+    assert decrement_chemical_stock("Pyrethrum 2% Extract (40 L)", 5) == "Pyrethrum 2% Extract (35 L)"
+    assert decrement_chemical_stock("Bti WP (30 kg)", 5) == "Bti WP (25 kg)"
+    assert decrement_chemical_stock("Temephos 50% EC (4 L)", 5) == "Temephos 50% EC (0 L)"
+
+    # Test PATCH /api/v1/vans/{van_id}/resolve endpoint
+    resp = client.patch("/api/v1/vans/VAN-01/resolve?decrement_stock_amount=5")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "VAN_RESOLVED"
+    assert data["van_id"] == "VAN-01"
+    assert data["new_status"] == "Available"

@@ -32,8 +32,10 @@ ALLOWED_TOOLS = frozenset(
     {
         "query_gee_microclimate",
         "compute_ward_entomological_indices",
+        "compute_ward_indices",
         "dispatch_fogging_van",
         "trigger_emergency_ward_alert",
+        "trigger_emergency_alert",
     }
 )
 
@@ -59,8 +61,10 @@ class SkillExecutor:
         self._dispatch_table: dict[str, Callable[..., dict[str, Any]]] = {
             "query_gee_microclimate": self.query_gee_microclimate,
             "compute_ward_entomological_indices": self.compute_ward_entomological_indices,
+            "compute_ward_indices": self.compute_ward_entomological_indices,
             "dispatch_fogging_van": self.dispatch_fogging_van,
             "trigger_emergency_ward_alert": self.trigger_emergency_ward_alert,
+            "trigger_emergency_alert": self.trigger_emergency_ward_alert,
         }
 
     def execute(self, tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
@@ -243,7 +247,7 @@ class SkillExecutor:
             lat=float(lat), lng=float(lng)
         )
         indices = self.compute_ward_entomological_indices(contact.lgd_code)["data"]
-        bi_val = float(indices.get("breteau_index") or 34.0)
+        bi_val = float(indices.get("breteau_index") or 0.0)
 
         receipt = get_email_alert_client().send_emergency_alert(
             to_email=contact.village_officer_email,

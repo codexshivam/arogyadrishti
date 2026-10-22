@@ -42,7 +42,7 @@ class ArogyaTelemetryService {
         );
         await FirebaseCrashlytics.instance.setCustomKey(
           'default_lgd_code',
-          '04055001',
+          '0404400017',
         );
 
         FlutterError.onError = (FlutterErrorDetails details) {

@@ -27,6 +27,8 @@ RUN groupadd -r arogya && useradd -r -g arogya -d /app -s /sbin/nologin arogya
 COPY --from=builder /install /usr/local
 COPY backend /app/backend
 COPY skills /app/skills
+COPY docs /app/docs
+COPY LICENSE /app/LICENSE
 
 WORKDIR /app/backend
 USER arogya

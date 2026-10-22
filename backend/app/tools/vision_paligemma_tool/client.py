@@ -94,6 +94,16 @@ class BreedingSiteScanResult(BaseModel):
     larvicide_dosage_protocol: str
     auto_escalation_triggered: bool = False
     alert_message_id: str | None = None
+    is_valid_breeding_habitat: bool = True
+    container_or_water_body_type: str = "Uncovered Overhead Tank"
+    water_turbidity_and_organic_matter: str = "Turbid Organic"
+    probable_vector_species: list[str] = Field(default_factory=lambda: ["Aedes aegypti", "Aedes albopictus"])
+    estimated_larval_stage: str = "Instar I-II"
+    estimated_larval_density_per_dip: float = 12.0
+    vision_risk_score: float = 0.88
+    ncvbdc_chemical_dosage_recommendation: str = ""
+    scientific_reasoning: str = ""
+    assigned_van: dict[str, Any] | None = None
 
 
 def compute_composite_risk_score(
@@ -285,26 +295,79 @@ class VisionPaliGemmaClient:
             blob.upload_from_string(sanitized_bytes, content_type="image/jpeg")
             return f"gs://{bucket_name}/{blob_path}"
         except Exception as exc:
-            logger.warning("GCS upload degraded for %s: %s", scan_id, exc)
-            return f"gs://{bucket_name}/{blob_path}"
+            logger.error("GCS upload failed for %s: %s", scan_id, exc)
+            raise VisionScanException(
+                f"Failed uploading sanitized scan image to GCS bucket '{bucket_name}': {exc}"
+            ) from exc
 
     def _run_multimodal_detector(
-        self, sanitized_bytes: bytes
+        self, sanitized_bytes: bytes, context: dict[str, Any] | None = None
     ) -> dict[str, Any]:
-        """Run Gemma 4 / Gemini Vision detector for mosquito breeding containers and larvae."""
-        b64_img = base64.b64encode(sanitized_bytes).decode("utf-8")
+        """Run Gemma 4 / Gemini Vision detector for mosquito breeding containers and larvae with hyper-local context."""
+        ctx = context or {}
+        ward_name = ctx.get("ward_name", "Chandigarh")
+        lgd_code = ctx.get("lgd_code", "0404400017")
+        lat = ctx.get("latitude", 30.7333)
+        lng = ctx.get("longitude", 76.7794)
+        lst_celsius = ctx.get("lst_celsius", 28.5)
+        ndwi = ctx.get("ndwi", -0.25)
+        ndvi = ctx.get("ndvi", 0.42)
+        rain_72h_mm = ctx.get("rain_72h_mm", 18.0)
+        rain_14d_mm = ctx.get("rain_14d_mm", 65.0)
+        current_hi = ctx.get("current_hi", 8.0)
+        current_ci = ctx.get("current_ci", 12.0)
+        current_bi = ctx.get("current_bi", 18.0)
+
         prompt = (
-            "You are an NCVBDC entomological computer vision model inspecting a field site in India. "
-            "Detect mosquito breeding containers and stagnant water sources. "
-            "Classify into one or more of: 'Uncovered Overhead Tank', 'Discarded Tires', "
-            "'Stagnant Drain', 'Cooler', 'Construction Water Pit', 'Algae/Larvae Presence'. "
-            "Respond ONLY with valid JSON matching this schema: "
-            '{"primary_classification": str, "water_type": str, "larval_density_estimate": str, '
-            '"stagnant_water_matrix_pct": int, "vision_confidence": float, '
-            '"detections": [{"label": str, "confidence": float, "box_2d": [ymin, xmin, ymax, xmax]}]}'
+            f"You are a Senior Medical Entomologist for the National Center for Vector Borne Disease Control (NCVBDC), Government of India.\n"
+            f"Analyze the attached field inspection photograph taken at:\n"
+            f"- Ward / Locality: {ward_name} (LGD Code: {lgd_code}), Coordinates: ({lat}, {lng})\n"
+            f"- Live Satellite Land Surface Temperature (MODIS): {lst_celsius} °C\n"
+            f"- Live Satellite Surface Water Index (Sentinel-2 NDWI): {ndwi} | Vegetation (NDVI): {ndvi}\n"
+            f"- Cumulative Rainfall (NASA GPM): {rain_72h_mm} mm (72h) / {rain_14d_mm} mm (14d)\n"
+            f"- Current Ward Baseline: House Index = {current_hi}%, Container Index = {current_ci}%, Breteau Index = {current_bi}\n\n"
+            f"Perform a rigorous visual and micro-climatic inspection of the image and return a strict JSON object with:\n"
+            f'1. "is_valid_breeding_habitat": boolean (false if the photo is a blank wall, indoor floor, selfie, or unrelated object)\n'
+            f'2. "container_or_water_body_type": string (e.g., "Discarded Rubber Tire", "Uncovered Overhead Tank", "Desert Cooler", "Stagnant Open Drain", "Construction Pit", "Plastic Drum", "Clean/Dry Surface")\n'
+            f'3. "stagnant_water_matrix_pct": float (0.0 to 100.0 estimating stagnant water coverage/retention risk in the frame)\n'
+            f'4. "water_turbidity_and_organic_matter": string (e.g., "Clear Stagnant (High Aedes Risk)", "Turbid Organic/Algae (High Culex/Anopheles Risk)", "No Water")\n'
+            f'5. "probable_vector_species": list[str] (e.g., ["Aedes aegypti", "Aedes albopictus", "Anopheles stephensi", "Culex quinquefasciatus"])\n'
+            f'6. "estimated_larval_stage": string ("None", "Instar I-II", "Instar III-IV", "Pupae Emerging")\n'
+            f'7. "estimated_larval_density_per_dip": float (0.0 to 100.0)\n'
+            f'8. "bounding_boxes": list[{{"label": str, "ymin": float, "xmin": float, "ymax": float, "xmax": float, "confidence": float}}]\n'
+            f'9. "vision_risk_score": float (0.0 to 1.0)\n'
+            f'10. "ncvbdc_chemical_dosage_recommendation": string (Exact larvicide formulation and dosage in ppm or ml/sq.m based on water type and container volume, e.g., "Temephos 50% EC @ 1 ppm (2 ml per 1000L)" or "Bacillus thuringiensis israelensis (Bti) WP @ 0.5 g/sq.m")\n'
+            f'11. "scientific_reasoning": string (2-3 sentences correlating the visual container findings with the satellite LST of {lst_celsius}°C and {rain_14d_mm}mm rainfall regarding Extrinsic Incubation Period and larval maturation speed)'
         )
 
-        # 1. Try Open-Weight Gemma 4 / Vertex AI OpenAI-compatible endpoint if configured
+        # 1. Primary: Gemini 3.8 Flash / Gemma Multimodal via google-genai SDK
+        api_key = self.settings.google_ai_api_key or os.getenv("GEMINI_API_KEY", "")
+        if api_key:
+            from google.genai import types
+
+            for candidate_model in ("gemini-3.8-flash", "gemma-4-26b-a4b-it"):
+                try:
+                    g_client = genai.Client(api_key=api_key)
+                    resp = g_client.models.generate_content(
+                        model=candidate_model,
+                        contents=[
+                            types.Part.from_bytes(data=sanitized_bytes, mime_type="image/jpeg"),
+                            prompt,
+                        ],
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            temperature=0.1,
+                        ),
+                    )
+                    raw_text = resp.text or ""
+                    parsed = self._extract_json(raw_text)
+                    if parsed and isinstance(parsed, dict):
+                        parsed["model_used"] = f"{candidate_model} (Multimodal Context-Injected VLM)"
+                        return parsed
+                except Exception as exc:
+                    logger.warning("google-genai multimodal inference with %s: %s", candidate_model, exc)
+
+        # 2. Try Open-Weight Gemma 4 / Vertex AI OpenAI-compatible endpoint if configured
         if self.settings.gemma_endpoint_url:
             try:
                 base_ep = self.settings.gemma_endpoint_url.rstrip("/")
@@ -325,9 +388,8 @@ class VisionPaliGemmaClient:
                         )
                     creds.refresh(google.auth.transport.requests.Request())
                     headers["Authorization"] = f"Bearer {creds.token}"
-                    if "gemma" in model_for_ep.lower():
-                        model_for_ep = "google/gemini-2.5-flash"
 
+                b64_img = base64.b64encode(sanitized_bytes).decode("utf-8")
                 with httpx.Client(timeout=15.0) as client:
                     resp = client.post(
                         chat_url,
@@ -354,45 +416,13 @@ class VisionPaliGemmaClient:
                     if resp.status_code == 200:
                         raw_text = resp.json()["choices"][0]["message"]["content"]
                         parsed = self._extract_json(raw_text)
-                        if parsed:
+                        if parsed and isinstance(parsed, dict):
                             parsed["model_used"] = self.settings.gemma_model_id
                             return parsed
             except Exception as exc:
-                logger.warning("Self-hosted Gemma endpoint degraded, using google-genai: %s", exc)
+                logger.warning("Self-hosted Gemma endpoint notice: %s", exc)
 
-        # 2. Try Open-Weight Gemma 4 (`gemma-4-26b-a4b-it`) and `gemini-3.8-flash` via google-genai Interactions API
-        api_key = self.settings.google_ai_api_key or os.getenv("GEMINI_API_KEY", "")
-        if api_key:
-            for candidate_model in ("gemma-4-26b-a4b-it", "gemini-3.8-flash"):
-                try:
-                    g_client = genai.Client(api_key=api_key)
-                    interaction = g_client.interactions.create(
-                        model=candidate_model,
-                        input=[
-                            {"type": "text", "text": prompt},
-                            {
-                                "type": "image",
-                                "data": b64_img,
-                                "mime_type": "image/jpeg",
-                            },
-                        ],
-                    )
-                    raw_text = interaction.output_text or ""
-                    parsed = self._extract_json(raw_text)
-                    if parsed:
-                        parsed["model_used"] = (
-                            f"{self.settings.gemma_model_id} + {candidate_model}"
-                        )
-                        return parsed
-                except Exception as exc:
-                    logger.warning(
-                        "google-genai Interactions inference with %s degraded: %s",
-                        candidate_model,
-                        exc,
-                    )
-
-        # 3. Deterministic colour/texture spectral analysis of the uploaded image bytes
-        # (computes real pixel luminance, water-reflection dark/cyan ratios, and algae green-channel dominance)
+        # 3. Deterministic colour/texture spectral analysis fallback
         return self._spectral_image_analysis(sanitized_bytes)
 
     @staticmethod
@@ -489,6 +519,7 @@ class VisionPaliGemmaClient:
         ward_lgd: str,
         gee_telemetry: GEEClimateTelemetry,
         ward_breteau_index: float,
+        context: dict[str, Any] | None = None,
     ) -> BreedingSiteScanResult:
         """Full pipeline: DPDP redaction -> GCS upload -> Multimodal detection -> Risk fusion."""
         scan_id = f"SCAN-{uuid.uuid4().hex[:10].upper()}"
@@ -496,32 +527,40 @@ class VisionPaliGemmaClient:
 
         sanitized_bytes, dpdp_audit = self.redact_pii_in_memory(raw_image_bytes)
         gcs_uri = self.upload_sanitized_image_to_gcs(sanitized_bytes, scan_id)
-        vision_out = self._run_multimodal_detector(sanitized_bytes)
+        vision_out = self._run_multimodal_detector(sanitized_bytes, context=context)
 
-        primary_class = str(
-            vision_out.get("primary_classification")
-            or "Uncovered Overhead Tank / Algae/Larvae Presence"
+        container_type = str(
+            vision_out.get("container_or_water_body_type")
+            or vision_out.get("primary_classification")
+            or "Uncovered Overhead Tank"
         )
-        i_vision = float(vision_out.get("vision_confidence") or 0.88)
+        primary_class = container_type
+        i_vision = float(
+            vision_out.get("vision_risk_score")
+            or vision_out.get("vision_confidence")
+            or 0.88
+        )
         i_vision = round(min(max(i_vision, 0.0), 1.0), 2)
 
-        raw_detections = vision_out.get("detections") or []
+        raw_detections = vision_out.get("bounding_boxes") or vision_out.get("detections") or []
         detections: list[BoundingBoxDetection] = []
         for det in raw_detections:
             if isinstance(det, dict):
-                detections.append(
-                    BoundingBoxDetection(
-                        label=str(det.get("label") or primary_class),
-                        confidence=round(
-                            min(max(float(det.get("confidence") or i_vision), 0.0), 1.0),
-                            2,
-                        ),
-                        box_2d=[
-                            int(x)
-                            for x in (det.get("box_2d") or [140, 140, 840, 840])[:4]
-                        ],
-                    )
-                )
+                lbl = str(det.get("label") or primary_class)
+                conf = round(min(max(float(det.get("confidence") or i_vision), 0.0), 1.0), 2)
+                if "box_2d" in det:
+                    b2d = [int(x) for x in det["box_2d"][:4]]
+                elif "ymin" in det and "xmin" in det and "ymax" in det and "xmax" in det:
+                    ymin = float(det["ymin"])
+                    xmin = float(det["xmin"])
+                    ymax = float(det["ymax"])
+                    xmax = float(det["xmax"])
+                    scale = 1000.0 if ymax <= 1.0 and xmax <= 1.0 else 1.0
+                    b2d = [int(ymin * scale), int(xmin * scale), int(ymax * scale), int(xmax * scale)]
+                else:
+                    b2d = [140, 140, 840, 840]
+                detections.append(BoundingBoxDetection(label=lbl, confidence=conf, box_2d=b2d))
+
         if not detections:
             detections.append(
                 BoundingBoxDetection(
@@ -536,7 +575,23 @@ class VisionPaliGemmaClient:
             ward_breteau_index=ward_breteau_index,
             i_vision=i_vision,
         )
-        intervention, dosage = get_ncvbdc_dosage_protocol(primary_class, risk_tier)
+        intervention, default_dosage = get_ncvbdc_dosage_protocol(primary_class, risk_tier)
+        dosage = str(vision_out.get("ncvbdc_chemical_dosage_recommendation") or default_dosage)
+        reasoning = str(vision_out.get("scientific_reasoning") or "")
+        water_type = str(
+            vision_out.get("water_turbidity_and_organic_matter")
+            or vision_out.get("water_type")
+            or "Turbid Organic"
+        )
+        species = list(
+            vision_out.get("probable_vector_species")
+            or ["Aedes aegypti", "Aedes albopictus"]
+        )
+        larval_stage = str(vision_out.get("estimated_larval_stage") or "Instar I-II")
+        larval_density = float(
+            vision_out.get("estimated_larval_density_per_dip") or 14.0
+        )
+        is_valid = bool(vision_out.get("is_valid_breeding_habitat", True))
 
         return BreedingSiteScanResult(
             scan_id=scan_id,
@@ -546,12 +601,10 @@ class VisionPaliGemmaClient:
             longitude=lng,
             image_gcs_uri=gcs_uri,
             primary_classification=primary_class,
-            water_type=str(vision_out.get("water_type") or "Turbid Organic"),
-            larval_density_estimate=str(
-                vision_out.get("larval_density_estimate") or "High Alert (35–50/dip)"
-            ),
+            water_type=water_type,
+            larval_density_estimate=f"{larval_stage} ({larval_density:.1f}/dip)",
             stagnant_water_matrix_pct=int(
-                vision_out.get("stagnant_water_matrix_pct") or int(round(i_vision * 100))
+                round(float(vision_out.get("stagnant_water_matrix_pct") or (i_vision * 100)))
             ),
             vision_confidence=i_vision,
             detections=detections,
@@ -565,6 +618,15 @@ class VisionPaliGemmaClient:
             recommended_intervention=intervention,
             larvicide_dosage_protocol=dosage,
             auto_escalation_triggered=composite_score >= 0.70,
+            is_valid_breeding_habitat=is_valid,
+            container_or_water_body_type=container_type,
+            water_turbidity_and_organic_matter=water_type,
+            probable_vector_species=species,
+            estimated_larval_stage=larval_stage,
+            estimated_larval_density_per_dip=larval_density,
+            vision_risk_score=i_vision,
+            ncvbdc_chemical_dosage_recommendation=dosage,
+            scientific_reasoning=reasoning,
         )
 
 

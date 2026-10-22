@@ -42,7 +42,7 @@
           "properties": {
             "lgd_code": {
               "type": "string",
-              "description": "Official LGD code of the ward or village (e.g. '04055001' for Sector 22-B Chandigarh or '07089014' for Ward 14 Anand Vihar)."
+              "description": "Official LGD code of the ward or village (e.g. '0404400017' for Ward 17 Sector 22 Chandigarh or '0404400014' for Ward 14 Dhanas)."
             }
           },
           "required": ["lgd_code"],

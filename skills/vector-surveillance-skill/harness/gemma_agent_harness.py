@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -13,11 +14,21 @@ import httpx
 from google import genai
 from pydantic import BaseModel, Field
 
-from .skill_executor import SkillExecutor
+try:
+    from .skill_executor import SkillExecutor
+except (ImportError, ValueError):
+    from skill_executor import SkillExecutor
 
 logger = logging.getLogger("arogya_drishti.gemma_harness")
 
 _SKILL_DIR = Path(__file__).resolve().parents[1]
+_HARNESS_DIR = Path(__file__).resolve().parent
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_BACKEND_DIR = _REPO_ROOT / "backend"
+for _p in (_HARNESS_DIR, _REPO_ROOT, _BACKEND_DIR):
+    if str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))
+
 _SKILL_MD_PATH = _SKILL_DIR / "SKILL.md"
 _SCHEMA_JSON_PATH = _SKILL_DIR / "schema.json"
 
@@ -282,26 +293,31 @@ class GemmaAgentHarness:
             except Exception as exc:
                 logger.warning("Self-hosted Gemma endpoint degraded: %s", exc)
 
-        # 2. Call Open-Weight Gemma 4 (`gemma-4-26b-a4b-it`) or `gemini-3.8-flash` via google-genai Interactions API
+        # 2. Call Open-Weight Gemma / Gemini via official google-genai SDK
         api_key = settings.google_ai_api_key or os.getenv("GEMINI_API_KEY", "")
         if api_key:
-            for model_id in ("gemma-4-26b-a4b-it", "gemini-3.8-flash"):
+            from google.genai import types
+
+            for model_id in ("gemini-3.8-flash", "gemma-4-26b-a4b-it", "gemini-2.5-flash"):
                 try:
                     g_client = genai.Client(api_key=api_key)
-                    interaction = g_client.interactions.create(
+                    resp = g_client.models.generate_content(
                         model=model_id,
-                        system_instruction=system_prompt,
-                        input=user_message,
+                        contents=user_message,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_prompt,
+                            temperature=0.2,
+                        ),
                     )
-                    if interaction.output_text:
+                    if resp.text:
                         return AgentChatTurnResult(
-                            reply_text=interaction.output_text.strip(),
+                            reply_text=resp.text.strip(),
                             model_used=f"{settings.gemma_model_id} ({model_id})",
                             language_detected=lang,
                             tool_cards=cards,
                         )
                 except Exception as exc:
-                    logger.warning("Interactions API with %s degraded: %s", model_id, exc)
+                    logger.warning("google-genai generate_content with %s degraded: %s", model_id, exc)
 
         # 3. Grounded NCVBDC synthesis from the live tool outputs
         reply_text = self._synthesize_grounded_protocol(
@@ -335,9 +351,9 @@ class GemmaAgentHarness:
             elif c.card_type == "VAN_DISPATCH":
                 van_metrics = c.metrics
 
-        hi = idx_metrics.get("house_index_pct", 14.2)
-        ci = idx_metrics.get("container_index_pct", 28.6)
-        bi = idx_metrics.get("breteau_index", 34.0)
+        hi = idx_metrics.get("house_index_pct", 0.0)
+        ci = idx_metrics.get("container_index_pct", 0.0)
+        bi = idx_metrics.get("breteau_index", 0.0)
         lst = gee_metrics.get("lst_celsius")
         rain = gee_metrics.get("rain_14d_mm")
 
@@ -368,3 +384,71 @@ class GemmaAgentHarness:
                 f"• **3. 100m Perimeter Surveillance:** Schedule **Pyrethrum 2% ULV thermal fogging (1:19 kerosene dilution)** across adjacent residential blocks within 24 hours.{van_line}"
             )
         return base
+
+
+def main() -> None:
+    """CLI autonomous execution loop for Gemma 4 Agent Skill."""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Arogya Drishti — Open-Weight Gemma 4 Agent Skill Execution Loop"
+    )
+    parser.add_argument(
+        "--message",
+        "-m",
+        type=str,
+        default="What is the Breteau Index and Temephos dosage protocol for Sector 22-B?",
+        help="Officer query or natural language directive",
+    )
+    parser.add_argument(
+        "--ward",
+        "-w",
+        type=str,
+        default="Sector 22-B",
+        help="Ward / Village name",
+    )
+    parser.add_argument(
+        "--lgd",
+        "-l",
+        type=str,
+        default="0404400017",
+        help="10-digit Local Government Directory (LGD) code",
+    )
+    parser.add_argument(
+        "--lat",
+        type=float,
+        default=30.7333,
+        help="WGS84 Latitude",
+    )
+    parser.add_argument(
+        "--lng",
+        type=float,
+        default=76.7794,
+        help="WGS84 Longitude",
+    )
+    args = parser.parse_args()
+
+    harness = GemmaAgentHarness()
+    print(f"\n[Gemma 4 Agent Skill] Executing turn for: '{args.message}'")
+    print(f"[Jurisdiction] Ward: {args.ward} | LGD: {args.lgd} | ({args.lat}, {args.lng})\n")
+
+    res = harness.run_chat_turn(
+        user_message=args.message,
+        ward_village=args.ward,
+        lgd_code=args.lgd,
+        lat=args.lat,
+        lng=args.lng,
+    )
+
+    print(f"--- Model Used: {res.model_used} ---")
+    print(f"--- Language Detected: {res.language_detected} ---")
+    print(f"--- Tool Cards Generated: {len(res.tool_cards)} ---")
+    for idx, card in enumerate(res.tool_cards, 1):
+        print(f"  [{idx}] Tool: {card.tool_name} | Type: {card.card_type} | Title: {card.title}")
+    print("\n--- Assistant Reply ---")
+    print(res.reply_text)
+    print("-----------------------\n")
+
+
+if __name__ == "__main__":
+    main()

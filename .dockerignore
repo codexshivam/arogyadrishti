@@ -1,0 +1,12 @@
+.git
+.venv
+venv
+flutter_app
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.ruff_cache
+.firebase
+.DS_Store

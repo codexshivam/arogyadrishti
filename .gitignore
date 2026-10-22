@@ -10,6 +10,8 @@
 key.properties
 .env
 .env.*
+env_vars.yaml
+*.yaml.env
 !.env.example
 google-services.json
 GoogleService-Info.plist

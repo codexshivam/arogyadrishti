@@ -1,14 +1,4 @@
 {
-  "auth": {
-    "providers": {
-      "anonymous": true,
-      "emailPassword": true,
-      "googleSignIn": {
-        "oAuthBrandDisplayName": "Arogya",
-        "supportEmail": "shivam@revlet.me"
-      }
-    }
-  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
@@ -25,6 +15,27 @@
       "**/node_modules/**"
     ],
     "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "arogya-drishti-api",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/healthz",
+        "run": {
+          "serviceId": "arogya-drishti-api",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/readyz",
+        "run": {
+          "serviceId": "arogya-drishti-api",
+          "region": "asia-south1"
+        }
+      },
       {
         "source": "/privacy",
         "destination": "/privacy.html"

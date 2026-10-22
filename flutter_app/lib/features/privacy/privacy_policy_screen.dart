@@ -14,6 +14,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
         backgroundColor: ArogyaTheme.surfaceWhite,
         surfaceTintColor: Colors.transparent,
         title: Row(

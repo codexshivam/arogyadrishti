@@ -1,6 +1,4 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -35,24 +33,18 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      systemOverlayStyle: const SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: Colors.white,
-        systemNavigationBarIconBrightness: Brightness.dark,
-        systemNavigationBarDividerColor: Colors.white,
-      ),
+      systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
       toolbarHeight: 50,
       title: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Arogya Drishti',
+            'Arogya',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: ArogyaTheme.primaryCrimson,
                   fontWeight: FontWeight.w800,
-                  fontSize: 16,
+                  fontSize: 18,
+                  letterSpacing: 0.2,
                 ),
           ),
           const SizedBox(height: 1),
@@ -429,16 +421,29 @@ void showArogyaToast(
   BuildContext context, {
   required String title,
   required String message,
-  ContentType contentType = ContentType.success,
+  dynamic contentType,
+  Color? backgroundColor,
 }) {
+  final isError = title.toLowerCase().contains('error') ||
+      title.toLowerCase().contains('fail') ||
+      title.toLowerCase().contains('reject') ||
+      message.toLowerCase().contains('error') ||
+      message.toLowerCase().contains('fail');
+  final bg = backgroundColor ??
+      (isError ? const Color(0xFF8B0000) : const Color(0xFF1E293B));
+
   final snackBar = SnackBar(
-    elevation: 0,
     behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: title,
-      message: message,
-      contentType: contentType,
+    backgroundColor: bg,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    duration: const Duration(seconds: 4),
+    content: Text(
+      title.isNotEmpty ? '$title: $message' : message,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
     ),
   );
   ScaffoldMessenger.of(context)
@@ -480,7 +485,7 @@ class _ActionDispatchBottomSheetState
     'Manimajra',
     'Dhanas',
     'Sector 16',
-    'Ward 14 - Anand Vihar',
+    'Sector 45',
   ];
   Map<String, dynamic>? _dispatchResult;
 
@@ -552,9 +557,8 @@ class _ActionDispatchBottomSheetState
       setState(() => _submitting = false);
       showArogyaToast(
         context,
-        title: 'Dispatch Error',
-        message: 'Could not reach Cloud Run dispatch service: $e',
-        contentType: ContentType.failure,
+        title: 'Dispatch Notice',
+        message: 'Could not reach dispatch service. Please check your network and try again.',
       );
     }
   }

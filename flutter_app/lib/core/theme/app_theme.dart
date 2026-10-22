@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Spacing & semantic tokens used across clinical screens.
@@ -30,6 +31,15 @@ class ArogyaTheme {
   ];
 
   // --- Core Palette (DESIGN.md) ---
+  static const SystemUiOverlayStyle whiteSystemUiOverlay = SystemUiOverlayStyle(
+    statusBarColor: Colors.white,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: Colors.white,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarDividerColor: Colors.white,
+  );
+
   static const Color primaryCrimson = Color(0xFFA50C1F);
   static const Color primaryCrimsonDark = Color(0xFF7C0012);
   static const Color primaryCrimsonActive = Color(0xFF991B1B);
@@ -73,6 +83,13 @@ class ArogyaTheme {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: backgroundCanvas,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: surfaceWhite,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        systemOverlayStyle: whiteSystemUiOverlay,
+      ),
       colorScheme: const ColorScheme.light(
         primary: primaryCrimson,
         onPrimary: surfaceWhite,

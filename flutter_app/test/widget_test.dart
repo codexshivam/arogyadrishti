@@ -1,3 +1,4 @@
+import 'package:arogya_drishti/core/network/api_client.dart';
 import 'package:arogya_drishti/core/theme/app_theme.dart';
 import 'package:arogya_drishti/core/widgets/arogya_shared_widgets.dart';
 import 'package:arogya_drishti/features/auth/auth_screen.dart';
@@ -6,6 +7,75 @@ import 'package:arogya_drishti/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+class _FakeSupportApiClient extends ArogyaApiClient {
+  _FakeSupportApiClient() : super(baseUrl: 'http://localhost:8080');
+
+  @override
+  Future<Map<String, dynamic>> fetchSupportOverview({String? lgdCode}) async {
+    return <String, dynamic>{
+      'emergency_hotlines': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'title': 'NCDC Vector Control Room',
+          'subtitle': '1800-11-VECTOR',
+          'number': '1800114377',
+          'icon_type': 'phone',
+          'is_primary': true,
+          'badge': 'NATIONAL',
+        },
+      ],
+      'nodal_officers': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'initials': 'RK',
+          'name': 'Dr. R. K. Sharma',
+          'role': 'District Nodal Representative (Chandigarh)',
+          'phone': '911123900110',
+          'email': 'shivam@revlet.me',
+          'color_hex': '0xFF8B0014',
+          'is_chat': false,
+          'source': '3_Staff_Directory / api.data.gov.in',
+        },
+      ],
+      'available_wards': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'lgd_code': '0404400017',
+          'ward_name': 'Sector 22-B',
+          'district': 'Chandigarh',
+          'state': 'Chandigarh',
+          'risk_tier': 'CRITICAL',
+        },
+      ],
+      'escalation_categories': <String>[
+        'Outbreak Cluster Flare-up (High Larval Index)',
+        'Stagnant Water / Construction Debris',
+      ],
+      'severity_levels': <String>[
+        'Critical (2h SLA)',
+        'High (6h SLA)',
+      ],
+      'recent_tickets': <Map<String, dynamic>>[],
+      'selected_ward': <String, dynamic>{
+        'lgd_code': '0404400017',
+        'ward_name': 'Sector 22-B',
+        'district': 'Chandigarh',
+        'state': 'Chandigarh',
+      },
+    };
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyStaff({
+    required String uid,
+    String? phone,
+    String? email,
+  }) async {
+    final cleanPhone = (phone ?? '').replaceAll(RegExp(r'\D'), '');
+    if (cleanPhone.endsWith('9915549458') || cleanPhone.endsWith('9501588795')) {
+      return {'status': 'STAFF_VERIFIED', 'officer_profile': {'name': 'Officer'}};
+    }
+    throw Exception('Phone number or email is not pre-authorized');
+  }
+}
 
 void main() {
   testWidgets(
@@ -37,7 +107,7 @@ void main() {
   );
 
   testWidgets(
-    'AuthScreen renders NCVBDC role selector and DPDP Act 2023 badge',
+    'AuthScreen renders initial Send OTP button, and reveals OTP input on officer select',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -50,7 +120,47 @@ void main() {
 
       expect(find.text('Welcome'), findsOneWidget);
       expect(find.text('Statutory Surveillance Notice'), findsOneWidget);
+      expect(find.text('Send OTP'), findsOneWidget);
+
+      // Select pre-authorized officer chip to reveal OTP & Verify button
+      await tester.tap(find.text('Shivam Yadav'));
+      await tester.pump();
+
       expect(find.text('Verify & Access Portal'), findsOneWidget);
+      expect(find.text('Enter 6-Digit Verification Code'), findsOneWidget);
+      expect(find.textContaining('Resend code in'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'AuthScreen displays Phone number not registered snackbar for unregistered phone numbers',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            apiClientProvider.overrideWithValue(_FakeSupportApiClient()),
+          ],
+          child: MaterialApp(
+            theme: ArogyaTheme.lightTheme(),
+            home: const AuthScreen(),
+          ),
+        ),
+      );
+
+      // Enter an unregistered phone number
+      final phoneField = find.byType(TextField).first;
+      await tester.enterText(phoneField, '9123456780');
+      await tester.pump();
+
+      // Tap Send OTP
+      await tester.tap(find.text('Send OTP'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      // Expect normal snackbar with 'Phone number not registered'
+      expect(find.text('Phone number not registered'), findsOneWidget);
+      // OTP field should NOT be revealed
+      expect(find.text('Enter 6-Digit Verification Code'), findsNothing);
     },
   );
 
@@ -70,7 +180,7 @@ void main() {
       );
 
       expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('Arogya Drishti'), findsOneWidget);
+      expect(find.text('Arogya'), findsOneWidget);
       expect(find.text('developed and managed by Team Rocket'), findsOneWidget);
       expect(find.byIcon(Icons.home_rounded), findsOneWidget);
 
@@ -91,6 +201,9 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
+          overrides: [
+            apiClientProvider.overrideWithValue(_FakeSupportApiClient()),
+          ],
           child: MaterialApp(
             theme: ArogyaTheme.lightTheme(),
             home: const SupportScreen(),

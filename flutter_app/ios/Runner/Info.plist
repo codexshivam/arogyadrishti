@@ -26,6 +26,38 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Arogya Drishti requires camera access to photograph suspected mosquito larvae breeding sites and water containers for automated AI entomological analysis.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Arogya Drishti requires photo library access to upload images of water containers and stagnant breeding sites for larval detection.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Arogya Drishti uses your location to geotag field vector inspections, locate nearby health centers, and coordinate emergency fogging vans in your ward.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Arogya Drishti uses your location to track vector surveillance routes and ensure accurate municipal ward allocation during field duty.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.234323362711-8dab7042otc44t6qbdi7mr8icakhaiee</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>mailto</string>
+		<string>https</string>
+		<string>comgooglemaps</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -7,6 +7,7 @@ from app.tools.sheets_admin_tool.client import (
     StaffContactRecord,
     VanFleetRecord,
     VanRequestRecord,
+    get_authorized_contacts,
     get_sheets_client,
 )
 from app.tools.sheets_admin_tool.exceptions import (
@@ -23,5 +24,6 @@ __all__ = [
     "StaffContactRecord",
     "VanFleetRecord",
     "VanRequestRecord",
+    "get_authorized_contacts",
     "get_sheets_client",
 ]

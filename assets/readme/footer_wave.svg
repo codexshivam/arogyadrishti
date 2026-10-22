@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" width="100%" height="100%" style="background:transparent;">
+  <defs>
+    <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#DC2626" stop-opacity="0.25" />
+      <stop offset="50%" stop-color="#7C3AED" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.25" />
+    </linearGradient>
+    <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.45" />
+      <stop offset="50%" stop-color="#F59E0B" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0.45" />
+    </linearGradient>
+  </defs>
+
+  <path d="M 0,60 C 300,10 600,110 900,40 C 1050,5 1150,85 1200,60 L 1200,120 L 0,120 Z" fill="url(#waveGrad1)">
+    <animate attributeName="d"
+      values="M 0,60 C 300,10 600,110 900,40 C 1050,5 1150,85 1200,60 L 1200,120 L 0,120 Z;
+              M 0,50 C 300,90 600,20 900,80 C 1050,40 1150,20 1200,50 L 1200,120 L 0,120 Z;
+              M 0,60 C 300,10 600,110 900,40 C 1050,5 1150,85 1200,60 L 1200,120 L 0,120 Z"
+      dur="10s" repeatCount="indefinite" />
+  </path>
+
+  <path d="M 0,80 C 250,40 550,110 850,60 C 1020,30 1120,95 1200,80 L 1200,120 L 0,120 Z" fill="url(#waveGrad2)">
+    <animate attributeName="d"
+      values="M 0,80 C 250,40 550,110 850,60 C 1020,30 1120,95 1200,80 L 1200,120 L 0,120 Z;
+              M 0,70 C 250,110 550,40 850,90 C 1020,60 1120,40 1200,70 L 1200,120 L 0,120 Z;
+              M 0,80 C 250,40 550,110 850,60 C 1020,30 1120,95 1200,80 L 1200,120 L 0,120 Z"
+      dur="7s" repeatCount="indefinite" />
+  </path>
+
+  <line x1="0" y1="119" x2="1200" y2="119" stroke="#334155" stroke-width="1" />
+</svg>

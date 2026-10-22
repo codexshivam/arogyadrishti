@@ -1,19 +1,33 @@
 ---
 name: arogya-drishti-vector-surveillance
 version: 1.0.0
-description: Standardized open-source epidemiological Agent Skill for vector-borne disease triage, Google Earth Engine micro-climate analysis, WHO/NCVBDC entomological index computation (HI, CI, BI), and municipal fogging van dispatch.
 license: Apache-2.0
+author: Team Rocket (Chandigarh University)
+repository: https://github.com/codexshivam/arogyadrishti
+homepage: https://arogyadrishti.in
 models:
-  - google/gemma-4-12B-it
+  - google/gemma-4-26b-it
+  - google/gemma-4-4b
   - google/gemma-2-9b-it
-  - google/paligemma-3b-pt-224
   - gemini-3.8-flash
-author: Team Rocket
+keywords:
+  - gemma-4
+  - open-weight-ai
+  - ncvbdc
+  - epidemiology
+  - vector-surveillance
+  - dengue-control
+  - smart-governance
+description: Autonomous epidemiological agent skill for vector-borne disease triage, micro-climate GEE extraction, and municipal fogging van dispatch conforming to the Agent Skill Open Standard and powered by open-weight Gemma 4.
 ---
 
 # Arogya Drishti — Vector Surveillance & Autonomous Triage Agent Skill
 
-This skill equips open-weight language models (**Gemma 4 12B-IT** / **Gemma 2 9B-IT**), open-weight vision-language models (**PaliGemma 3B**), and cloud multimodal models (**Gemini 3.8 Flash**) with deterministic tool execution and NCVBDC/WHO epidemiological protocols for Indian municipal vector control officers and ASHA workers.
+**Compliant with the Agent Skill Open Standard | Licensed under Apache 2.0 | Powered by Open-Weight Gemma 4**
+*Repository: [https://github.com/codexshivam/arogyadrishti](https://github.com/codexshivam/arogyadrishti)*
+*License: [Apache License, Version 2.0](../../LICENSE)*
+
+This Agent Skill equips open-weight foundational models (**Gemma 4 26B-IT** and **Gemma 4 4B**), open-weight vision-language models (**PaliGemma 3B**), and sovereign cloud models (**Gemini 3.8 Flash**) with deterministic tool execution and NCVBDC/WHO epidemiological protocols for Indian municipal sanitary inspectors, district nodal officers, and frontline ASHA health workers.
 
 ---
 
@@ -26,7 +40,7 @@ Always invoke one or more of the following four tools before answering questions
    - Use whenever an officer asks about weather, temperature, standing water, or climate risk at a coordinate.
 
 2. **`compute_ward_entomological_indices(lgd_code)`**
-   - Aggregates live Cloud Firestore `field_logs` for the specified Local Government Directory (`lgd_code`, e.g., `"04055001"` for Sector 22-B Chandigarh or `"07089014"` for Ward 14 Anand Vihar) and computes:
+   - Aggregates live Cloud Firestore `field_logs` for the specified Local Government Directory (`lgd_code`, e.g., `"0404400017"` for Ward 17 Sector 22 Chandigarh or `"0404400014"` for Ward 14 Dhanas) and computes:
      - **House Index ($HI\%$):** $\frac{\text{Infested Houses}}{\text{Inspected Houses}} \times 100$
      - **Container Index ($CI\%$):** $\frac{\text{Positive Containers}}{\text{Inspected Containers}} \times 100$
      - **Breteau Index ($BI$):** $\frac{\text{Positive Containers}}{\text{Inspected Houses}} \times 100$
@@ -60,3 +74,12 @@ When advising field officers in English, Hindi, Hinglish, or Punjabi, quote the 
 | **House Index ($HI\%$)** | $< 1.0\%$ | $1.0\% - 5.0\%$ | **$> 5.0\%$ (Critical Outbreak)** | Immediate house-to-house larval source reduction + Temephos 1 ppm. |
 | **Container Index ($CI\%$)** | $< 5.0\%$ | $5.0\% - 10.0\%$ | **$> 10.0\%$ (Severe Level)** | Puncture/drain discarded tires, cover overhead tanks, apply Bti. |
 | **Breteau Index ($BI$)** | $< 5.0$ | $5.0 - 20.0$ | **$> 20.0$ (Priority Fogging)** / **$> 50.0$ (Epidemic Zone)** | Invoke `dispatch_fogging_van` and `trigger_emergency_ward_alert` immediately. |
+
+---
+
+## 4. Open-Weight Model Orchestration & Sandboxed Execution
+
+The skill is executed through [`harness/gemma_agent_harness.py`](harness/gemma_agent_harness.py) and [`harness/skill_executor.py`](harness/skill_executor.py):
+* **Self-Hosted / Edge Deployment:** Gemma 4 open-weight weights running via vLLM, Ollama, or llama.cpp in local municipal environments with zero cloud egress.
+* **Deterministic Sandboxing:** Tool calls undergo strict allow-list validation and parameter type casting against [`schema.json`](schema.json) before touching databases or external gateways.
+* **Full Open-Source License:** Released under the [Apache License, Version 2.0](../../LICENSE) as part of the public Arogya Drishti repository.

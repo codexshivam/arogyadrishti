@@ -1,18 +1,58 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arogya_shared_widgets.dart';
 
-/// Screen 1: HomeScreen (`/home`) — Officer Profile, GPS Ward Bar, 3 Quick Actions,
-/// Field Vector Inspection Form (HI/CI/BI), and More Services.
+/// State representation for Home Screen Command Center
+class HomeState {
+  final bool isSyncing;
+  final int pendingWriteCount;
+  final String locationSearchQuery;
+
+  const HomeState({
+    this.isSyncing = false,
+    this.pendingWriteCount = 0,
+    this.locationSearchQuery = '',
+  });
+
+  HomeState copyWith({
+    bool? isSyncing,
+    int? pendingWriteCount,
+    String? locationSearchQuery,
+  }) {
+    return HomeState(
+      isSyncing: isSyncing ?? this.isSyncing,
+      pendingWriteCount: pendingWriteCount ?? this.pendingWriteCount,
+      locationSearchQuery: locationSearchQuery ?? this.locationSearchQuery,
+    );
+  }
+}
+
+class HomeViewModel extends StateNotifier<HomeState> {
+  HomeViewModel() : super(const HomeState());
+
+  void setSyncing(bool val) => state = state.copyWith(isSyncing: val);
+  void setPendingWriteCount(int count) =>
+      state = state.copyWith(pendingWriteCount: count);
+  void setSearchQuery(String q) =>
+      state = state.copyWith(locationSearchQuery: q);
+}
+
+final homeViewModelProvider =
+    StateNotifierProvider<HomeViewModel, HomeState>((ref) {
+  return HomeViewModel();
+});
+
+/// Screen 1: HomeScreen (`/home`) — Primary Command Center for frontline health workers
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,43 +61,115 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _searchController = TextEditingController();
-  final _wardInputController = TextEditingController();
   final _housesInspectedController = TextEditingController();
   final _housesPositiveController = TextEditingController();
   final _containersCheckedController = TextEditingController();
   final _containersPositiveController = TextEditingController();
 
+  String _selectedWardLgd = '0404400014';
+  String _selectedWardName = 'Ward 14 – Dhanas';
   String _selectedTreatment = 'Temephos 50% EC Applied';
+
   bool _locating = false;
   bool _savingLog = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final ward = ref.read(activeWardProvider);
-    if (ward.wardName.isNotEmpty) {
-      _wardInputController.text = ward.wardName.split(',').first.trim();
-    }
-  }
+  List<Map<String, dynamic>> _availableWards = [];
 
   static const List<String> _treatments = <String>[
     'Temephos 50% EC Applied',
-    'Bti Applied',
+    'Bti Granules',
     'Pyrethrum Spray',
     'Source Drained',
     'None',
   ];
 
   @override
+  void initState() {
+    super.initState();
+    final ward = ref.read(activeWardProvider);
+    if (ward.lgdCode.isNotEmpty) {
+      _selectedWardLgd = ward.lgdCode;
+      _selectedWardName = ward.wardName;
+    }
+    _loadAvailableWards();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
-    _wardInputController.dispose();
     _housesInspectedController.dispose();
     _housesPositiveController.dispose();
     _containersCheckedController.dispose();
     _containersPositiveController.dispose();
     super.dispose();
+  }
+
+  String _getEffectiveUid() {
+    final authUser = FirebaseAuth.instance.currentUser;
+    if (authUser != null && authUser.uid.isNotEmpty) {
+      return authUser.uid;
+    }
+    final wardState = ref.read(activeWardProvider);
+    if (wardState.officerPhone.isNotEmpty) {
+      final clean = wardState.officerPhone.replaceAll(RegExp(r'\D'), '');
+      return 'user_$clean';
+    }
+    return 'user_9915549458';
+  }
+
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'GOOD MORNING,';
+    if (hour < 17) return 'GOOD AFTERNOON,';
+    return 'GOOD EVENING,';
+  }
+
+  Future<void> _loadAvailableWards() async {
+    try {
+      final api = ref.read(apiClientProvider);
+      final resp = await api.fetchLocationsWards();
+      final wardsList = (resp['wards'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>();
+
+      if (wardsList.isNotEmpty && mounted) {
+        setState(() {
+          _availableWards = wardsList;
+          final match = wardsList.firstWhere(
+            (w) => w['lgd_code'] == _selectedWardLgd,
+            orElse: () => wardsList.first,
+          );
+          _selectedWardLgd = match['lgd_code'].toString();
+          _selectedWardName = match['ward_name'].toString();
+        });
+        return;
+      }
+    } catch (_) {}
+
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('wards')
+          .orderBy('ward_no')
+          .limit(40)
+          .get();
+      final wardList = snap.docs.map((d) {
+        final data = d.data();
+        return {
+          'lgd_code': d.id,
+          'ward_name': (data['ward_name'] ?? d.id).toString(),
+          'lat': (data['lat'] as num?)?.toDouble() ?? 30.7675,
+          'lng': (data['lng'] as num?)?.toDouble() ?? 76.7460,
+        };
+      }).toList();
+
+      if (wardList.isNotEmpty && mounted) {
+        setState(() {
+          _availableWards = wardList;
+          _selectedWardLgd = wardList.first['lgd_code'].toString();
+          _selectedWardName = wardList.first['ward_name'].toString();
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _resolveCurrentGpsWard() async {
@@ -69,7 +181,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
       if (perm == LocationPermission.whileInUse ||
           perm == LocationPermission.always) {
-        final pos = await Geolocator.getCurrentPosition();
+        final pos = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
         String wardLabel = 'Sector 22-B, Chandigarh';
         try {
           final placemarks = await placemarkFromCoordinates(
@@ -79,38 +193,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (placemarks.isNotEmpty) {
             final pm = placemarks.first;
             final sub = (pm.subLocality ?? pm.locality ?? 'Sector 22-B').trim();
-            final city = (pm.locality ?? pm.administrativeArea ?? 'Chandigarh')
-                .trim();
+            final city =
+                (pm.locality ?? pm.administrativeArea ?? 'Chandigarh').trim();
             wardLabel = '$sub, $city';
-            _wardInputController.text = sub;
           }
         } catch (_) {}
 
-        ref
-            .read(activeWardProvider.notifier)
-            .updateWard(
-              lgdCode: '04055001',
+        ref.read(activeWardProvider.notifier).updateWard(
+              lgdCode: _selectedWardLgd,
               wardName: wardLabel,
               district: 'Chandigarh',
               latitude: pos.latitude,
               longitude: pos.longitude,
             );
+
+        setState(() {
+          _selectedWardName = wardLabel;
+        });
       }
     } catch (_) {
-      // Fallback to verified Chandigarh Sector 22-B GPS coordinate if permission denied on desktop/web
-      ref
-          .read(activeWardProvider.notifier)
-          .updateWard(
-            lgdCode: '04055001',
+      ref.read(activeWardProvider.notifier).updateWard(
+            lgdCode: '0404400017',
             wardName: 'Sector 22-B, Chandigarh',
             district: 'Chandigarh',
             latitude: 30.7333,
             longitude: 76.7794,
           );
     } finally {
-      if (mounted) {
-        setState(() => _locating = false);
-      }
+      if (mounted) setState(() => _locating = false);
     }
   }
 
@@ -122,36 +232,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => ActionDispatchBottomSheet(
         actionType: actionType,
-        initialWard: _wardInputController.text.trim().isNotEmpty
-            ? _wardInputController.text.trim()
-            : wardState.wardName.split(',').first,
+        initialWard: _selectedWardName,
         initialLat: wardState.latitude,
         initialLng: wardState.longitude,
       ),
     );
   }
 
+  Future<void> _handleLogout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Logout'),
+        content: const Text(
+          'Are you sure you want to end your active officer surveillance session?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8B0000),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final uid = _getEffectiveUid();
+      try {
+        await ref.read(apiClientProvider).logout(uid: uid);
+      } catch (_) {}
+      await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      context.go('/auth');
+    } catch (_) {
+      if (mounted) context.go('/auth');
+    }
+  }
+
   Future<void> _saveFieldInspectionLog() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
     final hInsp = int.tryParse(_housesInspectedController.text.trim()) ?? 0;
     final hPos = int.tryParse(_housesPositiveController.text.trim()) ?? 0;
     final cChk = int.tryParse(_containersCheckedController.text.trim()) ?? 0;
     final cPos = int.tryParse(_containersPositiveController.text.trim()) ?? 0;
-    final ward = _wardInputController.text.trim();
-
-    if (ward.isEmpty ||
-        hInsp <= 0 ||
-        cChk <= 0 ||
-        hPos > hInsp ||
-        cPos > cChk) {
-      showArogyaToast(
-        context,
-        title: 'Validation Error',
-        message:
-            'Ensure Houses Inspected > 0, Containers Checked > 0, and positive counts do not exceed totals.',
-        contentType: ContentType.warning,
-      );
-      return;
-    }
 
     final hi = (hPos / hInsp) * 100.0;
     final ci = (cPos / cChk) * 100.0;
@@ -159,39 +293,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final wardState = ref.read(activeWardProvider);
 
     setState(() => _savingLog = true);
+    ref.read(homeViewModelProvider.notifier).setSyncing(true);
+
     try {
-      // 1. Write directly to Firestore with offline persistence enabled
       if (FirestoreSyncService.isFirebaseReady) {
-        await FirebaseFirestore.instance
-            .collection('field_logs')
-            .add(<String, dynamic>{
-              'officer_uid': wardState.officerUid,
-              'officer_name': wardState.officerName,
-              'lgd_code': wardState.lgdCode,
-              'ward_village': ward,
-              'larvicidal_treatment': _selectedTreatment,
-              'houses_inspected': hInsp,
-              'houses_positive': hPos,
-              'containers_checked': cChk,
-              'containers_positive': cPos,
-              'computed_hi': double.parse(hi.toStringAsFixed(2)),
-              'computed_ci': double.parse(ci.toStringAsFixed(2)),
-              'computed_bi': double.parse(bi.toStringAsFixed(2)),
-              'latitude': wardState.latitude,
-              'longitude': wardState.longitude,
-              'geohash': 'ttnfv8',
-              'timestamp': FieldValue.serverTimestamp(),
-            });
+        await FirebaseFirestore.instance.collection('field_logs').add({
+          'officer_uid': wardState.officerUid,
+          'officer_name': wardState.officerName,
+          'lgd_code': _selectedWardLgd,
+          'ward_village': _selectedWardName,
+          'larvicidal_treatment': _selectedTreatment,
+          'houses_inspected': hInsp,
+          'houses_positive': hPos,
+          'containers_checked': cChk,
+          'containers_positive': cPos,
+          'computed_hi': double.parse(hi.toStringAsFixed(2)),
+          'computed_ci': double.parse(ci.toStringAsFixed(2)),
+          'computed_bi': double.parse(bi.toStringAsFixed(2)),
+          'latitude': wardState.latitude,
+          'longitude': wardState.longitude,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
       }
 
-      // 2. Also sync via FastAPI backend `/api/v1/field-logs`
-      await ref
-          .read(apiClientProvider)
-          .submitFieldLog(
+      await ref.read(apiClientProvider).submitFieldLog(
             officerUid: wardState.officerUid,
             officerName: wardState.officerName,
-            lgdCode: wardState.lgdCode,
-            wardVillage: ward,
+            lgdCode: _selectedWardLgd,
+            wardVillage: _selectedWardName,
             larvicidalTreatment: _selectedTreatment,
             housesInspected: hInsp,
             housesPositive: hPos,
@@ -208,21 +337,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       if (!mounted) return;
       setState(() => _savingLog = false);
+      ref.read(homeViewModelProvider.notifier).setSyncing(false);
+
       showArogyaToast(
         context,
-        title: 'Saved & Queued for Sync',
+        title: 'Inspection Synced',
         message:
-            'HI: ${hi.toStringAsFixed(1)}% · CI: ${ci.toStringAsFixed(1)}% · BI: ${bi.toStringAsFixed(1)} logged for $ward.',
+            'HI: ${hi.toStringAsFixed(1)}% · CI: ${ci.toStringAsFixed(1)}% · BI: ${bi.toStringAsFixed(1)} recorded to Cloud Firestore & Google Sheets.',
       );
     } catch (e) {
       if (!mounted) return;
       setState(() => _savingLog = false);
+      ref.read(homeViewModelProvider.notifier).setSyncing(false);
       showArogyaToast(
         context,
-        title: 'Cached Offline Locally',
+        title: 'Inspection Queued Offline',
         message:
-            'HI: ${hi.toStringAsFixed(1)}% · CI: ${ci.toStringAsFixed(1)}% · BI: ${bi.toStringAsFixed(1)} queued for background sync.',
-        contentType: ContentType.help,
+            'HI: ${hi.toStringAsFixed(1)}% · CI: ${ci.toStringAsFixed(1)}% · BI: ${bi.toStringAsFixed(1)} queued for auto-sync.',
       );
     }
   }
@@ -230,50 +361,88 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final wardState = ref.watch(activeWardProvider);
+    final uid = _getEffectiveUid();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: const ArogyaTopShellBar(activeTabIndex: 0),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-                    // 1. Deep Crimson Officer Profile Card (matches ui_design.png Screen 1)
-                    Container(
+      body: SafeArea(
+        child: RefreshIndicator(
+          color: const Color(0xFF8B0000),
+          onRefresh: () async {
+            await _loadAvailableWards();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Component A: Top Profile Card (#8B0000 Crimson Theme)
+                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    final userData = snapshot.data?.data() ?? {};
+                    final officerName = userData['name']?.toString() ??
+                        wardState.officerName;
+                    final officerPhone = userData['phone']?.toString() ??
+                        wardState.officerPhone;
+                    final assignedJurisdiction =
+                        userData['assigned_ward']?.toString() ??
+                            'Arogya Drishti | Chandigarh';
+
+                    return Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         gradient: ArogyaTheme.crimsonHeaderGradient,
                         borderRadius: BorderRadius.circular(18),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x248B0000),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'GREETINGS,',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: Colors.white70,
-                                  letterSpacing: 1.1,
-                                ),
+                            _getTimeBasedGreeting(),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              letterSpacing: 1.1,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 3),
                           Text(
-                            wardState.officerName,
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(color: Colors.white),
+                            officerName.isNotEmpty ? officerName : 'Officer',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -0.3,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Arogya Drishti | ${wardState.wardName}',
+                            assignedJurisdiction,
                             style: const TextStyle(
-                              color: Colors.white70,
+                              color: Colors.white,
                               fontSize: 12.5,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           Text(
-                            wardState.officerPhone,
+                            officerPhone.isNotEmpty
+                                ? officerPhone
+                                : '+91 99155 49458',
                             style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 12,
@@ -285,19 +454,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Expanded(
                                 child: OutlinedButton(
                                   style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.white.withValues(
-                                      alpha: 0.12,
-                                    ),
+                                    backgroundColor:
+                                        Colors.white.withValues(alpha: 0.12),
                                     foregroundColor: Colors.white,
                                     side: const BorderSide(
                                       color: Colors.white38,
                                     ),
                                     minimumSize: const Size.fromHeight(38),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
-                                  onPressed: () => context.go('/settings'),
+                                  onPressed: () => context.push('/settings'),
                                   child: const Text(
                                     'Account Settings',
-                                    style: TextStyle(fontSize: 12),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -305,24 +479,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Expanded(
                                 child: OutlinedButton(
                                   style: OutlinedButton.styleFrom(
-                                    backgroundColor: Colors.white.withValues(
-                                      alpha: 0.12,
-                                    ),
+                                    backgroundColor:
+                                        Colors.white.withValues(alpha: 0.12),
                                     foregroundColor: Colors.white,
                                     side: const BorderSide(
                                       color: Colors.white38,
                                     ),
                                     minimumSize: const Size.fromHeight(38),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    ref
-                                        .read(activeWardProvider.notifier)
-                                        .signOut();
-                                    context.go('/auth');
-                                  },
+                                  onPressed: _handleLogout,
                                   child: const Text(
                                     'Log Out',
-                                    style: TextStyle(fontSize: 12),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -330,332 +504,489 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 14),
+                    );
+                  },
+                ),
+                const SizedBox(height: 14),
 
-                    // 2. Live Location & Ward Search Bar
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.location_on_rounded,
-                                  size: 15,
-                                  color: ArogyaTheme.primaryCrimson,
-                                ),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    'Location: Arogya Drishti, ${wardState.wardName}',
-                                    style: const TextStyle(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: ArogyaTheme.primaryCrimson,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                // Component B: Geospatial Location Bar & GPS Resolver
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x06000000),
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_rounded,
+                            size: 16,
+                            color: Color(0xFF8B0000),
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              'Location: Arogya Drishti, $_selectedWardName',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF8B0000),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SizedBox(
-                                    height: 42,
-                                    child: TextField(
-                                      controller: _searchController,
-                                      onSubmitted: (val) {
-                                        if (val.trim().isNotEmpty) {
-                                          _wardInputController.text = val
-                                              .trim();
-                                          ref
-                                              .read(activeWardProvider.notifier)
-                                              .updateWard(
-                                                lgdCode: '04055001',
-                                                wardName: val.trim(),
-                                                district: 'Chandigarh',
-                                                latitude: wardState.latitude,
-                                                longitude: wardState.longitude,
-                                              );
-                                        }
-                                      },
-                                      decoration: const InputDecoration(
-                                        prefixIcon: Icon(
-                                          Icons.search,
-                                          size: 18,
-                                        ),
-                                        hintText: 'Search city, or location...',
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 8,
-                                        ),
-                                      ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 42,
+                              child: TextField(
+                                controller: _searchController,
+                                onSubmitted: (val) {
+                                  if (val.trim().isNotEmpty) {
+                                    setState(() {
+                                      _selectedWardName = val.trim();
+                                    });
+                                    ref.read(homeViewModelProvider.notifier)
+                                        .setSearchQuery(val.trim());
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(
+                                    Icons.search,
+                                    size: 18,
+                                    color: Color(0xFF64748B),
+                                  ),
+                                  hintText:
+                                      'Search city, sector, or ward...',
+                                  hintStyle: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                  filled: true,
+                                  fillColor: const Color(0xFFF8FAFC),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 8,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFE2E8F0),
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFE2E8F0),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(8),
-                                  onTap: _locating
-                                      ? null
-                                      : _resolveCurrentGpsWard,
-                                  child: Container(
-                                    height: 42,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: ArogyaTheme.triageRedBg,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: _locating ? null : _resolveCurrentGpsWard,
+                            child: Container(
+                              height: 42,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFEBEE),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: const Color(0xFFFFCDD2),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  _locating
+                                      ? const SizedBox(
+                                          width: 14,
+                                          height: 14,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Color(0xFF8B0000),
+                                          ),
+                                        )
+                                      : const Icon(
                                           Icons.my_location_rounded,
                                           size: 15,
-                                          color: ArogyaTheme.primaryCrimson,
+                                          color: Color(0xFF8B0000),
                                         ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          _locating ? '...' : 'Current',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w800,
-                                            color: ArogyaTheme.primaryCrimson,
-                                          ),
-                                        ),
-                                      ],
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    'Current',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF8B0000),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // Component C: Quick Action Cards (Scan, Request Van, Send Alert)
+                Row(
+                  children: [
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.qr_code_scanner_rounded,
+                        label: 'Scan',
+                        onTap: () => context.push('/scan'),
                       ),
                     ),
-                    const SizedBox(height: 14),
-
-                    // 3. Three Quick Action Cards (Scan, Request Van, Send Alert)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _QuickActionTile(
-                            icon: Icons.qr_code_scanner_rounded,
-                            label: 'Scan',
-                            onTap: () => context.push('/scan'),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _QuickActionTile(
-                            icon: Icons.local_shipping_outlined,
-                            label: 'Request Van',
-                            onTap: () => _openDispatchModal('REQUEST_VAN'),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _QuickActionTile(
-                            icon: Icons.campaign_outlined,
-                            label: 'Send Alert',
-                            onTap: () => _openDispatchModal('SEND_ALERT'),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.local_shipping_outlined,
+                        label: 'Request Van',
+                        onTap: () => _openDispatchModal('REQUEST_VAN'),
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.campaign_outlined,
+                        label: 'Send Alert',
+                        onTap: () => _openDispatchModal('SEND_ALERT'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
 
-                    // 4. Field Vector Inspection Form Card
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.assignment_turned_in_outlined,
-                                  color: ArogyaTheme.primaryCrimson,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Field Vector Inspection Form',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
-                                ),
-                              ],
+                // Component D: Field Vector Inspection Form Card (Offline-First)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x06000000),
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: const [
+                            Icon(
+                              Icons.assignment_turned_in_outlined,
+                              color: Color(0xFF8B0000),
+                              size: 18,
                             ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Village / Ward',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.labelSmall,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      TextField(
-                                        controller: _wardInputController,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Larvicidal Treatment',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.labelSmall,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      DropdownButtonFormField<String>(
-                                        initialValue: _selectedTreatment,
-                                        isExpanded: true,
-                                        items: _treatments
-                                            .map(
-                                              (t) => DropdownMenuItem<String>(
-                                                value: t,
-                                                child: Text(
-                                                  t,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                        onChanged: (v) {
-                                          if (v != null) {
-                                            setState(
-                                              () => _selectedTreatment = v,
-                                            );
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _MetricNumberInput(
-                                    label: 'Houses Inspected',
-                                    controller: _housesInspectedController,
-                                    hintText: 'e.g. 50',
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: _MetricNumberInput(
-                                    label: 'Houses Positive',
-                                    controller: _housesPositiveController,
-                                    hintText: 'e.g. 3',
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _MetricNumberInput(
-                                    label: 'Containers Checked',
-                                    controller: _containersCheckedController,
-                                    hintText: 'e.g. 120',
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: _MetricNumberInput(
-                                    label: 'Containers Positive',
-                                    controller: _containersPositiveController,
-                                    hintText: 'e.g. 5',
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 14),
-                            ElevatedButton.icon(
-                              onPressed: _savingLog
-                                  ? null
-                                  : _saveFieldInspectionLog,
-                              icon: const Icon(Icons.save_outlined, size: 18),
-                              label: Text(
-                                _savingLog
-                                    ? 'Computing HI/CI/BI & Syncing...'
-                                    : 'Save Offline & Queue Sync',
+                            SizedBox(width: 6),
+                            Text(
+                              'Field Vector Inspection Form',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0F172A),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
-                    // 5. MORE SERVICES Section (Vans, Centers, Support)
-                    Center(
-                      child: Text(
-                        'MORE SERVICES',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _QuickActionTile(
-                            icon: Icons.airport_shuttle_rounded,
-                            label: 'Vans',
-                            onTap: () => context.push('/vans'),
-                          ),
+                        // Dropdown Row: Ward + Treatment
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Village / Ward',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  DropdownButtonFormField<String>(
+                                    value: _selectedWardLgd.isNotEmpty
+                                        ? _selectedWardLgd
+                                        : null,
+                                    isExpanded: true,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 8,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    items: _availableWards.map((w) {
+                                      return DropdownMenuItem<String>(
+                                        value: w['lgd_code'].toString(),
+                                        child: Text(
+                                          w['ward_name'].toString(),
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (v) {
+                                      if (v != null) {
+                                        final match = _availableWards.firstWhere(
+                                          (w) => w['lgd_code'].toString() == v,
+                                          orElse: () => {'ward_name': v},
+                                        );
+                                        setState(() {
+                                          _selectedWardLgd = v;
+                                          _selectedWardName =
+                                              match['ward_name'].toString();
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Larvicidal Treatment',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  DropdownButtonFormField<String>(
+                                    value: _selectedTreatment,
+                                    isExpanded: true,
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 8,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    items: _treatments.map((t) {
+                                      return DropdownMenuItem<String>(
+                                        value: t,
+                                        child: Text(
+                                          t,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (v) {
+                                      if (v != null) {
+                                        setState(() => _selectedTreatment = v);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _QuickActionTile(
-                            icon: Icons.local_hospital_outlined,
-                            label: 'Centers',
-                            onTap: () => context.push('/centers'),
-                          ),
+                        const SizedBox(height: 10),
+
+                        // Inputs: Houses Inspected & Houses Positive
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _MetricFormField(
+                                label: 'Houses Inspected',
+                                controller: _housesInspectedController,
+                                hintText: 'e.g. 50',
+                                validator: (val) {
+                                  final n = int.tryParse(val?.trim() ?? '');
+                                  if (n == null || n <= 0) return 'Enter > 0';
+                                  return null;
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _MetricFormField(
+                                label: 'Houses Positive',
+                                controller: _housesPositiveController,
+                                hintText: 'e.g. 3',
+                                validator: (val) {
+                                  final n = int.tryParse(val?.trim() ?? '');
+                                  final tot = int.tryParse(
+                                          _housesInspectedController.text
+                                              .trim()) ??
+                                      0;
+                                  if (n == null || n < 0) return 'Invalid';
+                                  if (n > tot) return 'Exceeds inspected';
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _QuickActionTile(
-                            icon: Icons.support_agent_rounded,
-                            label: 'Support',
-                            onTap: () => context.push('/support'),
+                        const SizedBox(height: 10),
+
+                        // Inputs: Containers Checked & Containers Positive
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _MetricFormField(
+                                label: 'Containers Checked',
+                                controller: _containersCheckedController,
+                                hintText: 'e.g. 120',
+                                validator: (val) {
+                                  final n = int.tryParse(val?.trim() ?? '');
+                                  if (n == null || n <= 0) return 'Enter > 0';
+                                  return null;
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _MetricFormField(
+                                label: 'Containers Positive',
+                                controller: _containersPositiveController,
+                                hintText: 'e.g. 5',
+                                validator: (val) {
+                                  final n = int.tryParse(val?.trim() ?? '');
+                                  final tot = int.tryParse(
+                                          _containersCheckedController.text
+                                              .trim()) ??
+                                      0;
+                                  if (n == null || n < 0) return 'Invalid';
+                                  if (n > tot) return 'Exceeds checked';
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Save & Sync Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 46,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF8B0000),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: _savingLog
+                                ? null
+                                : _saveFieldInspectionLog,
+                            icon: _savingLog
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.save_outlined, size: 18),
+                            label: Text(
+                              _savingLog
+                                  ? 'Computing HI/CI/BI & Syncing...'
+                                  : 'Save & Sync Inspection',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Component E: More Services Grid (Vans, Centers, Support)
+                const Center(
+                  child: Text(
+                    'MORE SERVICES',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF64748B),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.airport_shuttle_rounded,
+                        label: 'Vans',
+                        onTap: () => context.push('/vans'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.local_hospital_outlined,
+                        label: 'Centers',
+                        onTap: () => context.push('/centers'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _QuickActionTile(
+                        icon: Icons.support_agent_rounded,
+                        label: 'Support',
+                        onTap: () => context.push('/support'),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-            );
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -682,14 +1013,21 @@ class _QuickActionTile extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 78),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
           decoration: BoxDecoration(
-            color: ArogyaTheme.surfaceWhite,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: ArogyaTheme.borderHairline),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x04000000),
+                blurRadius: 4,
+                offset: Offset(0, 1),
+              ),
+            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: ArogyaTheme.primaryCrimson, size: 24),
+              Icon(icon, color: const Color(0xFF8B0000), size: 24),
               const SizedBox(height: 6),
               Text(
                 label,
@@ -697,7 +1035,7 @@ class _QuickActionTile extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: ArogyaTheme.slateHeading,
+                  color: Color(0xFF0F172A),
                 ),
               ),
             ],
@@ -708,35 +1046,49 @@ class _QuickActionTile extends StatelessWidget {
   }
 }
 
-class _MetricNumberInput extends StatelessWidget {
-  const _MetricNumberInput({
+class _MetricFormField extends StatelessWidget {
+  const _MetricFormField({
     required this.label,
     required this.controller,
-    this.hintText,
+    required this.hintText,
+    required this.validator,
   });
 
   final String label;
   final TextEditingController controller;
-  final String? hintText;
+  final String hintText;
+  final FormFieldValidator<String> validator;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF64748B),
+          ),
+        ),
         const SizedBox(height: 4),
-        TextField(
+        TextFormField(
           controller: controller,
+          validator: validator,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: hintText,
+            hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 8,
             ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
         ),
       ],
     );

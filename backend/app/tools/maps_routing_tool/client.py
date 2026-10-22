@@ -46,7 +46,7 @@ class OptimalVanRoute(BaseModel):
     chemical_stock: str
     routing_source: str = Field(
         default="GOOGLE_MAPS_ROUTES_V2",
-        description="GOOGLE_MAPS_ROUTES_V2 | ROAD_ADJUSTED_HAVERSINE_FALLBACK",
+        description="GOOGLE_MAPS_ROUTES_V2",
     )
 
 
@@ -80,7 +80,7 @@ def encode_polyline(coordinates: Sequence[tuple[float, float]]) -> str:
 
 
 class MapsRoutingClient:
-    """Google Maps Routes API v2 client with tenacity retry and road-adjusted fallback."""
+    """Google Maps Routes API v2 client with tenacity retry."""
 
     def __init__(self, settings: Settings | None = None) -> None:
         self.settings = settings or get_settings()
@@ -126,7 +126,7 @@ class MapsRoutingClient:
             "computeAlternativeRoutes": False,
         }
 
-        with httpx.Client(timeout=8.0) as client:
+        with httpx.Client(timeout=10.0) as client:
             resp = client.post(_ROUTES_API_V2_URL, json=body, headers=headers)
             if resp.status_code >= 500:
                 raise RoutingUnavailableException(
@@ -134,7 +134,7 @@ class MapsRoutingClient:
                 )
             if resp.status_code != 200:
                 raise RoutingUnavailableException(
-                    f"Google Maps Routes API v2 error ({resp.status_code}): {resp.text[:200]}"
+                    f"Google Maps Routes API v2 error ({resp.status_code}): {resp.text[:300]}"
                 )
             data: dict[str, Any] = resp.json()
 
@@ -146,13 +146,14 @@ class MapsRoutingClient:
             )
 
         route = routes[0]
-        raw_duration = str(route.get("duration") or "60s").rstrip("s")
-        duration_sec = max(60, int(float(raw_duration)))
-        distance_m = int(route.get("distanceMeters") or 100)
-        polyline = str(
-            (route.get("polyline") or {}).get("encodedPolyline")
-            or encode_polyline([(origin_lat, origin_lng), (target_lat, target_lng)])
-        )
+        raw_duration = str(route.get("duration") or "0s").rstrip("s")
+        duration_sec = max(1, int(float(raw_duration)))
+        distance_m = int(route.get("distanceMeters") or 0)
+        polyline = str((route.get("polyline") or {}).get("encodedPolyline") or "")
+        if not polyline:
+            raise RoutingUnavailableException(
+                "Google Maps Routes API v2 response missing encodedPolyline."
+            )
         return {
             "duration_sec": duration_sec,
             "eta_minutes": max(1, round(duration_sec / 60)),
@@ -161,36 +162,13 @@ class MapsRoutingClient:
             "routing_source": "GOOGLE_MAPS_ROUTES_V2",
         }
 
-    def _compute_road_adjusted_fallback(
-        self,
-        origin_lat: float,
-        origin_lng: float,
-        target_lat: float,
-        target_lng: float,
-    ) -> dict[str, Any]:
-        """Fallback road-network-adjusted Haversine distance (1.32x urban tortuosity factor, 26 km/h municipal speed)."""
-        straight_km = haversine_km(origin_lat, origin_lng, target_lat, target_lng)
-        road_km = round(max(0.4, straight_km * 1.32), 2)
-        duration_sec = max(120, int((road_km / 26.0) * 3600))
-        mid_lat = round((origin_lat + target_lat) / 2.0 + 0.0018, 6)
-        mid_lng = round((origin_lng + target_lng) / 2.0 - 0.0015, 6)
-        return {
-            "duration_sec": duration_sec,
-            "eta_minutes": max(2, round(duration_sec / 60)),
-            "distance_km": road_km,
-            "encoded_polyline": encode_polyline(
-                [(origin_lat, origin_lng), (mid_lat, mid_lng), (target_lat, target_lng)]
-            ),
-            "routing_source": "ROAD_ADJUSTED_HAVERSINE_FALLBACK",
-        }
-
     def select_fastest_van(
         self,
         target_lat: float,
         target_lng: float,
         vans: list[VanFleetRecord],
     ) -> OptimalVanRoute:
-        """Rank all Available candidate vans by lowest traffic-adjusted duration and return the optimal van."""
+        """Rank all Available candidate vans by lowest live Google Maps traffic-adjusted duration."""
         if not (-90.0 <= target_lat <= 90.0 and -180.0 <= target_lng <= 180.0):
             raise RoutingUnavailableException(
                 f"Invalid destination coordinates ({target_lat}, {target_lng}).",
@@ -201,7 +179,6 @@ class MapsRoutingClient:
             v for v in vans if v.status.strip().lower() == "available"
         ]
         if not available_vans:
-            # If all vans were marked Dispatched during continuous demo runs, allow re-routing closest active unit
             available_vans = list(vans)
         if not available_vans:
             raise RoutingUnavailableException(
@@ -209,7 +186,6 @@ class MapsRoutingClient:
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-        # Pre-filter top 3 closest by Haversine so we minimize upstream Routes API v2 latency
         candidates = sorted(
             available_vans,
             key=lambda v: haversine_km(v.base_lat, v.base_lng, target_lat, target_lng),
@@ -219,27 +195,12 @@ class MapsRoutingClient:
         min_duration_sec = float("inf")
 
         for van in candidates:
-            try:
-                route_info = self.compute_route(
-                    origin_lat=van.base_lat,
-                    origin_lng=van.base_lng,
-                    target_lat=target_lat,
-                    target_lng=target_lng,
-                )
-            except Exception as exc:
-                logger.warning(
-                    "Routes API v2 degraded for van %s (%s), using road-adjusted calculation: %s",
-                    van.van_id,
-                    van.vehicle_no,
-                    exc,
-                )
-                route_info = self._compute_road_adjusted_fallback(
-                    origin_lat=van.base_lat,
-                    origin_lng=van.base_lng,
-                    target_lat=target_lat,
-                    target_lng=target_lng,
-                )
-
+            route_info = self.compute_route(
+                origin_lat=van.base_lat,
+                origin_lng=van.base_lng,
+                target_lat=target_lat,
+                target_lng=target_lng,
+            )
             if route_info["duration_sec"] < min_duration_sec:
                 min_duration_sec = route_info["duration_sec"]
                 best_route = OptimalVanRoute(
