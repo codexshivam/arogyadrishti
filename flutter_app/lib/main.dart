@@ -16,11 +16,14 @@ import 'features/settings/settings_screen.dart';
 import 'features/stats/stats_screen.dart';
 import 'features/support/support_screen.dart';
 import 'features/vans/vans_screen.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     await FirestoreSyncService.configureOfflinePersistence(
       firebaseInitialized: true,
     );

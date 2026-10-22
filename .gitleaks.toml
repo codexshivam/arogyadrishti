@@ -4,11 +4,14 @@ title = "Arogya Drishti Gitleaks Configuration"
 useDefault = true
 
 [allowlist]
-description = "Ignore untracked local .env and compiled Flutter build artifacts"
+description = "Ignore untracked local .env, compiled Flutter build artifacts, and public Firebase client SDK config files"
 paths = [
   '''^backend/\.env$''',
   '''^\.env$''',
   '''^flutter_app/build/.*''',
+  '''^flutter_app/android/app/google-services\.json$''',
+  '''^flutter_app/ios/Runner/GoogleService-Info\.plist$''',
+  '''^flutter_app/lib/firebase_options\.dart$''',
   '''^\.venv/.*''',
   '''^\.dart_tool/.*''',
 ]
