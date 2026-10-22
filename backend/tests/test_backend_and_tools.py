@@ -163,7 +163,7 @@ def test_api_endpoints_end_to_end() -> None:
     # 1. Verify staff
     r_auth = client.post(
         "/api/v1/auth/verify-staff",
-        json={"uid": "test_officer_01", "phone": "+919915549455"},
+        json={"uid": "officer_9915549458", "phone": "+919915549458"},
     )
     assert r_auth.status_code == 200
     assert r_auth.json()["status"] == "STAFF_VERIFIED"

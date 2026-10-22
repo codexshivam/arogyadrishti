@@ -18,7 +18,7 @@ class AuthScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
-  final _phoneController = TextEditingController(text: '9915549455');
+  final _phoneController = TextEditingController(text: '9915549458');
   final List<TextEditingController> _otpControllers = List.generate(
     6,
     (idx) => TextEditingController(text: <String>['5', '8', '2', '4', '1', '9'][idx]),
