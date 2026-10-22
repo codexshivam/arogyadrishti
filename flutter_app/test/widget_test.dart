@@ -46,7 +46,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Officer Sign In'), findsOneWidget);
+      expect(find.text('Welcome'), findsOneWidget);
       expect(find.text('Statutory Surveillance Notice'), findsOneWidget);
       expect(find.text('Verify & Access Portal'), findsOneWidget);
     },
