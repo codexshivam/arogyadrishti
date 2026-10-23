@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
+import '../../core/services/offline_sync_manager.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Support Screen: Frontline emergency escalation and ticketing hub.
@@ -243,8 +245,63 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     }
 
     setState(() => _submitting = true);
+    final active = ref.read(activeWardProvider);
+    final officerUid = active.officerUid.isNotEmpty
+        ? active.officerUid
+        : 'officer_9915549455';
+
+    final payload = {
+      'ward_lgd_code': _selectedWardLgd,
+      'ward_village': _selectedWardName,
+      'category': _selectedCategory,
+      'severity': _selectedSeverity,
+      'description': desc,
+      'officer_uid': officerUid,
+    };
+
+    // Check connectivity
+    final conn = await Connectivity().checkConnectivity();
+    final isOffline = conn.every((c) => c == ConnectivityResult.none);
+
+    if (isOffline) {
+      await ref.read(offlineSyncManagerProvider).enqueueAction(
+        actionType: 'SUPPORT_TICKET',
+        payload: payload,
+      );
+
+      final localId = '#ESC-OFFLINE-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+      final offlineTicket = <String, dynamic>{
+        'ticket_id': localId,
+        'category': _selectedCategory,
+        'ward_name': _selectedWardName,
+        'ward_lgd_code': _selectedWardLgd,
+        'severity': _selectedSeverity,
+        'status': 'QUEUED OFFLINE',
+        'created_at_utc': DateTime.now().toUtc().toIso8601String(),
+        'observation_notes': desc,
+      };
+
+      if (!mounted) return;
+      _descController.clear();
+      setState(() {
+        _apiTickets = [offlineTicket, ..._apiTickets];
+        _submitting = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Color(0xFFD97706),
+          duration: Duration(seconds: 4),
+          content: Text(
+            'Queued Offline • Escalation ticket saved locally and will auto-sync upon connection',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+      );
+      return;
+    }
+
     try {
-      final active = ref.read(activeWardProvider);
       final api = ref.read(apiClientProvider);
 
       final ticketRes = await api.createSupportTicket(
@@ -252,9 +309,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         category: _selectedCategory,
         severity: _selectedSeverity,
         description: desc,
-        officerUid: active.officerUid.isNotEmpty
-            ? active.officerUid
-            : 'officer_9915549455',
+        officerUid: officerUid,
         wardVillage: _selectedWardName,
       );
 
@@ -293,12 +348,35 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         ),
       );
     } catch (e) {
+      // If network fails during submission, gracefully queue offline
+      await ref.read(offlineSyncManagerProvider).enqueueAction(
+        actionType: 'SUPPORT_TICKET',
+        payload: payload,
+      );
+
+      final localId = '#ESC-OFFLINE-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+      final offlineTicket = <String, dynamic>{
+        'ticket_id': localId,
+        'category': _selectedCategory,
+        'ward_name': _selectedWardName,
+        'ward_lgd_code': _selectedWardLgd,
+        'severity': _selectedSeverity,
+        'status': 'QUEUED OFFLINE',
+        'created_at_utc': DateTime.now().toUtc().toIso8601String(),
+        'observation_notes': desc,
+      };
+
       if (!mounted) return;
+      _descController.clear();
+      setState(() {
+        _apiTickets = [offlineTicket, ..._apiTickets];
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor: _crimson,
+          backgroundColor: Color(0xFFD97706),
           content: Text(
-            'Network error. Ticket will retry automatically on connection.',
+            'Network unavailable. Ticket queued locally and will sync automatically.',
           ),
         ),
       );
@@ -1153,7 +1231,11 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     Color statusBg = const Color(0xFFEEF2FF);
     Color statusFg = const Color(0xFF4F46E5);
 
-    if (rawStatus.contains('PENDING')) {
+    if (rawStatus.contains('QUEUED') || rawStatus.contains('OFFLINE')) {
+      status = 'QUEUED OFFLINE';
+      statusBg = const Color(0xFFFEF3C7);
+      statusFg = const Color(0xFFD97706);
+    } else if (rawStatus.contains('PENDING')) {
       status = 'PENDING CMO';
       statusBg = const Color(0xFFFEE2E2);
       statusFg = const Color(0xFFDC2626);

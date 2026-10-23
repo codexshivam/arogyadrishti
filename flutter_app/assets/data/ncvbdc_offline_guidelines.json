@@ -1,0 +1,137 @@
+{
+  "version": "2026.1",
+  "authority": "National Center for Vector Borne Diseases Control (NCVBDC) & ICMR Guidelines",
+  "chemicals_and_dosages": [
+    {
+      "name": "Temephos 50% EC (Abate)",
+      "target": "Aedes aegypti, Anopheles, and Culex mosquito larvae",
+      "dosage": "1 ppm (1 ml per 1,000 Litres of potable or clean stored water)",
+      "application_sites": "Domestic water storage containers, overhead tanks, masonry tanks, cement cisterns, desert coolers",
+      "safety_instructions": "Safe for drinking water at 1 ppm statutory concentration. Do not overdose. Repeat every 10 to 14 days.",
+      "keywords": ["temephos", "abate", "larvicide", "cooler", "tank", "drum", "potable water", "dosage"]
+    },
+    {
+      "name": "Bacillus thuringiensis israelensis (Bti) WP / AS",
+      "target": "Biological larvicide for mosquito larvae (dipteran specific)",
+      "dosage": "0.5 g to 1.0 g per square meter of water surface area (wettable powder) or 1–2 ml/sq.m (aqueous suspension)",
+      "application_sites": "Desert coolers, ornamental ponds, domestic water containers, fountains, slow drains",
+      "safety_instructions": "Completely non-toxic to human beings, fish, mammals, and birds. Endotoxin crystallizes in alkaline larval gut.",
+      "keywords": ["bti", "bacillus", "biological larvicide", "bio-larvicide", "safe larvicide", "eco friendly"]
+    },
+    {
+      "name": "Diflubenzuron 25% WP (Insect Growth Regulator)",
+      "target": "Chitin synthesis inhibitor preventing larval pupation to adult stage",
+      "dosage": "1.0 g per 1,000 Litres of water (0.25 to 1.0 ppm a.i.)",
+      "application_sites": "Large storage tanks, construction sumps, stagnant ground pools, abandoned swimming pools",
+      "safety_instructions": "Prevents mosquito emergence by inhibiting cuticle formation. Does not kill fourth instar or pupae immediately.",
+      "keywords": ["diflubenzuron", "igr", "growth regulator", "chitin", "sump", "construction pool"]
+    },
+    {
+      "name": "Pyrosene Oil / MLO (Mosquito Larvicidal Oil)",
+      "target": "Physical suffocant forming thin monomolecular film over water",
+      "dosage": "15 to 20 ml per square meter of water surface area",
+      "application_sites": "Drainage channels, polluted cesspools, septic tanks, sewage overflows (NON-POTABLE ONLY)",
+      "safety_instructions": "Strictly FORBIDDEN for drinking water containers. Use exclusively on highly polluted or organically rich stagnant drains.",
+      "keywords": ["mlo", "larvicidal oil", "pyrosene", "kerosene", "drain", "sewage", "cesspool", "polluted water"]
+    },
+    {
+      "name": "Malathion (5% Technical in Diesel) for Thermal Fogging",
+      "target": "Adult biting mosquitoes during acute outbreak clusters",
+      "dosage": "50 ml of technical grade Malathion per Litre of diesel oil, discharged at 10–20 Litres/hectare",
+      "application_sites": "Outdoor thermal fogging during dawn (06:00–08:00) or dusk (17:30–19:30) when vector flight is peak",
+      "safety_instructions": "Evacuate children and elders from immediate path. Direct fog into dense vegetation, building perimeter, and dark crevices.",
+      "keywords": ["malathion", "thermal fogging", "fogging", "van", "adulticide", "spray", "outbreak control"]
+    }
+  ],
+  "biological_control": [
+    {
+      "species": "Gambusia affinis (Mosquito Fish)",
+      "stocking_rate": "5 to 10 fish per square meter of water surface area (for small ponds/cisterns: 20–30 fish per 1,000 L)",
+      "efficiency": "Single fish consumes 100 to 300 larvae within 24 hours. Thrives in shallow, clear, or moderately turbid water.",
+      "notes": "Best suited for unchlorinated cement storage tanks, rural open wells, garden ponds, construction sumps."
+    },
+    {
+      "species": "Poecilia reticulata (Guppy Fish)",
+      "stocking_rate": "10 to 15 fish per square meter of water surface area",
+      "efficiency": "Highly tolerant of moderate organic pollution and wastewater drains compared to Gambusia.",
+      "notes": "Ideal for unlined drains, sullage pools, and semi-polluted urban water bodies."
+    }
+  ],
+  "entomological_indices": [
+    {
+      "index_name": "Breteau Index (BI)",
+      "formula": "BI = (Number of positive containers / Total number of houses inspected) * 100",
+      "severity_thresholds": {
+        "safe": "< 5.0 (Low transmission potential)",
+        "moderate": "5.0 - 20.0 (Pre-epidemic alert - source reduction mandatory)",
+        "critical": "> 20.0 (High epidemic transmission potential - statutory emergency action)"
+      },
+      "significance": "Most reliable indicator of vector density and community outbreak vulnerability."
+    },
+    {
+      "index_name": "House Index (HI)",
+      "formula": "HI = (Number of positive houses / Total number of houses inspected) * 100",
+      "severity_thresholds": {
+        "safe": "< 1.0%",
+        "critical": ">= 5.0% (Actionable outbreak trigger under NCVBDC guidelines)"
+      },
+      "significance": "Percentage of premises harboring active mosquito breeding."
+    },
+    {
+      "index_name": "Container Index (CI)",
+      "formula": "CI = (Number of positive water containers / Total water containers inspected) * 100",
+      "severity_thresholds": {
+        "safe": "< 5.0%",
+        "critical": ">= 10.0%"
+      },
+      "significance": "Proportion of water-holding receptacles positive for immature vector stages."
+    }
+  ],
+  "vector_identification": [
+    {
+      "vector": "Aedes aegypti (Yellow Fever / Dengue / Chikungunya Mosquito)",
+      "visual_markers": "Pitch black body with brilliant silvery-white lyre-shaped markings on thorax dorsal surface; banded legs.",
+      "biting_habit": "Exclusively diurnal (daytime biter), peak activity 2 hours after sunrise and 2 hours before dusk.",
+      "breeding_preference": "Artificial, clean stagnant domestic water receptacles (coolers, flower pots, discarded tyres, overhead tanks, unsealed plastic drums)."
+    },
+    {
+      "vector": "Anopheles stephensi (Urban Malaria Vector)",
+      "visual_markers": "Wings spotted with dark and pale scales; rests at 45-degree angle to the surface; proboscis and body in straight line.",
+      "biting_habit": "Nocturnal (bites from dusk till dawn, 21:00 to 04:00 peak).",
+      "breeding_preference": "Overhead masonry tanks, roof water collections, domestic storage pots, curing tanks at construction sites."
+    },
+    {
+      "vector": "Culex quinquefasciatus (Lymphatic Filariasis & West Nile)",
+      "visual_markers": "Brownish mosquito, blunt abdomen, rests parallel to the surface.",
+      "biting_habit": "Nocturnal biter in indoor living quarters.",
+      "breeding_preference": "Heavily polluted, foul-smelling stagnant drains, cesspools, septic tanks."
+    }
+  ],
+  "standard_operating_procedures": [
+    {
+      "title": "Dry Day SOP for Desert Coolers",
+      "steps": [
+        "Empty water completely at least once every 7 days ('Dry Day' protocol).",
+        "Scrub cooler sides and bottom with brush to dislodge attached Aedes eggs which survive desiccation up to 6 months.",
+        "Allow to dry under sun for minimum 2 hours before refilling.",
+        "If continuous water drainage is impossible, apply Temephos 50% EC @ 1 ml per 1000L or 1g Bti WP."
+      ]
+    },
+    {
+      "title": "Overhead Tank (OHT) and Drum Sealing Protocol",
+      "steps": [
+        "Inspect lid tightness. A gap of 2 mm is sufficient for female Aedes to deposit eggs.",
+        "Wrap tank overflow pipes with fine nylon wire-mesh (16 mesh per linear inch).",
+        "Fasten rubber gaskets on inspection manhole covers."
+      ]
+    },
+    {
+      "title": "Construction Sumps & Stagnant Basements",
+      "steps": [
+        "Apply Diflubenzuron 25% WP @ 1 g/1000L or introduce Gambusia affinis biological fish.",
+        "Dewater temporary rain accumulations within 48 hours using portable sub-pumps.",
+        "Sprinkle mineral larvicidal oil over inaccessible elevator shafts."
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/widgets/arogya_shared_widgets.dart';
+import 'local_triage_engine.dart';
 
 /// Screen 2: ChatScreen (`/chat`) — Multilingual Gemma 4 / Vertex AI Officer Copilot (`Dr. Arogya`).
 /// Zero-hardcoded data: All indices, dosages, satellite metrics, and tool cards stream from live backend & Firestore.
@@ -166,6 +168,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
     _scrollToBottom();
 
+    // Check connectivity first
+    bool isOnline = true;
+    try {
+      final connectivityResults = await Connectivity().checkConnectivity();
+      isOnline = connectivityResults.any((r) => r != ConnectivityResult.none);
+    } catch (_) {}
+
+    if (!isOnline) {
+      // Offline Mode: Route immediately to LocalTriageEngine
+      final triage = await LocalTriageEngine.query(text);
+      if (!mounted) return;
+
+      setState(() {
+        _sending = false;
+        _messages.add(<String, dynamic>{
+          'role': 'assistant',
+          'sender': 'Dr. Arogya (NCVBDC Offline)',
+          'time': 'Now',
+          'text': triage.answer,
+          'tool_cards': <Map<String, dynamic>>[],
+        });
+      });
+      _scrollToBottom();
+      return;
+    }
+
     try {
       final res = await ref
           .read(apiClientProvider)
@@ -198,15 +226,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       });
       _scrollToBottom();
     } catch (e) {
+      // Network failure or backend timeout fallback to LocalTriageEngine
+      final triage = await LocalTriageEngine.query(text);
       if (!mounted) return;
+
       setState(() {
         _sending = false;
         _messages.add(<String, dynamic>{
           'role': 'assistant',
-          'sender': 'Dr. Arogya',
+          'sender': 'Dr. Arogya (NCVBDC Offline)',
           'time': 'Now',
-          'text':
-              'Unable to reach AI copilot service. Please check your connection and retry.',
+          'text': triage.answer,
           'tool_cards': <Map<String, dynamic>>[],
         });
       });

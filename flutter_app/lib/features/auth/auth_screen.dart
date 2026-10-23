@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../firebase_options.dart';
 import '../settings/legal_viewer_screen.dart';
 
 /// Screen 6: Welcome / Officer Sign-In & OTP Verification (`/auth`).
@@ -76,7 +78,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     // Fast path: authorized staff contacts in Chandigarh MCC
     const preAuthorizedPhones = {
       '9915549458', // Shivam Yadav (State Nodal Vector Control Officer)
-      '9501588795', // Rahul Chaudhary (Zonal Vector Surveillance Officer)
+      '9501588794', // Rahul Chaudhary (Zonal Vector Surveillance Officer)
+      '9501588795', // Rahul Chaudhary (Alternate Mobile)
+      '7292958701', // Amit Kumar (Field Officer / SI, Ward 6)
       '9815011018', // Ishwor Chaudhary (Field Epidemiologist)
       '9815011027', // Aman Yadav (Sub-District Vector Officer)
       '9815022001', // Dr. Suman Singh (Director Health Services / MOH MCC)
@@ -140,6 +144,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     setState(() {
       _lastDispatchedPhone = rawDigits;
     });
+
+    // Safeguard: Ensure Firebase is initialized
+    if (Firebase.apps.isEmpty) {
+      try {
+        await Firebase.initializeApp();
+      } catch (_) {
+        try {
+          await Firebase.initializeApp(
+            options: DefaultFirebaseOptions.currentPlatform,
+          );
+        } catch (_) {}
+      }
+    }
 
     try {
       if (kIsWeb) {
@@ -236,11 +253,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       debugPrint('Auth dispatch note: $e');
       if (!mounted) return;
       setState(() => _sendingOtp = false);
+      String userMessage = 'Could not send verification code. Please try again.';
+      if (e is FirebaseAuthException) {
+        userMessage = e.message ?? e.code;
+      } else if (e.toString().contains('no-app')) {
+        userMessage = 'Firebase services initializing. Please tap Send Code again.';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Could not send verification code. Please check your connection and try again.',
-          ),
+        SnackBar(
+          content: Text(userMessage),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -301,10 +322,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           'district_rep_phone': '+919815022001',
           'district_rep_email': 'academyxshivam@gmail.com',
         };
-      } else if (rawDigits == '9501588795') {
+      } else if (rawDigits == '9501588794' || rawDigits == '9501588795') {
         profile = {
           'name': 'Rahul Chaudhary',
-          'phone': '+919501588795',
+          'phone': '+91$rawDigits',
           'email': 'chaudharyraul07@gmail.com',
           'role': 'NODAL_OFFICER',
           'assigned_lgd_code': '0404400019',
@@ -314,6 +335,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           'district_rep_name':
               'Dr. Parmjit Singh (State IDSP Epidemiologist, GMSH-16)',
           'district_rep_phone': '+919815022002',
+          'district_rep_email': 'academyxshivam@gmail.com',
+        };
+      } else if (rawDigits == '7292958701') {
+        profile = {
+          'name': 'Amit Kumar',
+          'phone': '+917292958701',
+          'email': 'amitkumar.mcc@chd.gov.in',
+          'role': 'NODAL_OFFICER',
+          'assigned_lgd_code': '0404400006',
+          'ward_village':
+              'Ward 6: Shivalik Enclave, Modern Housing Complex (MHC) Manimajra, Govindpura',
+          'district': 'Chandigarh',
+          'state': 'Chandigarh',
+          'district_rep_name':
+              'Dr. Suman Singh (Director Health Services / MOH MCC)',
+          'district_rep_phone': '+919815022001',
           'district_rep_email': 'academyxshivam@gmail.com',
         };
       }

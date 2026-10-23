@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import (
+    BackgroundTasks,
     Body,
     Depends,
     FastAPI,
@@ -32,7 +33,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.cloud import firestore
 from google.oauth2.service_account import Credentials
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -141,7 +142,35 @@ app.add_middleware(
 )
 
 # In-memory idempotency cache backed by Firestore `dispatches` collection
+# Keys expire after 15 minutes (900 seconds)
 _IDEMPOTENCY_CACHE: dict[str, dict[str, Any]] = {}
+_IDEMPOTENCY_TIMESTAMPS: dict[str, float] = {}
+
+
+def emit_certin_audit_log(
+    event_type: str,
+    actor_uid: str | None,
+    action: str,
+    resource_id: str,
+    details: dict[str, Any],
+) -> None:
+    """
+    Emit a structured audit log meeting CERT-In directions and ISO 27001 compliance.
+    Cloud Logging automatically mirrors these events via sink `certin-audit-worm-sink`
+    to gs://teamrocketnp-certin-worm-audit-logs with a 180-day Object Retention Lock.
+    """
+    now_iso = datetime.now(UTC).isoformat()
+    record = {
+        "event_type": event_type,
+        "actor_uid": actor_uid or "anonymous",
+        "action": action,
+        "resource_id": resource_id,
+        "timestamp_utc": now_iso,
+        "compliance": "CERT-In 180-Day WORM Audit Log",
+        "details": details,
+    }
+    # Log with severity INFO and structured JSON representation
+    logger.info("CERT-In Audit Trail: %s", json.dumps(record))
 
 
 def get_firestore_db(cfg: Settings = Depends(get_settings)) -> firestore.Client:
@@ -295,6 +324,19 @@ def verify_staff_endpoint(
         db.collection("users").document(payload.uid).set(profile, merge=True)
     except Exception as exc:
         logger.warning("Firestore user profile sync note: %s", exc)
+
+    emit_certin_audit_log(
+        event_type="auth_event",
+        actor_uid=payload.uid,
+        action="VERIFY_STAFF_LOGIN",
+        resource_id=f"users/{payload.uid}",
+        details={
+            "phone": scrub_pii_text(payload.phone or ""),
+            "role": role,
+            "lgd_code": staff_record.lgd_code,
+            "ward_village": staff_record.ward_or_village,
+        },
+    )
 
     return {
         "status": "STAFF_VERIFIED",
@@ -502,22 +544,36 @@ class DispatchActionPayload(BaseModel):
 @app.post("/api/v1/dispatch-action", tags=["Dispatch"])
 def handle_dispatch_action(
     payload: DispatchActionPayload,
+    background_tasks: BackgroundTasks,
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
     db: firestore.Client = Depends(get_firestore_db),
     _jwt: dict[str, Any] | None = Depends(optional_firebase_jwt),
 ) -> dict[str, Any]:
-    """Handle Request Van and Send Alert modal actions with idempotency protection."""
-    idem_key = (idempotency_key or payload.idempotency_key or "").strip()
-    if idem_key and idem_key in _IDEMPOTENCY_CACHE:
-        return {**_IDEMPOTENCY_CACHE[idem_key], "idempotent_replay": True}
+    """Handle Request Van and Send Alert modal actions with 15-minute idempotency protection and sheets background queue."""
+    now_time = time.time()
+    # Expire old idempotency entries (>15 minutes = 900 seconds)
+    expired_keys = [k for k, ts in _IDEMPOTENCY_TIMESTAMPS.items() if now_time - ts > 900.0]
+    for k in expired_keys:
+        _IDEMPOTENCY_CACHE.pop(k, None)
+        _IDEMPOTENCY_TIMESTAMPS.pop(k, None)
+
+    # Resolve idempotency key: header or payload or synthesized hash(ward_id + officer_uid + date_hour)
+    raw_key = (idempotency_key or payload.idempotency_key or "").strip()
+    if not raw_key:
+        hour_token = datetime.now(UTC).strftime("%Y%m%d%H")
+        raw_key = f"idem-{hash(f'{payload.ward_village}_{payload.officer_uid}_{hour_token}_{payload.action_type}')}"
+
+    if raw_key in _IDEMPOTENCY_CACHE:
+        logger.info("Idempotent dispatch hit for key %s (returning existing assignment within 15-min window).", raw_key)
+        return {**_IDEMPOTENCY_CACHE[raw_key], "idempotent_replay": True}
 
     sheets = get_sheets_client()
     contacts = sheets.lookup_authorized_staff(
         ward_village=payload.ward_village, district_lgd=payload.district_lgd
     )
     dispatch_id = (
-        f"DSP-{idem_key[:10].upper()}"
-        if idem_key
+        f"DSP-{raw_key[:10].upper()}"
+        if raw_key
         else f"DSP-{uuid.uuid4().hex[:8].upper()}"
     )
     now_utc = datetime.now(UTC)
@@ -537,12 +593,35 @@ def handle_dispatch_action(
     }
 
     if payload.action_type == "REQUEST_VAN":
-        vans = sheets.get_vans_fleet(ward_or_district=payload.ward_village)
+        # Multi-Region Sheets Cache Fallback: Try reading vans from Firestore first if sheets is busy/rate-limited
+        vans = []
+        try:
+            vans = sheets.get_vans_fleet(ward_or_district=payload.ward_village)
+        except Exception as exc:
+            logger.warning("Google Sheets fleet quota hit. Serving from Cloud Firestore fallback: %s", exc)
+            fs_vans = list(db.collection("vans").stream())
+            for idx, fsv in enumerate(fs_vans, start=2):
+                vd = fsv.to_dict() or {}
+                from app.tools.sheets_admin_tool.models import VanFleetRecord
+                vans.append(
+                    VanFleetRecord(
+                        row_index=idx,
+                        van_id=str(vd.get("van_id") or fsv.id),
+                        vehicle_no=str(vd.get("vehicle_no") or ""),
+                        driver_name=str(vd.get("driver_name") or ""),
+                        driver_phone=str(vd.get("driver_phone") or "+919815011000"),
+                        base_lat=float(vd.get("base_lat") or 30.7333),
+                        base_lng=float(vd.get("base_lng") or 76.7794),
+                        status=str(vd.get("status") or "Available"),
+                        chemical_stock=str(vd.get("chemical_stock") or "Cyphenothrin 5% EC"),
+                        ward_or_district=str(vd.get("assigned_ward") or "Chandigarh"),
+                    )
+                )
+
         available_vans = [v for v in vans if v.status.strip().lower() == "available"]
         if not available_vans:
-            # Check entire fleet if ward-specific filter yielded no available vans
             available_vans = [
-                v for v in sheets.get_vans_fleet(ward_or_district=None)
+                v for v in vans
                 if v.status.strip().lower() == "available"
             ]
         if not available_vans:
@@ -556,22 +635,8 @@ def handle_dispatch_action(
             target_lng=payload.longitude,
             vans=available_vans,
         )
-        van_req_row = sheets.log_van_request(
-            request_id=dispatch_id,
-            officer_uid=payload.officer_uid,
-            ward_village=payload.ward_village,
-            target_lat=payload.latitude,
-            target_lng=payload.longitude,
-            assigned_van_id=optimal_van.van_id,
-            vehicle_no=optimal_van.vehicle_no,
-            driver_phone=optimal_van.driver_phone,
-            maps_eta_mins=optimal_van.eta_minutes,
-            distance_km=optimal_van.distance_km,
-            van_row_index=optimal_van.row_index,
-            status_label="Dispatched",
-        )
+
         firestore_record["assigned_van"] = optimal_van.model_dump()
-        firestore_record["sheet_row"] = van_req_row.model_dump()
         db.collection("dispatches").document(dispatch_id).set(firestore_record)
         try:
             db.collection("vans").document(optimal_van.van_id.upper()).set({
@@ -595,14 +660,50 @@ def handle_dispatch_action(
         except Exception as fs_err:
             logger.warning("Firestore van/van_requests update notice: %s", fs_err)
 
+        # Multi-Region Sheets Cache Fallback: Asynchronously queue spreadsheet synchronization
+        def _sync_sheets_van_request():
+            try:
+                sheets.log_van_request(
+                    request_id=dispatch_id,
+                    officer_uid=payload.officer_uid,
+                    ward_village=payload.ward_village,
+                    target_lat=payload.latitude,
+                    target_lng=payload.longitude,
+                    assigned_van_id=optimal_van.van_id,
+                    vehicle_no=optimal_van.vehicle_no,
+                    driver_phone=optimal_van.driver_phone,
+                    maps_eta_mins=optimal_van.eta_minutes,
+                    distance_km=optimal_van.distance_km,
+                    van_row_index=optimal_van.row_index,
+                    status_label="Dispatched",
+                )
+            except Exception as s_err:
+                logger.warning("Background Google Sheets van sync notice: %s", s_err)
+
+        background_tasks.add_task(_sync_sheets_van_request)
+
         result = {
             "status": "VAN_ASSIGNED",
             "dispatch_id": dispatch_id,
             "van_details": {**optimal_van.model_dump(), "status": "Dispatched"},
             "notified_contacts": contacts.model_dump(),
         }
-        if idem_key:
-            _IDEMPOTENCY_CACHE[idem_key] = result
+        _IDEMPOTENCY_CACHE[raw_key] = result
+        _IDEMPOTENCY_TIMESTAMPS[raw_key] = now_time
+
+        emit_certin_audit_log(
+            event_type="dispatch_action",
+            actor_uid=payload.officer_uid,
+            action="REQUEST_VAN_DISPATCH",
+            resource_id=f"dispatches/{dispatch_id}",
+            details={
+                "van_id": optimal_van.van_id,
+                "vehicle_no": optimal_van.vehicle_no,
+                "ward_village": payload.ward_village,
+                "lat": payload.latitude,
+                "lng": payload.longitude,
+            },
+        )
         return result
 
     # action_type == "SEND_ALERT"
@@ -629,19 +730,26 @@ def handle_dispatch_action(
         rain_14d_mm=gee.rain_14d_mm,
         district_rep_phone=contacts.district_rep_phone,
     )
-    alert_row = sheets.log_alert_dispatch(
-        alert_id=dispatch_id,
-        ward_village=payload.ward_village,
-        severity="CRITICAL",
-        breteau_index=ward_bi,
-        gee_risk_score=gee.environmental_suitability_score,
-        emailed_to=contacts.village_officer_email,
-        district_rep_notified=f"{contacts.district_rep_name} ({contacts.district_rep_phone})",
-        action_notes=payload.notes,
-    )
     firestore_record["email_receipt"] = receipt.model_dump()
-    firestore_record["sheet_row"] = alert_row.model_dump()
     db.collection("dispatches").document(dispatch_id).set(firestore_record)
+
+    # Asynchronously queue spreadsheet synchronization using BackgroundTasks
+    def _sync_sheets_alert_dispatch():
+        try:
+            sheets.log_alert_dispatch(
+                alert_id=dispatch_id,
+                ward_village=payload.ward_village,
+                severity="CRITICAL",
+                breteau_index=ward_bi,
+                gee_risk_score=gee.environmental_suitability_score,
+                emailed_to=contacts.village_officer_email,
+                district_rep_notified=f"{contacts.district_rep_name} ({contacts.district_rep_phone})",
+                action_notes=payload.notes,
+            )
+        except Exception as s_err:
+            logger.warning("Background Google Sheets alert sync notice: %s", s_err)
+
+    background_tasks.add_task(_sync_sheets_alert_dispatch)
 
     result = {
         "status": "ALERT_SENT",
@@ -649,8 +757,22 @@ def handle_dispatch_action(
         "notified": contacts.model_dump(),
         "email_receipt": receipt.model_dump(),
     }
-    if idem_key:
-        _IDEMPOTENCY_CACHE[idem_key] = result
+    _IDEMPOTENCY_CACHE[raw_key] = result
+    _IDEMPOTENCY_TIMESTAMPS[raw_key] = now_time
+
+    emit_certin_audit_log(
+        event_type="dispatch_action",
+        actor_uid=payload.officer_uid,
+        action="SEND_EMERGENCY_ALERT",
+        resource_id=f"dispatches/{dispatch_id}",
+        details={
+            "ward_village": payload.ward_village,
+            "target_email": target_to_email,
+            "breteau_index": ward_bi,
+            "lat": payload.latitude,
+            "lng": payload.longitude,
+        },
+    )
     return result
 
 
@@ -1301,6 +1423,22 @@ class FieldInspectionPayload(BaseModel):
     latitude: float = Field(..., ge=-90.0, le=90.0)
     longitude: float = Field(..., ge=-180.0, le=180.0)
 
+    @field_validator("houses_positive")
+    @classmethod
+    def validate_house_counts(cls, v: int, info: Any) -> int:
+        if hasattr(info, "data") and "houses_inspected" in info.data:
+            if v > info.data["houses_inspected"]:
+                raise ValueError("houses_positive cannot exceed houses_inspected")
+        return v
+
+    @field_validator("containers_positive")
+    @classmethod
+    def validate_container_counts(cls, v: int, info: Any) -> int:
+        if hasattr(info, "data") and "containers_checked" in info.data:
+            if v > info.data["containers_checked"]:
+                raise ValueError("containers_positive cannot exceed containers_checked")
+        return v
+
 
 @app.post("/api/v1/field-logs", tags=["Epidemiology & IHIP"])
 def create_field_inspection_log(
@@ -1375,6 +1513,7 @@ SupportTicketPayload = CreateSupportTicketPayload
 @app.post("/api/v1/support/tickets", tags=["Support & Escalation"])
 def create_support_ticket(
     payload: CreateSupportTicketPayload,
+    background_tasks: BackgroundTasks,
     db: firestore.Client = Depends(get_firestore_db),
 ) -> dict[str, Any]:
     """Create an escalation ticket in Firestore, auto-assign via 3_Staff_Directory, mirror to 7_Support_Tickets & 5_Alert_Logs in Sheets, and email assigned officer + team."""
@@ -1467,37 +1606,35 @@ def create_support_ticket(
     }
     db.collection("support_tickets").document(ticket_id).set(ticket_doc)
 
-    # 1. Mirror into Google Sheets Tab 7_Support_Tickets
-    try:
-        sheets.log_support_ticket(
-            ticket_id=ticket_id,
-            timestamp_utc=now_iso,
-            ward_id=resolved_lgd,
-            ward_name=resolved_ward,
-            category=payload.category,
-            severity_sla=resolved_severity,
-            observation_notes=scrub_pii_text(resolved_notes),
-            status=ticket_status,
-            assigned_nodal_officer=assigned_name,
-            officer_email=officer_email,
-        )
-    except Exception as exc:
-        logger.warning("Google Sheets 7_Support_Tickets logging notice: %s", exc)
+    # Multi-Region Sheets Cache Fallback: Asynchronously queue spreadsheet synchronization
+    def _sync_sheets_ticket_dispatch():
+        try:
+            sheets.log_support_ticket(
+                ticket_id=ticket_id,
+                timestamp_utc=now_iso,
+                ward_id=resolved_lgd,
+                ward_name=resolved_ward,
+                category=payload.category,
+                severity_sla=resolved_severity,
+                observation_notes=scrub_pii_text(resolved_notes),
+                status=ticket_status,
+                assigned_nodal_officer=assigned_name,
+                officer_email=officer_email,
+            )
+            sheets.log_alert_dispatch(
+                alert_id=ticket_id,
+                ward_village=resolved_ward,
+                severity=resolved_severity,
+                breteau_index=ward_bi,
+                gee_risk_score=gee_risk,
+                emailed_to=officer_email,
+                district_rep_notified=f"{assigned_name} ({contacts.district_rep_phone or '+911722752000'})",
+                action_notes=f"[{payload.category}] {scrub_pii_text(resolved_notes)}",
+            )
+        except Exception as exc:
+            logger.warning("Background Google Sheets ticket sync notice: %s", exc)
 
-    # 2. Mirror into Google Sheets Tab 5_Alert_Logs
-    try:
-        sheets.log_alert_dispatch(
-            alert_id=ticket_id,
-            ward_village=resolved_ward,
-            severity=resolved_severity,
-            breteau_index=ward_bi,
-            gee_risk_score=gee_risk,
-            emailed_to=officer_email,
-            district_rep_notified=f"{assigned_name} ({contacts.district_rep_phone or '+911722752000'})",
-            action_notes=f"[{payload.category}] {scrub_pii_text(resolved_notes)}",
-        )
-    except Exception as exc:
-        logger.warning("Google Sheets 5_Alert_Logs logging notice: %s", exc)
+    background_tasks.add_task(_sync_sheets_ticket_dispatch)
 
     # 3. Dispatch live zero-blue crimson ticket assignment email exclusively to allocated ward officer
     try:
@@ -1522,6 +1659,20 @@ def create_support_ticket(
         )
     except Exception as exc:
         logger.warning("Ticket assignment email dispatch notice: %s", exc)
+
+    emit_certin_audit_log(
+        event_type="ticket_update",
+        actor_uid=payload.officer_uid,
+        action="CREATE_SUPPORT_TICKET",
+        resource_id=f"support_tickets/{ticket_id}",
+        details={
+            "category": payload.category,
+            "severity": resolved_severity,
+            "ward_village": resolved_ward,
+            "assigned_nodal_officer": assigned_name,
+            "status": ticket_status,
+        },
+    )
 
     return {
         "status": "TICKET_CREATED",

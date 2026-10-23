@@ -8,6 +8,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/telemetry_service.dart';
 
+/// Primary direct Cloud Run API endpoint (Mumbai, asia-south1)
+const String kPrimaryCloudRunUrl =
+    'https://arogya-drishti-api-234323362711.asia-south1.run.app';
+
+/// Secondary CDN / Firebase Hosting proxy endpoint
+const String kSecondaryProxyUrl = 'https://arogya.shivm.co';
+
 /// Resolves backend base URL: fully pinned to production backend in all builds (debug & release).
 String resolveBackendBaseUrl() {
   const fromEnv = String.fromEnvironment('AROGYA_API_BASE_URL');
@@ -20,9 +27,10 @@ String resolveBackendBaseUrl() {
             host.contains('firebaseapp.com'))) {
       return '';
     }
+    return kSecondaryProxyUrl;
   }
-  // Production sovereign HTTPS endpoint in Mumbai (asia-south1) via Firebase CDN & Cloud Run
-  return 'https://arogya.shivm.co';
+  // Mobile platforms (Android/iOS): use sovereign Cloud Run API endpoint in Mumbai
+  return kPrimaryCloudRunUrl;
 }
 
 final apiClientProvider = Provider<ArogyaApiClient>((ref) {
@@ -35,7 +43,7 @@ class ArogyaApiClient {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 12),
+        connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 25),
         headers: const <String, String>{
           'Accept': 'application/json',
@@ -44,7 +52,7 @@ class ArogyaApiClient {
       ),
     );
 
-    if (!kIsWeb) {
+    if (!kIsWeb && kDebugMode) {
       final adapter = _dio.httpClientAdapter;
       if (adapter is IOHttpClientAdapter) {
         adapter.createHttpClient = () {
@@ -77,14 +85,58 @@ class ArogyaApiClient {
           }
 
           try {
-            final appCheckToken = await FirebaseAppCheck.instance.getToken();
+            // Safe non-blocking timeout: prevents request freeze if Play Integrity attestation is unavailable
+            final appCheckToken = await FirebaseAppCheck.instance
+                .getToken()
+                .timeout(
+                  const Duration(milliseconds: 1000),
+                  onTimeout: () => null,
+                );
             if (appCheckToken != null && appCheckToken.isNotEmpty) {
               options.headers['X-Firebase-AppCheck'] = appCheckToken;
             }
           } catch (_) {
-            // App Check optional in local dev
+            // App Check optional in local/sideloaded builds
           }
           handler.next(options);
+        },
+        onError: (DioException err, handler) async {
+          // Automatic seamless failover between primary Cloud Run and secondary proxy CDN
+          final isConnectionError =
+              err.type == DioExceptionType.connectionError ||
+              err.type == DioExceptionType.connectionTimeout ||
+              err.type == DioExceptionType.sendTimeout ||
+              err.type == DioExceptionType.receiveTimeout;
+
+          final alreadyRetried =
+              err.requestOptions.extra['retried_fallback'] == true;
+
+          if (isConnectionError && !alreadyRetried && !kIsWeb) {
+            final currentBase = err.requestOptions.baseUrl.isNotEmpty
+                ? err.requestOptions.baseUrl
+                : baseUrl;
+            final fallbackBase = currentBase.contains('run.app')
+                ? kSecondaryProxyUrl
+                : kPrimaryCloudRunUrl;
+
+            debugPrint(
+              'ArogyaApiClient: Connection error on $currentBase. Failing over to $fallbackBase',
+            );
+
+            try {
+              final newOptions = err.requestOptions;
+              newOptions.baseUrl = fallbackBase;
+              newOptions.extra['retried_fallback'] = true;
+
+              final response = await _dio.fetch<dynamic>(newOptions);
+              return handler.resolve(response);
+            } catch (fallbackError) {
+              if (fallbackError is DioException) {
+                return handler.next(fallbackError);
+              }
+            }
+          }
+          return handler.next(err);
         },
       ),
     );

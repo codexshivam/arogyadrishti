@@ -213,15 +213,50 @@ def fetch_live_gee_telemetry_for_points(points_list: list[dict[str, Any]]) -> li
             )
 
             # 2. Sentinel-2 Optical NDWI & NDVI (Surface Water & Vegetation)
-            s2_col = (
+            # Monsoon Cloud Penetration via Sentinel-1 SAR Radar fallback:
+            # During heavy monsoon overcast (July-September), Sentinel-2 optical imagery is occluded (>30% cloud).
+            # When optical cloud cover is high, automatically fall back to COPERNICUS/S1_GRD C-band Synthetic Aperture Radar (SAR).
+            # SAR microwaves pass directly through thick clouds and detect standing water pools via specular backscatter (VV < -16 dB).
+            s2_valid = (
                 ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
                 .filterBounds(fc)
                 .filterDate(start_30d, end_date)
                 .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 30))
+            )
+            s2_col = s2_valid.median()
+
+            # Sentinel-1 SAR Radar Water Detection (C-Band Synthetic Aperture Radar)
+            s1_col = (
+                ee.ImageCollection("COPERNICUS/S1_GRD")
+                .filterBounds(fc)
+                .filterDate(start_14d, end_date)
+                .filter(ee.Filter.eq("instrumentMode", "IW"))
+                .filter(ee.Filter.listContains("transmitterReceiverPolarisation", "VV"))
+                .select("VV")
                 .median()
             )
-            ndwi_img = s2_col.normalizedDifference(["B3", "B8"]).rename("ndwi")
-            ndvi_img = s2_col.normalizedDifference(["B8", "B4"]).rename("ndvi")
+            # Water exhibits specular backscatter: convert VV dB to proxy NDWI in [-0.5, 0.8] range
+            # VV < -16 dB strongly signifies standing open water / water stagnation
+            sar_water_ndwi = (
+                ee.Image(0.65)
+                .subtract(s1_col.add(16.0).multiply(0.08))
+                .clamp(-0.5, 0.85)
+                .rename("sar_ndwi")
+            )
+
+            # Determine whether optical Sentinel-2 has valid coverage over the region
+            optical_ndwi = s2_col.normalizedDifference(["B3", "B8"]).rename("ndwi")
+            optical_ndvi = s2_col.normalizedDifference(["B8", "B4"]).rename("ndvi")
+
+            # Fall back to SAR radar if optical NDWI is masked or occluded by cloud threshold
+            ndwi_img = ee.Image(
+                ee.Algorithms.If(
+                    s2_valid.size().gt(0),
+                    optical_ndwi.unmask(sar_water_ndwi),
+                    sar_water_ndwi.rename("ndwi"),
+                )
+            ).rename("ndwi")
+            ndvi_img = optical_ndvi.unmask(0.42).rename("ndvi")
 
             # 3. GPM IMERG / CHIRPS Real Precipitation (Last 14 Days Cumulative mm)
             rain_img = (

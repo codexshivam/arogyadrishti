@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,7 @@ import 'package:plump_icons/plump_icons.dart';
 
 import '../network/api_client.dart';
 import '../services/firestore_sync.dart';
+import '../services/offline_sync_manager.dart';
 import '../theme/app_theme.dart';
 
 class _ShellTab {
@@ -579,6 +581,55 @@ class _ActionDispatchBottomSheetState
     setState(() => _submitting = true);
     final wardState = ref.read(activeWardProvider);
     final isVan = widget.actionType == 'REQUEST_VAN';
+
+    // Check connectivity first
+    final conn = await Connectivity().checkConnectivity();
+    final isOffline = conn.every((c) => c == ConnectivityResult.none);
+
+    final payload = {
+      'officer_uid': wardState.officerUid.isNotEmpty
+          ? wardState.officerUid
+          : 'officer_9915549455',
+      'action_type': widget.actionType,
+      'ward_village': _selectedWard,
+      'district_lgd': wardState.lgdCode,
+      'latitude': _lat,
+      'longitude': _lng,
+      'notes': _notesController.text.trim(),
+    };
+
+    if (isOffline) {
+      await ref.read(offlineSyncManagerProvider).enqueueAction(
+        actionType: 'VAN_REQUEST',
+        payload: payload,
+      );
+      if (!mounted) return;
+      showArogyaToast(
+        context,
+        title: 'Queued Offline',
+        message: isVan
+            ? 'Van dispatch queued locally. Will transmit automatically once network is restored.'
+            : 'Alert queued locally. Will transmit automatically once network is restored.',
+        backgroundColor: const Color(0xFFD97706),
+      );
+      final syntheticResult = {
+        'status': 'QUEUED_OFFLINE',
+        'is_offline': true,
+        'van_details': {
+          'van_id': 'VAN-OFFLINE',
+          'vehicle_no': 'QUEUED FOR DISPATCH',
+          'driver_phone': 'Offline Queue',
+          'eta_minutes': 15,
+          'distance_km': 1.8,
+          'status_label': 'Queued Offline',
+          'ticket_id': '#OFFLINE-DISPATCH',
+          'status_badge': 'Queued Offline',
+        },
+      };
+      Navigator.of(context).pop(syntheticResult);
+      return;
+    }
+
     try {
       final result = await ref
           .read(apiClientProvider)
@@ -602,14 +653,34 @@ class _ActionDispatchBottomSheetState
       );
       Navigator.of(context).pop(result);
     } catch (e) {
+      // If network fails during dispatch, seamlessly queue offline
+      await ref.read(offlineSyncManagerProvider).enqueueAction(
+        actionType: 'VAN_REQUEST',
+        payload: payload,
+      );
       if (!mounted) return;
-      setState(() => _submitting = false);
       showArogyaToast(
         context,
-        title: 'Dispatch Notice',
+        title: 'Queued Offline',
         message:
-            'Could not reach dispatch service. Please check your network and try again.',
+            'Network unreachable. Action has been safely queued and will sync automatically.',
+        backgroundColor: const Color(0xFFD97706),
       );
+      final fallbackResult = {
+        'status': 'QUEUED_OFFLINE',
+        'is_offline': true,
+        'van_details': {
+          'van_id': 'VAN-OFFLINE',
+          'vehicle_no': 'QUEUED FOR DISPATCH',
+          'driver_phone': 'Offline Queue',
+          'eta_minutes': 15,
+          'distance_km': 1.8,
+          'status_label': 'Queued Offline',
+          'ticket_id': '#OFFLINE-DISPATCH',
+          'status_badge': 'Queued Offline',
+        },
+      };
+      Navigator.of(context).pop(fallbackResult);
     }
   }
 

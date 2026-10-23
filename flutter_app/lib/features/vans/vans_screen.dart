@@ -631,7 +631,10 @@ class _VansScreenState extends ConsumerState<VansScreen> {
 
                     Color statusBg;
                     Color statusColor;
-                    if (status == 'AVAILABLE') {
+                    if (status.contains('QUEUED') || status.contains('OFFLINE')) {
+                      statusBg = const Color(0xFFFEF3C7);
+                      statusColor = const Color(0xFFD97706);
+                    } else if (status == 'AVAILABLE') {
                       statusBg = const Color(0xFFE8F5E9);
                       statusColor = const Color(0xFF2E7D32);
                     } else if (status == 'DISPATCHED') {

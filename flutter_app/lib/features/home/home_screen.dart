@@ -11,6 +11,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
+import '../../core/services/offline_sync_manager.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arogya_shared_widgets.dart';
 
@@ -831,6 +832,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Global Offline Sync Banner
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final isOnline = ref.watch(isNetworkConnectedProvider).value ?? true;
+                        final pendingCount = ref.watch(pendingQueueCountProvider).value ?? 0;
+
+                        if (isOnline && pendingCount == 0) return const SizedBox.shrink();
+
+                        return Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isOnline ? const Color(0xFFFEF3C7) : const Color(0xFFFDE68A),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFF59E0B)),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                isOnline ? Icons.sync_rounded : Icons.cloud_off_rounded,
+                                size: 18,
+                                color: const Color(0xFFB45309),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  isOnline
+                                      ? 'Syncing cached field records ($pendingCount pending)...'
+                                      : 'Working Offline • ${pendingCount > 0 ? '$pendingCount items' : 'Records'} queued for sync',
+                                  style: const TextStyle(
+                                    color: Color(0xFF92400E),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              if (pendingCount > 0 && isOnline)
+                                TextButton(
+                                  onPressed: () {
+                                    ref.read(offlineSyncManagerProvider).drainQueue();
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(50, 24),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: const Text('Sync Now', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFB45309))),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
                     // Component A: Top Profile Card (#8B0000 Crimson Theme)
                     StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                       stream: FirebaseFirestore.instance

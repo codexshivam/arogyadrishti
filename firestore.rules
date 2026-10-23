@@ -95,23 +95,49 @@ rules_version = '2';
 //   - created_at: timestamp (optional, immutable)
 //   - created_at_utc: string (optional, immutable, 1..64 chars)
 //   - updated_at: timestamp (optional)
-//
 // Collection: users/{userId}
 // Document ID: {userId} (Firebase Auth UID)
 // Fields:
-//   - uid: string (required, immutable, must equal userId)
-//   - name: string (required, 1..120 chars)
-//   - role: string (required, immutable for non-admin, in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'])
-//   - assigned_lgd_code: string (required, 1..32 chars)
-//   - ward_village: string (optional, 1..120 chars)
+//   - uid: string (optional on partial update, immutable, must equal userId if present)
+//   - name: string (optional on partial update, 1..120 chars)
+//   - role: string (optional, immutable for non-admin, in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'])
+//   - assigned_lgd_code / lgd_code: string (optional, 1..32 chars)
+//   - assigned_ward / ward_village / ward_id: string (optional, 1..120 chars)
 //   - district: string (optional, 1..100 chars)
 //   - state: string (optional, 1..100 chars)
 //   - email: string (optional, 3..254 chars) - PII protected (owner/admin read only)
 //   - phone: string (optional, 3..32 chars) - PII protected (owner/admin read only)
+//   - avatar_initials: string (optional, 1..8 chars)
+//   - updated_at: timestamp or ISO string (optional)
 //   - district_rep_name: string (optional, 1..120 chars)
 //   - district_rep_phone: string (optional, 3..32 chars)
 //   - district_rep_email: string (optional, 3..254 chars)
 //   - verified_at_utc: string (optional, 1..64 chars)
+//   - doc_key: string (optional, 1..128 chars)
+//   - authorized_staff: bool (optional)
+//   - latitude: number (optional, -90..90)
+//   - longitude: number (optional, -180..180)
+//
+// Subcollection: users/{userId}/preferences/{prefId}
+// Document ID: 'settings' or string (1..64 chars)
+// Fields: push_notifications_enabled, email_notifications_enabled, etc.
+//
+// Collection: chat_sessions/{userId} and subcollection messages/{messageId}
+// Document ID: {userId} for session doc, {messageId} for messages
+// Message Fields:
+//   - text: string (required, 1..4000 chars)
+//   - role: string (optional, in ['user', 'assistant', 'system'])
+//   - sender: string (optional, 1..120 chars)
+//   - session_id: string (optional, 1..128 chars)
+//   - ward_village: string (optional, 1..120 chars)
+//   - lgd_code: string (optional, 1..32 chars)
+//   - model_used: string (optional, 1..120 chars)
+//   - tool_cards: list (optional, max 20 items)
+//   - timestamp: timestamp (optional)
+//   - FORBIDDEN PII FIELDS (DPDP Act 2023): ['aadhaar', 'pan_number', 'patient_name', 'phone_number']
+//
+// Collection: app_config/{configId}
+// Document ID: {configId} (read-only for authenticated staff)
 //
 // ===============================================================
 
@@ -497,45 +523,103 @@ service cloud.firestore {
 
     // Validate users/{userId} staff profile document (PII-isolated to owner & Nodal/Admin)
     function isValidUserProfile(data, userId) {
-      let requiredFields = ['uid', 'name', 'role', 'assigned_lgd_code'];
       let allowedFields = [
         'uid',
         'name',
         'email',
         'phone',
         'ward_village',
+        'assigned_ward',
         'district',
         'state',
         'assigned_lgd_code',
+        'lgd_code',
+        'avatar_initials',
+        'updated_at',
         'district_rep_name',
         'district_rep_phone',
         'district_rep_email',
         'role',
-        'verified_at_utc'
+        'verified_at_utc',
+        'doc_key',
+        'authorized_staff',
+        'ward_id',
+        'latitude',
+        'longitude'
       ];
-      return hasRequiredFields(requiredFields) &&
-             hasOnlyAllowedFields(allowedFields) &&
-             data.uid is string &&
-             data.uid == userId &&
-             data.uid.size() >= 1 &&
-             data.uid.size() <= 128 &&
-             data.name is string &&
-             data.name.size() >= 1 &&
-             data.name.size() <= 120 &&
-             data.role is string &&
-             data.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'] &&
-             data.assigned_lgd_code is string &&
-             data.assigned_lgd_code.size() >= 1 &&
-             data.assigned_lgd_code.size() <= 32 &&
+      return hasOnlyAllowedFields(allowedFields) &&
+             hasNoForbiddenPiiFields(data) &&
+             (!('uid' in data) || (data.uid is string && data.uid == userId && data.uid.size() >= 1 && data.uid.size() <= 128)) &&
+             (!('name' in data) || (data.name is string && data.name.size() >= 1 && data.name.size() <= 120)) &&
+             (!('role' in data) || (data.role is string && data.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'])) &&
+             (!('assigned_lgd_code' in data) || (data.assigned_lgd_code is string && data.assigned_lgd_code.size() >= 1 && data.assigned_lgd_code.size() <= 32)) &&
+             (!('lgd_code' in data) || (data.lgd_code is string && data.lgd_code.size() >= 1 && data.lgd_code.size() <= 32)) &&
+             (!('assigned_ward' in data) || (data.assigned_ward is string && data.assigned_ward.size() >= 1 && data.assigned_ward.size() <= 120)) &&
+             (!('ward_id' in data) || (data.ward_id is string && data.ward_id.size() >= 1 && data.ward_id.size() <= 120)) &&
+             (!('doc_key' in data) || (data.doc_key is string && data.doc_key.size() >= 1 && data.doc_key.size() <= 128)) &&
+             (!('authorized_staff' in data) || data.authorized_staff is bool) &&
+             isValidOptionalNumber('latitude', -90, 90) &&
+             isValidOptionalNumber('longitude', -180, 180) &&
              isValidOptionalString('email', 3, 254) &&
              isValidOptionalString('phone', 3, 32) &&
              isValidOptionalString('ward_village', 1, 120) &&
              isValidOptionalString('district', 1, 100) &&
              isValidOptionalString('state', 1, 100) &&
+             isValidOptionalString('avatar_initials', 1, 8) &&
+             (!('updated_at' in data) || data.updated_at is timestamp || (data.updated_at is string && data.updated_at.size() <= 64)) &&
              isValidOptionalString('district_rep_name', 1, 120) &&
              isValidOptionalString('district_rep_phone', 3, 32) &&
              isValidOptionalString('district_rep_email', 3, 254) &&
              isValidOptionalString('verified_at_utc', 1, 64);
+    }
+
+    // Validate users/{userId}/preferences/{prefId} document
+    function isValidUserPreference(data) {
+      let allowedFields = [
+        'push_notifications_enabled',
+        'email_notifications_enabled',
+        'sms_alerts_enabled',
+        'theme_mode',
+        'language_code',
+        'updated_at'
+      ];
+      return hasOnlyAllowedFields(allowedFields) &&
+             hasNoForbiddenPiiFields(data) &&
+             (!('push_notifications_enabled' in data) || data.push_notifications_enabled is bool) &&
+             (!('email_notifications_enabled' in data) || data.email_notifications_enabled is bool) &&
+             (!('sms_alerts_enabled' in data) || data.sms_alerts_enabled is bool) &&
+             (!('theme_mode' in data) || (data.theme_mode is string && data.theme_mode.size() <= 32)) &&
+             (!('language_code' in data) || (data.language_code is string && data.language_code.size() <= 16)) &&
+             isValidOptionalTimestamp('updated_at');
+    }
+
+    // Validate chat_sessions/{userId}/messages/{messageId} copilot chat messages
+    function isValidChatMessage(data) {
+      let allowedFields = [
+        'text',
+        'role',
+        'sender',
+        'session_id',
+        'ward_village',
+        'lgd_code',
+        'model_used',
+        'tool_cards',
+        'timestamp'
+      ];
+      return hasRequiredFields(['text']) &&
+             hasOnlyAllowedFields(allowedFields) &&
+             hasNoForbiddenPiiFields(data) &&
+             data.text is string &&
+             data.text.size() >= 1 &&
+             data.text.size() <= 4000 &&
+             (!('role' in data) || (data.role is string && data.role in ['user', 'assistant', 'system'])) &&
+             isValidOptionalString('sender', 1, 120) &&
+             isValidOptionalString('session_id', 1, 128) &&
+             isValidOptionalString('ward_village', 1, 120) &&
+             isValidOptionalString('lgd_code', 1, 32) &&
+             isValidOptionalString('model_used', 1, 120) &&
+             (!('tool_cards' in data) || (data.tool_cards is list && data.tool_cards.size() <= 20)) &&
+             isValidOptionalTimestamp('timestamp');
     }
 
     // ===============================================================
@@ -641,27 +725,59 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isNodalOrAdmin();
 
-      // Prevent privilege escalation: only ADMIN can assign/modify roles, or user can create profile matching their verified JWT role claim
+      // Allow profile creation by owner or ADMIN. Non-admins cannot self-assign role or assigned_lgd_code
+      // unless verified via custom JWT claims.
       allow create: if isAuthenticated() &&
                     isValidUserProfile(request.resource.data, userId) && (
                       isAdmin() ||
                       (isOwner(userId) &&
-                       'role' in request.auth.token &&
-                       request.resource.data.role == request.auth.token.role &&
-                       isAssignedToLgd(request.resource.data.assigned_lgd_code))
+                       (!('role' in request.resource.data) || ('role' in request.auth.token && request.resource.data.role == request.auth.token.role)) &&
+                       (!('assigned_lgd_code' in request.resource.data) || isAssignedToLgd(request.resource.data.assigned_lgd_code)))
                     );
 
+      // Allow profile updates by owner or ADMIN.
+      // For owners: UID cannot change, role cannot change unless verified by admin/token,
+      // and existing assigned_lgd_code cannot be escalated.
       allow update: if isAuthenticated() &&
                     isValidUserProfile(request.resource.data, userId) && (
                       isAdmin() ||
                       (isOwner(userId) &&
-                       areImmutableFieldsUnchanged(['uid', 'role', 'assigned_lgd_code']))
+                       (!('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid) &&
+                       (!('role' in request.resource.data) || request.resource.data.role == resource.data.role || ('role' in request.auth.token && request.resource.data.role == request.auth.token.role)) &&
+                       (!('assigned_lgd_code' in request.resource.data) || request.resource.data.assigned_lgd_code == resource.data.assigned_lgd_code || isAssignedToLgd(request.resource.data.assigned_lgd_code)))
                     );
 
       allow delete: if false;
+
+      // Subcollection: users/{userId}/preferences/{prefId}
+      match /preferences/{prefId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId) && isValidUserPreference(request.resource.data);
+        allow delete: if false;
+      }
     }
 
-    // 6. Default Deny for all other paths
+    // 6. Copilot AI Chat Sessions & Messages: chat_sessions/{userId}/messages/{messageId}
+    match /chat_sessions/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidChatMessage(request.resource.data);
+        allow update: if isOwner(userId) && isValidChatMessage(request.resource.data);
+        allow delete: if false;
+      }
+    }
+
+    // 7. App Configuration & Metadata: app_config/{configId}
+    match /app_config/{configId} {
+      // Authenticated staff can read app metadata and version configuration
+      allow read: if isAuthenticated();
+      // Only system administrators can update application config
+      allow write: if isAdmin();
+    }
+
+    // 8. Default Deny for all other paths
     match /{document=**} {
       allow read, write: if false;
     }

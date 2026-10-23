@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" width="100%" height="100%" style="background: linear-gradient(135deg, #090D16 0%, #0F172A 50%, #1E1B4B 100%); border-radius: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="phoneGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B0000" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="crimsonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#8B0000"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="accentCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background decorative grid & circuits -->
+  <g opacity="0.15">
+    <path d="M 0 100 L 1100 100 M 0 200 L 1100 200 M 0 300 L 1100 300 M 0 400 L 1100 400 M 0 500 L 1100 500" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 8"/>
+    <path d="M 150 0 L 150 560 M 350 0 L 350 560 M 550 0 L 550 560 M 750 0 L 750 560 M 950 0 L 950 560" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 8"/>
+    <circle cx="200" cy="120" r="180" fill="url(#phoneGlow)" filter="url(#glow)"/>
+    <circle cx="900" cy="400" r="220" fill="url(#phoneGlow)" filter="url(#glow)"/>
+  </g>
+
+  <!-- LEFT DEVICE: Phone Mockup 1 (Home Screen / Risk Map Telemetry) -->
+  <g transform="translate(140, 40)" filter="url(#dropShadow)">
+    <!-- Device Frame -->
+    <rect x="0" y="0" width="250" height="480" rx="36" fill="#0B0F19" stroke="#334155" stroke-width="4"/>
+    <rect x="6" y="6" width="238" height="468" rx="32" fill="#020617"/>
+
+    <!-- Notch / Dynamic Island -->
+    <rect x="85" y="14" width="80" height="18" rx="9" fill="#0B0F19"/>
+    <circle cx="145" cy="23" r="3.5" fill="#1E293B"/>
+
+    <!-- App Bar -->
+    <rect x="12" y="42" width="226" height="52" rx="10" fill="#0F172A"/>
+    <text x="24" y="65" fill="#FFFFFF" font-size="12" font-weight="bold">AROGYA DRISHTI</text>
+    <text x="24" y="79" fill="#94A3B8" font-size="8.5">Chandigarh • Ward 17 (LGD: 0404400017)</text>
+    <circle cx="216" cy="67" r="12" fill="#8B0000"/>
+    <text x="216" y="71" fill="#FFFFFF" font-size="9" font-weight="bold" text-anchor="middle">RC</text>
+
+    <!-- Offline Resilience Banner -->
+    <rect x="18" y="102" width="214" height="24" rx="6" fill="#D97706" fill-opacity="0.2" stroke="#D97706" stroke-width="1"/>
+    <circle cx="28" cy="114" r="3.5" fill="#F59E0B"/>
+    <text x="38" y="117" fill="#FDE68A" font-size="8.5" font-weight="600">Tier-1 Offline Engine Active • 0 Loss</text>
+
+    <!-- Critical Composite Score Card -->
+    <rect x="18" y="134" width="214" height="120" rx="12" fill="url(#crimsonGrad)"/>
+    <text x="30" y="156" fill="#FECACA" font-size="9" font-weight="700" letter-spacing="1">EPIDEMIC RISK INDEX</text>
+    <text x="30" y="196" fill="#FFFFFF" font-size="38" font-weight="900">82<tspan font-size="18" fill="#FCA5A5">/100</tspan></text>
+    <rect x="135" y="146" width="86" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.2"/>
+    <text x="178" y="160" fill="#FFFFFF" font-size="8.5" font-weight="800" text-anchor="middle">CRITICAL ALERT</text>
+    <text x="30" y="222" fill="#FFFFFF" font-size="9.5" font-weight="600">BI: 34.2 • HI: 18.5% • CI: 22.1%</text>
+    <text x="30" y="240" fill="#FEE2E2" font-size="8.5">Monsoon Surge: Outbreak Vector Threshold Exceeded</text>
+
+    <!-- GEE Satellite Radar Telemetry Pill Grid -->
+    <rect x="18" y="264" width="102" height="54" rx="8" fill="#1E293B"/>
+    <text x="26" y="280" fill="#94A3B8" font-size="8">ORBITAL LST</text>
+    <text x="26" y="304" fill="#38BDF8" font-size="14" font-weight="bold">28.4°C</text>
+    <text x="74" y="304" fill="#64748B" font-size="8">MODIS</text>
+
+    <rect x="130" y="264" width="102" height="54" rx="8" fill="#1E293B"/>
+    <text x="138" y="280" fill="#94A3B8" font-size="8">SAR RADAR NDWI</text>
+    <text x="138" y="304" fill="#34D399" font-size="14" font-weight="bold">+0.32</text>
+    <text x="194" y="304" fill="#64748B" font-size="8">S1-GRD</text>
+
+    <!-- Action Buttons -->
+    <rect x="18" y="328" width="214" height="42" rx="8" fill="#DC2626"/>
+    <text x="125" y="354" fill="#FFFFFF" font-size="11" font-weight="bold" text-anchor="middle">🚨 Dispatch Municipal Fogging Van</text>
+
+    <rect x="18" y="378" width="214" height="38" rx="8" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="125" y="402" fill="#E2E8F0" font-size="10.5" font-weight="600" text-anchor="middle">📷 AI Vector Camera Scan</text>
+
+    <!-- Bottom Navigation Bar -->
+    <rect x="12" y="424" width="226" height="42" rx="14" fill="#0F172A"/>
+    <circle cx="45" cy="445" r="4" fill="#DC2626"/>
+    <circle cx="85" cy="445" r="4" fill="#64748B"/>
+    <circle cx="125" cy="445" r="4" fill="#64748B"/>
+    <circle cx="165" cy="445" r="4" fill="#64748B"/>
+    <circle cx="205" cy="445" r="4" fill="#64748B"/>
+  </g>
+
+  <!-- CENTER DEVICE: Phone Mockup 2 (AI Vision Scan / Instar Triage Overlay) -->
+  <g transform="translate(425, 10)" filter="url(#dropShadow)">
+    <!-- Device Frame Elevated -->
+    <rect x="0" y="0" width="250" height="500" rx="38" fill="#0F172A" stroke="#475569" stroke-width="4"/>
+    <rect x="6" y="6" width="238" height="488" rx="34" fill="#020617"/>
+
+    <!-- Notch -->
+    <rect x="85" y="14" width="80" height="18" rx="9" fill="#0F172A"/>
+
+    <!-- Camera Viewport / Inspection Frame -->
+    <g transform="translate(14, 46)">
+      <rect x="0" y="0" width="222" height="230" rx="14" fill="#1E293B"/>
+      <!-- Simulated Camera Image Scene (Water cooler container) -->
+      <path d="M 40 70 L 180 70 L 165 190 L 55 190 Z" fill="#334155" stroke="#475569" stroke-width="2"/>
+      <ellipse cx="110" cy="120" rx="45" ry="18" fill="#0284C7" fill-opacity="0.6"/>
+      <path d="M 100 115 Q 110 110 115 125" stroke="#FDE047" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M 120 120 Q 125 128 130 118" stroke="#FDE047" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M 85 122 Q 90 128 95 121" stroke="#FDE047" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+      <!-- PaliGemma AI Bounding Box Overlay -->
+      <rect x="35" y="60" width="150" height="140" rx="6" fill="#DC2626" fill-opacity="0.15" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="6 4"/>
+      <rect x="35" y="44" width="135" height="18" rx="4" fill="#DC2626"/>
+      <text x="42" y="57" fill="#FFFFFF" font-size="8.5" font-weight="bold">AEDES AEGYPTI (96.4%)</text>
+      <circle cx="175" cy="53" r="3" fill="#22C55E"/>
+
+      <!-- Micro-climate HUD tag -->
+      <rect x="10" y="196" width="202" height="24" rx="6" fill="#000000" fill-opacity="0.75"/>
+      <text x="18" y="212" fill="#E2E8F0" font-size="8.5">Instar IV Larvae • Breeding Foci Confirmed</text>
+    </g>
+
+    <!-- Vision Triage Diagnostic Cards -->
+    <rect x="14" y="286" width="222" height="120" rx="10" fill="#0F172A" stroke="#1E293B" stroke-width="1.5"/>
+    <text x="24" y="306" fill="#38BDF8" font-size="9" font-weight="bold">STATUTORY NCVBDC PROTOCOL</text>
+    <text x="24" y="324" fill="#FFFFFF" font-size="12" font-weight="bold">Temephos 50% EC (Abate)</text>
+    <text x="24" y="340" fill="#CBD5E1" font-size="8.5">• Dosage: 1 ppm (1 ml per 1,000 Litres)</text>
+    <text x="24" y="354" fill="#CBD5E1" font-size="8.5">• Alternate: Bacillus thuringiensis (Bti) @ 1g/m²</text>
+    <text x="24" y="368" fill="#CBD5E1" font-size="8.5">• Target: Diurnal daytime container breeders</text>
+    <rect x="24" y="378" width="202" height="18" rx="4" fill="#16A34A" fill-opacity="0.2"/>
+    <text x="125" y="390" fill="#4ADE80" font-size="8" font-weight="700" text-anchor="middle">✓ Auto-Logged to IHIP Tab 6 & Firestore</text>
+
+    <!-- Bottom Primary Confirm Button -->
+    <rect x="14" y="416" width="222" height="42" rx="8" fill="url(#crimsonGrad)"/>
+    <text x="125" y="442" fill="#FFFFFF" font-size="11" font-weight="bold" text-anchor="middle">Generate Official Health Notice</text>
+  </g>
+
+  <!-- RIGHT DEVICE: Phone Mockup 3 (Gemma Copilot & Van Telemetry) -->
+  <g transform="translate(710, 40)" filter="url(#dropShadow)">
+    <!-- Device Frame -->
+    <rect x="0" y="0" width="250" height="480" rx="36" fill="#0B0F19" stroke="#334155" stroke-width="4"/>
+    <rect x="6" y="6" width="238" height="468" rx="32" fill="#020617"/>
+
+    <!-- Notch -->
+    <rect x="85" y="14" width="80" height="18" rx="9" fill="#0B0F19"/>
+
+    <!-- App Header -->
+    <rect x="12" y="42" width="226" height="48" rx="10" fill="#0F172A"/>
+    <text x="24" y="64" fill="#FFFFFF" font-size="11.5" font-weight="bold">AI VECTOR COPILOT</text>
+    <text x="24" y="78" fill="#10B981" font-size="8.5">● Gemma 4 Agent • Dual Mode Online/Offline</text>
+
+    <!-- Chat Message Bubble 1 (User Query) -->
+    <rect x="60" y="100" width="170" height="38" rx="10" fill="#1E293B"/>
+    <text x="70" y="116" fill="#FFFFFF" font-size="8.5">What is the larvicide dosage for</text>
+    <text x="70" y="129" fill="#FFFFFF" font-size="8.5">desert coolers in Sector 22?</text>
+
+    <!-- Chat Message Bubble 2 (Gemma Agent Grounded Reply) -->
+    <rect x="18" y="146" width="214" height="142" rx="10" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="28" y="164" fill="#F87171" font-size="8" font-weight="bold">NCVBDC / ICMR STATUTORY PROTOCOL</text>
+    <text x="28" y="180" fill="#E2E8F0" font-size="8.5">Apply Temephos 50% EC at 1 ppm</text>
+    <text x="28" y="194" fill="#E2E8F0" font-size="8.5">(1 ml/1000L of water). Enforce weekly</text>
+    <text x="28" y="208" fill="#E2E8F0" font-size="8.5">'Dry Day' cooler scrubbing protocol.</text>
+
+    <rect x="28" y="218" width="194" height="26" rx="6" fill="#1E1B4B" stroke="#4338CA" stroke-width="1"/>
+    <text x="36" y="234" fill="#A5B4FC" font-size="8">Live GEE: 72mm rain recorded in Ward 17</text>
+
+    <text x="28" y="260" fill="#94A3B8" font-size="7.5">⚡ Offline Fallback: ICMR Vector Knowledge Base</text>
+    <text x="28" y="274" fill="#10B981" font-size="8" font-weight="600">✓ Van CH-01-GA-3412 Dispatched (ETA: 11m)</text>
+
+    <!-- Live Van Dispatch Telemetry Card -->
+    <rect x="18" y="298" width="214" height="114" rx="10" fill="#1E293B" stroke="#8B0000" stroke-width="1.5"/>
+    <circle cx="34" cy="316" r="10" fill="#8B0000"/>
+    <text x="34" y="320" fill="#FFFFFF" font-size="10" text-anchor="middle">🚐</text>
+    <text x="50" y="315" fill="#FFFFFF" font-size="10.5" font-weight="bold">VAN-04 (CH-01-GA-3412)</text>
+    <text x="50" y="327" fill="#94A3B8" font-size="8">Driver: Ramesh Kumar • +91 98150 22001</text>
+
+    <line x1="28" y1="338" x2="222" y2="338" stroke="#334155" stroke-width="1"/>
+
+    <text x="28" y="356" fill="#CBD5E1" font-size="8.5">Stock: 45 L Cyphenothrin 5% EC</text>
+    <text x="28" y="370" fill="#CBD5E1" font-size="8.5">Routes API v2 ETA: <tspan fill="#38BDF8" font-weight="bold">8.4 mins (2.1 km)</tspan></text>
+    <rect x="28" y="380" width="194" height="22" rx="4" fill="#059669"/>
+    <text x="125" y="395" fill="#FFFFFF" font-size="9" font-weight="bold" text-anchor="middle">Track Real-Time Van GPS</text>
+
+    <!-- Bottom Input Bar -->
+    <rect x="14" y="424" width="222" height="38" rx="8" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="28" y="447" fill="#64748B" font-size="9">Ask Gemma vector copilot...</text>
+    <circle cx="218" cy="443" r="10" fill="#DC2626"/>
+    <text x="218" y="447" fill="#FFFFFF" font-size="10" text-anchor="middle">↑</text>
+  </g>
+</svg>

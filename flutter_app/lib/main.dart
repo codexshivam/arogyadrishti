@@ -30,28 +30,71 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(ArogyaTheme.whiteSystemUiOverlay);
+
+  bool firebaseReady = false;
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    // Initialize Firebase App Check for Android Play Integrity & debug provider
-    if (!kIsWeb) {
-      await FirebaseAppCheck.instance.activate(
-        androidProvider: kDebugMode
-            ? AndroidProvider.debug
-            : AndroidProvider.playIntegrity,
-        appleProvider: kDebugMode
-            ? AppleProvider.debug
-            : AppleProvider.deviceCheck,
+    if (kIsWeb) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
       );
+      firebaseReady = true;
+    } else {
+      // On Android/iOS: attach to native google-services initialization,
+      // fallback to explicit options if native is not present.
+      try {
+        await Firebase.initializeApp();
+        firebaseReady = true;
+      } catch (nativeErr) {
+        debugPrint('Native Firebase init note ($nativeErr), trying with options...');
+        try {
+          await Firebase.initializeApp(
+            options: DefaultFirebaseOptions.currentPlatform,
+          );
+          firebaseReady = true;
+        } catch (optionsErr) {
+          debugPrint('Firebase init with options: $optionsErr');
+          if (Firebase.apps.isNotEmpty || optionsErr.toString().contains('duplicate')) {
+            firebaseReady = true;
+          }
+        }
+      }
     }
-    await FirestoreSyncService.configureOfflinePersistence(
-      firebaseInitialized: true,
-    );
-    await ArogyaTelemetryService.initialize();
-  } catch (_) {
-    // Runs with FastAPI Cloud Run backend when Firebase client options are not injected on desktop tests
+  } catch (e) {
+    debugPrint('Firebase initialization caught: $e');
   }
+
+  if (firebaseReady || Firebase.apps.isNotEmpty) {
+    // App Check non-blocking
+    if (!kIsWeb) {
+      try {
+        await FirebaseAppCheck.instance.activate(
+          androidProvider: kDebugMode
+              ? AndroidProvider.debug
+              : AndroidProvider.playIntegrity,
+          appleProvider: kDebugMode
+              ? AppleProvider.debug
+              : AppleProvider.deviceCheck,
+        );
+      } catch (e) {
+        debugPrint('App Check activate bypassed: $e');
+      }
+    }
+
+    try {
+      await FirestoreSyncService.configureOfflinePersistence(
+        firebaseInitialized: true,
+      );
+    } catch (e) {
+      debugPrint('Firestore persistence init bypassed: $e');
+    }
+
+    try {
+      await ArogyaTelemetryService.initialize();
+    } catch (e) {
+      debugPrint('ArogyaTelemetryService init bypassed: $e');
+    }
+  }
+
   runApp(const ProviderScope(child: ArogyaDrishtiApp()));
 }
 
