@@ -1,14 +1,12 @@
 <div align="center">
 
-<!-- App UI Showcase Mockup SVG Header -->
-<img src="./assets/readme/app_mockup_showcase.svg" width="100%" alt="Arogya Drishti Mobile UI Showcase: Real-Time Risk Map, AI Instar Vision Triage, and Offline Gemma Vector Copilot" />
+<!-- Arogya Header Banner -->
+<img src="./assets/readme/arogya_banner.svg" width="100%" alt="Arogya" />
 
 <br/><br/>
 
 <!-- Dynamic Typing Subtitle -->
-<a href="https://arogya.shivm.co">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=15&duration=2600&pause=1000&color=EF4444&center=true&vCenter=true&width=860&lines=Intercepting+Vector-Borne+Outbreaks+14+Days+Before+Hospital+Admissions+Spike;Five-Pillar+Fusion%3A+Satellite+Radar+%2B+Field+Entomology+%2B+Multimodal+AI;Powered+by+Open-Weight+Google+Gemma+4%2C+Earth+Engine%2C+Cloud+Firestore+%26+FastAPI;Tier-3+Offline+Resilience+%E2%80%A2+CERT-In+Compliant+180-Day+WORM+Audit+Trail" alt="Typing Subtitle" />
-</a>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=15&duration=2600&pause=1000&color=EF4444&center=true&vCenter=true&width=860&lines=Intercepting+Vector-Borne+Outbreaks+14+Days+Before+Hospital+Admissions+Spike;Five-Pillar+Fusion%3A+Satellite+Radar+%2B+Field+Entomology+%2B+Multimodal+AI;Powered+by+Open-Weight+Google+Gemma+4%2C+Earth+Engine%2C+Cloud+Firestore+%26+FastAPI;Tier-3+Offline+Resilience+%E2%80%A2+CERT-In+Compliant+180-Day+WORM+Audit+Trail" alt="Typing Subtitle" />
 
 <br/>
 
@@ -17,13 +15,13 @@
 [![Open-Weight AI](https://img.shields.io/badge/Open--Weight_AI-Google_Gemma_4-8B5CF6.svg?style=for-the-badge&logo=google)](skills/vector-surveillance-skill/SKILL.md)
 [![Satellite Radar](https://img.shields.io/badge/Satellite_Radar-Sentinel--1_SAR_%2B_MODIS-0284C7.svg?style=for-the-badge&logo=googleearth)](#2-tools-and-technologies-used)
 [![Mobile Client](https://img.shields.io/badge/Mobile_DPI-Flutter_3.24+-02569B.svg?style=for-the-badge&logo=flutter)](flutter_app/)
-[![Cloud Run Backend](https://img.shields.io/badge/Backend-FastAPI_on_Cloud_Run-009688.svg?style=for-the-badge&logo=fastapi)](backend/)
+[![Backend](https://img.shields.io/badge/Backend-FastAPI_on_Cloud_Run-009688.svg?style=for-the-badge&logo=fastapi)](backend/)
 [![Data Residency](https://img.shields.io/badge/Data_Residency-GCP_asia--south1_(Mumbai)-DC2626.svg?style=for-the-badge&logo=googlecloud)](#6-security-and-ethical-practices)
 [![CERT-In Compliant](https://img.shields.io/badge/CERT--In-180--Day_WORM_Audit-10B981.svg?style=for-the-badge)](#6-security-and-ethical-practices)
 
 <br/>
 
-**[📱 Download Android Release APK](https://github.com/codexshivam/arogyadrishti/releases)** • **[🌐 Live Web Portal (arogya.shivm.co)](https://arogya.shivm.co)** • **[⚡ Production Cloud Run API](https://arogya-drishti-api-234323362711.asia-south1.run.app/api/v1/app/metadata)** • **[📜 Privacy Policy](docs/legal/privacy_policy.md)** • **[📄 Terms of Service](docs/legal/terms_of_service.md)**
+**[📱 Download Android Release APK](https://github.com/codexshivam/arogyadrishti/releases)** • **[⚡ Production Cloud Run API](https://arogya-drishti-api-234323362711.asia-south1.run.app/api/v1/app/metadata)** • **[📜 Privacy Policy](docs/legal/privacy_policy.md)** • **[📄 Terms of Service](docs/legal/terms_of_service.md)**
 
 ---
 
@@ -191,7 +189,6 @@ See the [LICENSE](LICENSE) file for details. Open for government adoption, publi
 | Resource | Link |
 | :--- | :--- |
 | 📱 **Android Release APK** | **[Download Latest APK (GitHub Releases)](https://github.com/codexshivam/arogyadrishti/releases)** |
-| 🌐 **Live Web Application** | **[arogya.shivm.co](https://arogya.shivm.co)** |
 | ⚡ **Production API Gateway** | **[Cloud Run API Documentation](https://arogya-drishti-api-234323362711.asia-south1.run.app/readyz)** |
 | 📜 **Privacy Policy** | **[docs/legal/privacy_policy.md](docs/legal/privacy_policy.md)** |
 | 📄 **Terms of Service** | **[docs/legal/terms_of_service.md](docs/legal/terms_of_service.md)** |

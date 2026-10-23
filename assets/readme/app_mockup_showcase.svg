@@ -130,7 +130,7 @@
     <text x="24" y="354" fill="#CBD5E1" font-size="8.5">• Alternate: Bacillus thuringiensis (Bti) @ 1g/m²</text>
     <text x="24" y="368" fill="#CBD5E1" font-size="8.5">• Target: Diurnal daytime container breeders</text>
     <rect x="24" y="378" width="202" height="18" rx="4" fill="#16A34A" fill-opacity="0.2"/>
-    <text x="125" y="390" fill="#4ADE80" font-size="8" font-weight="700" text-anchor="middle">✓ Auto-Logged to IHIP Tab 6 & Firestore</text>
+    <text x="125" y="390" fill="#4ADE80" font-size="8" font-weight="700" text-anchor="middle">✓ Auto-Logged to IHIP Tab 6 &amp; Firestore</text>
 
     <!-- Bottom Primary Confirm Button -->
     <rect x="14" y="416" width="222" height="42" rx="8" fill="url(#crimsonGrad)"/>
