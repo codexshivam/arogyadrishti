@@ -1,0 +1,138 @@
+{
+  "fps": 60,
+  "durationInFrames": 3600,
+  "width": 1920,
+  "height": 1080,
+  "bpm": 120,
+  "beatFrames": 30,
+  "scenes": [0, 480, 930, 1380, 1860, 2340, 2820, 3270, 3600],
+  "T": {
+    "authToHome": 440,
+    "homeToScan": 890,
+    "scanToMap": 1340,
+    "mapToStats": 1820,
+    "statsToCenters": 2300,
+    "centersToSupport": 2780,
+    "outro": 3270
+  },
+  "auth": {
+    "typeStart": 30,
+    "typeInterval": 7,
+    "digits": "9915549458",
+    "tapSend": 120,
+    "otpShow": 135,
+    "otpStart": 160,
+    "otpInterval": 10,
+    "otp": "482910",
+    "zoomOut": 200,
+    "pipeline": [240, 280, 320, 360],
+    "success": 400
+  },
+  "home": {
+    "enter": 460,
+    "alertPop": 510,
+    "sparkDraw": 540,
+    "tapScan": 850
+  },
+  "scan": {
+    "enter": 910,
+    "telemetry": 960,
+    "boxes": [1000, 1070]
+  },
+  "map": {
+    "enter": 1360,
+    "pan": 1410,
+    "pins": [1440, 1470, 1500, 1530],
+    "sheet": 1560
+  },
+  "stats": {
+    "enter": 1840,
+    "chart": 1890,
+    "evalRows": [1980, 2030, 2080]
+  },
+  "centers": {
+    "enter": 2320,
+    "telemetry": 2360,
+    "vans": [2400, 2460],
+    "tapCall": 2720
+  },
+  "support": {
+    "enter": 2800,
+    "typeStart": 2860,
+    "typeInterval": 3,
+    "text": "Uncovered water tanks at site, larvae visible.",
+    "tapSubmit": 3020,
+    "chips": [3060, 3130]
+  },
+  "outro": {
+    "start": 3270,
+    "logoPop": 3310,
+    "title": 3340,
+    "subtitle": 3380
+  },
+  "headlines": [
+    {
+      "id": "auth",
+      "start": 210,
+      "end": 430,
+      "side": "left",
+      "step": "STAGE 01",
+      "title": "Secure Municipal Onboarding",
+      "subtitle": "Firebase OTP verification with FastAPI staff whitelist matching and role-scoped JWT claim issuance."
+    },
+    {
+      "id": "home",
+      "start": 480,
+      "end": 880,
+      "side": "left",
+      "step": "STAGE 02",
+      "title": "Proactive Outbreak Detection",
+      "subtitle": "Instant Breteau Index threshold alerts and live municipal surveillance telemetry."
+    },
+    {
+      "id": "scan",
+      "start": 930,
+      "end": 1330,
+      "side": "right",
+      "step": "STAGE 03",
+      "title": "Multimodal Vision AI",
+      "subtitle": "On-device PaliGemma larvae classification combined with satellite climate feeds."
+    },
+    {
+      "id": "map",
+      "start": 1380,
+      "end": 1810,
+      "side": "right",
+      "step": "STAGE 04",
+      "title": "Precision Ward-Level GIS",
+      "subtitle": "Live outbreak density heatmaps, field inspector tracking, and high-risk breeding sites."
+    },
+    {
+      "id": "stats",
+      "start": 1860,
+      "end": 2290,
+      "side": "left",
+      "step": "STAGE 05",
+      "title": "Longitudinal Health Indices",
+      "subtitle": "Multi-week epidemiological trends evaluated against WHO and NCVBDC guidelines."
+    },
+    {
+      "id": "centers",
+      "start": 2340,
+      "end": 2770,
+      "side": "right",
+      "step": "STAGE 06",
+      "title": "Autonomous Fleet Dispatch",
+      "subtitle": "Real-time patrol vehicle routing and direct integration with accredited hospitals."
+    },
+    {
+      "id": "support",
+      "start": 2820,
+      "end": 3250,
+      "side": "left",
+      "step": "STAGE 07",
+      "title": "Emergency Escalation",
+      "subtitle": "Direct SOS dispatch hotline and field incident tracking with guaranteed SLA response times."
+    }
+  ]
+}
