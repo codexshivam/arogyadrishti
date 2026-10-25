@@ -23,7 +23,8 @@ class NidanIQTelemetryService {
       await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
       await FirebaseAnalytics.instance
           .setDefaultEventParameters(<String, Object>{
-            'app_package': 'teamrocket.NidanIQ.android',
+            'app_package': 'shivamyadav.nidaniq.android',
+            'ios_bundle_id': 'shivamyadav.nidaniq.ios',
             'gcp_region': 'asia-south1',
           });
 
@@ -37,7 +38,7 @@ class NidanIQTelemetryService {
         );
         await FirebaseCrashlytics.instance.setCustomKey(
           'app_package',
-          'teamrocket.NidanIQ.android',
+          'shivamyadav.nidaniq.android',
         );
         await FirebaseCrashlytics.instance.setCustomKey(
           'data_residency_region',

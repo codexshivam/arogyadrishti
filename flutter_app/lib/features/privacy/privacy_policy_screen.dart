@@ -98,7 +98,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           Text(
-                            'Android Package ID: teamrocket.NidanIQ.android',
+                            'Package ID: shivamyadav.nidaniq.android | iOS: shivamyadav.nidaniq.ios',
                             style: GoogleFonts.ibmPlexMono(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
