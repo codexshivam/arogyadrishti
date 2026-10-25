@@ -676,7 +676,7 @@ NidanIQ leverages an end-to-end, sovereign, open-source stack designed for zero 
       <td><strong>📂 Sovereign Source Repository</strong></td>
       <td>Complete production codebase containing the Flutter mobile DPI client (Android & iOS), FastAPI Cloud Run backend, Earth Engine satellite pipelines, and verified test suites.</td>
       <td><code>Open Source DPI</code><br/>Apache 2.0 License</td>
-      <td><a href="https://github.com/codexshivam/NidanIQ"><strong>GitHub Repository</strong></a></td>
+      <td><a href="https://github.com/codexshivam/nidaniq"><strong>GitHub Repository</strong></a></td>
     </tr>
   </tbody>
 </table>
