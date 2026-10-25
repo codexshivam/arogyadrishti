@@ -3,25 +3,6 @@
 <!-- Arogya Header Banner -->
 <img src="./assets/readme/arogya_banner.svg" width="100%" alt="Arogya" />
 
-<br/><br/>
-
-<!-- Dynamic Typing Subtitle -->
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=15&duration=2600&pause=1000&color=EF4444&center=true&vCenter=true&width=860&lines=Intercepting+Vector-Borne+Outbreaks+14+Days+Before+Hospital+Admissions+Spike;Five-Pillar+Fusion%3A+Satellite+Radar+%2B+Field+Entomology+%2B+Multimodal+AI;Powered+by+Open-Weight+Google+Gemma+4%2C+Earth+Engine%2C+Cloud+Firestore+%26+FastAPI;Tier-3+Offline+Resilience+%E2%80%A2+CERT-In+Compliant+180-Day+WORM+Audit+Trail" alt="Typing Subtitle" />
-
-<br/>
-
-<!-- Product Badges -->
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge&logo=apache)](LICENSE)
-[![Open-Weight AI](https://img.shields.io/badge/Open--Weight_AI-Google_Gemma_4-8B5CF6.svg?style=for-the-badge&logo=google)](skills/vector-surveillance-skill/SKILL.md)
-[![Satellite Radar](https://img.shields.io/badge/Satellite_Radar-Sentinel--1_SAR_%2B_MODIS-0284C7.svg?style=for-the-badge&logo=googleearth)](#3-five-pillar-epidemiological-ingestion-engine-0600-am-ist)
-[![Mobile Client](https://img.shields.io/badge/Mobile_DPI-Flutter_3.24+-02569B.svg?style=for-the-badge&logo=flutter)](flutter_app/)
-[![Backend](https://img.shields.io/badge/Backend-FastAPI_on_Cloud_Run-009688.svg?style=for-the-badge&logo=fastapi)](backend/)
-[![Data Residency](https://img.shields.io/badge/Data_Residency-GCP_asia--south1_(Mumbai)-DC2626.svg?style=for-the-badge&logo=googlecloud)](#6-security-sovereignty--ethical-governance)
-[![CERT-In Compliant](https://img.shields.io/badge/CERT--In-180--Day_WORM_Audit-10B981.svg?style=for-the-badge)](#6-security-sovereignty--ethical-governance)
-[![Platforms](https://img.shields.io/badge/Platforms-Android_%7C_iOS-blue.svg?style=for-the-badge&logo=apple)](flutter_app/)
-
----
-
 </div>
 
 ## Executive Overview & Architectural Mission
@@ -35,7 +16,13 @@ Traditional public health surveillance operates reactively: municipal authoritie
 <br/>
 
 <div align="center">
-  <img src="./assets/readme/app_mockup_showcase.svg" width="100%" alt="Arogya Drishti Mobile DPI Interface Mockup" />
+  <a href="https://docs.google.com/presentation/d/1J2fiWyCnKmhVXb0tEsRWMHxopULAneF_/edit?usp=sharing&ouid=109225249232404642044&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer">
+    <img src="./assets/readme/mockup.png" width="94%" alt="Arogya Drishti Mobile DPI Interface Showcase" />
+  </a>
+  <br/><br/>
+  <p>
+    📊 <strong><a href="https://docs.google.com/presentation/d/1J2fiWyCnKmhVXb0tEsRWMHxopULAneF_/edit?usp=sharing&ouid=109225249232404642044&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer">View Executive Pitch Presentation (Google Slides)</a></strong> — Official institutional deck for public health agencies, research institutions, and municipal partners.
+  </p>
 </div>
 
 <br/>
@@ -575,7 +562,97 @@ def dispatch_optimal_fogging_van(ward_id: str, ward_lat: float, ward_lng: float)
 
 ---
 
-## 12. License & Sovereign Open-Source Adoption
+## 12. Tools Used & Technology Stack
+
+Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed for zero data egress, sub-second latency, and Tier-3 offline resilience in resource-constrained environments:
+
+### 12.1 Core Engineering & Architecture Matrix
+
+| Domain | Technology / Tool | Version / Standard | Architectural Role & Purpose |
+| :--- | :--- | :--- | :--- |
+| **Mobile Client** | **Flutter & Dart** | Flutter 3.24+ / Dart 3.5+ | Cross-platform DPI client (Android & iOS) with Material 3 styling, offline SQLite caching, and zero-jank 60 FPS performance. |
+| **Mapping & GIS** | **Google Maps SDK** | Latest Platform SDK | Vector GIS overlays, municipal ward polygon boundaries, dynamic heatmap generation, and real-time vehicle route tracking. |
+| **Offline Storage** | **sqflite** | SQLite 3 Engine | Tier-3 offline-first inspection ledger, local sync queues, and write-ahead transaction logging. |
+| **Secure Keyring** | **flutter_secure_storage** | iOS Keychain / Android Keystore | Hardware-backed AES-256 encryption for session tokens, JWTs, and cryptographic keys. |
+| **Typography** | **Google Fonts** | Plus Jakarta Sans / Inter / IBM Plex Mono | Institutional design system, high-contrast field legibility, and monospace data readouts. |
+| **Backend API** | **FastAPI** | Python 3.14 (Async) | High-concurrency RESTful API gateway, automated OpenAPI / Swagger generation, and microsecond endpoint routing. |
+| **ASGI Server** | **Uvicorn** | UVloop Cython Engine | Lightning-fast asynchronous HTTP/1.1 and WebSocket connection handling. |
+| **Data Contracts** | **Pydantic v2** | Rust-based Core Engine | Strict JSON schema validation, automated field coercion, and deterministic data serialization. |
+| **Async Network** | **HTTPX** | HTTP/2 Async Client | Non-blocking telemetry ingestion, weather API harvesting, and distributed webhook dispatches. |
+| **Edge Vision** | **Google Gemma 4 / PaliGemma 2** | Open-Weight Multimodal AI | Real-time smartphone camera detection of mosquito breeding containers, water stagnation surfaces, and larval classification. |
+| **Earth Observation** | **Google Earth Engine (GEE)** | Sentinel-1 SAR & MODIS | Planetary-scale radar surface water backscatter analysis, thermal land surface temperature (LST), and vegetation indices. |
+| **Meteorology** | **Open-Meteo & ERA5 Reanalysis** | Global Forecast ECMWF | Micro-climate meteorological parameters (hourly temperature, relative humidity, vapor pressure deficit) for adult vector survival curves. |
+| **Autonomous AI** | **Agent Skills Specification** | Custom Standard | Autonomous vector surveillance agent harnesses, dynamic tool calling, and automated municipal response orchestration. |
+| **Serverless Cloud** | **Google Cloud Run** | Zero-Scale Microservices | Sovereign container hosting in GCP Mumbai (`asia-south1`) with auto-scaling to 0 instances to eliminate idle infrastructure cost. |
+| **NoSQL Database** | **Cloud Firestore** | Enterprise Multi-Region | Sub-second real-time state synchronization, optimistic offline persistence, and fine-grained security rules. |
+| **Object Storage** | **Google Cloud Storage (GCS)** | Sovereign Encrypted Buckets | 180-day WORM-compliant audit logs, field inspection photographs, and automated lifecycle expiration policies. |
+| **Security Scanning** | **GitHub CodeQL Advanced** | CodeQL Bundle v2.27+ | Continuous static application security testing (SAST) for taint tracking, injection vulnerability detection, and code security verification. |
+| **Secret Detection** | **Gitleaks** | Automated Pre-Commit / CI | Zero-credential-leak enforcement across all commits, configurations, and repository branches. |
+| **Code Quality** | **Ruff & Pytest** | Fast Python Tooling | Sub-millisecond Python linting, formatting, and automated epidemiological test suites. |
+| **Motion Graphics** | **Remotion** | React & TypeScript | Programmatic showcase sequences, SVG data visualizations, and animated institutional presentations. |
+
+---
+
+## 13. Official Documents and Resources
+
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="24%" align="left">Document / Resource</th>
+      <th width="40%" align="left">Scope, Legal Compliance & Purpose</th>
+      <th width="20%" align="left">Statutory / Technical Standard</th>
+      <th width="16%" align="left">Direct Repository Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>📊 Executive Pitch Deck</strong></td>
+      <td>Comprehensive institutional presentation detailing the 14-day predictive surveillance breakthrough, clinical validation, autonomous agent orchestration, and municipal deployment model.</td>
+      <td><code>Institutional Pitch</code><br/>Google Slides</td>
+      <td><a href="https://docs.google.com/presentation/d/1J2fiWyCnKmhVXb0tEsRWMHxopULAneF_/edit?usp=sharing&ouid=109225249232404642044&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer"><strong>Pitch Deck ↗</strong></a></td>
+    </tr>
+    <tr>
+      <td><strong>🎯 Autonomous Agent Skill Standard</strong></td>
+      <td>Technical specification for open-weight Google Gemma 4 & PaliGemma 2 autonomous vector surveillance, field multi-tool orchestration, and automated municipal emergency triage.</td>
+      <td><code>Agent Skill Standard</code><br/>Apache 2.0</td>
+      <td><a href="skills/vector-surveillance-skill/SKILL.md"><strong>SKILL.md</strong></a></td>
+    </tr>
+    <tr>
+      <td><strong>📜 Data Privacy Policy</strong></td>
+      <td>Statutory governance governing the collection, processing, storage, pseudonymization, and minimization of personal telemetry under Indian data protection law. Outlines DPO contact and grievance redressal SLA.</td>
+      <td><code>DPDP Act, 2023</code><br/>IT Act, 2000 (Sec 43A)</td>
+      <td><a href="docs/legal/privacy_policy.md"><strong>Privacy Policy</strong></a></td>
+    </tr>
+    <tr>
+      <td><strong>📄 Terms of Service</strong></td>
+      <td>Legally binding framework for authorized frontline health workers, municipal cadres, and supervisory leadership. Outlines truthfulness mandates, anti-falsification rules, and liability disclaimers.</td>
+      <td><code>Municipal DPI Protocol</code><br/>NCVBDC Field Manual</td>
+      <td><a href="docs/legal/terms_of_service.md"><strong>Terms of Service</strong></a></td>
+    </tr>
+    <tr>
+      <td><strong>📐 Architectural Design Blueprint</strong></td>
+      <td>Comprehensive architectural documentation detailing the Dengue Potential Index (DPI) mathematical formulation, radar SAR backscatter physics, and offline SQLite synchronization protocols.</td>
+      <td><code>Technical Architecture</code><br/>High-Level Specification</td>
+      <td><a href="DESIGN.md"><strong>DESIGN.md</strong></a></td>
+    </tr>
+    <tr>
+      <td><strong>🛡️ Security Policy & Threat Model</strong></td>
+      <td>Security governance, vulnerability disclosure guidelines, role-based access controls, and CERT-In compliant 180-day WORM audit log infrastructure in GCP Mumbai (<code>asia-south1</code>).</td>
+      <td><code>CERT-In Directions</code><br/>Cyber Security Standard</td>
+      <td><a href="SECURITY.md"><strong>SECURITY.md</strong></a></td>
+    </tr>
+    <tr>
+      <td><strong>📂 Sovereign Source Repository</strong></td>
+      <td>Complete production codebase containing the Flutter mobile DPI client (Android & iOS), FastAPI Cloud Run backend, Earth Engine satellite pipelines, and verified test suites.</td>
+      <td><code>Open Source DPI</code><br/>Apache 2.0 License</td>
+      <td><a href="https://github.com/codexshivam/arogyadrishti"><strong>GitHub Repository</strong></a></td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 14. License & Sovereign Open-Source Adoption
 
 Arogya Drishti is licensed under the **Apache License, Version 2.0**.
 See the [LICENSE](LICENSE) file for complete terms.
@@ -595,14 +672,3 @@ limitations under the License.
 ```
 
 The platform is designed and documented for open adoption by municipal corporations, state health departments, the **Integrated Health Information Platform (IHIP)**, and international public health agencies seeking sovereign, cost-efficient, and predictive vector surveillance infrastructure.
-
----
-
-## 13. Official Documents and Resources
-
-| Resource | Direct Link |
-| :--- | :--- |
-| 🎯 **Agent Skill Standard** | **[skills/vector-surveillance-skill/SKILL.md](skills/vector-surveillance-skill/SKILL.md)** |
-| 📜 **Data Privacy Policy** | **[docs/legal/privacy_policy.md](docs/legal/privacy_policy.md)** |
-| 📄 **Terms of Service** | **[docs/legal/terms_of_service.md](docs/legal/terms_of_service.md)** |
-| 📂 **Source Repository** | **[github.com/codexshivam/arogyadrishti](https://github.com/codexshivam/arogyadrishti)** |

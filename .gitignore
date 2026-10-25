@@ -52,5 +52,8 @@ ui-debug.log
 
 # ---- OS / editors ----
 .DS_Store
+Screenshot*.png
+/*.png
+*.tmp
 .vscode/*
 !.vscode/extensions.json

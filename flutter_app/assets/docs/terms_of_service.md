@@ -6,13 +6,13 @@
 **Document Version:** 1.0.0
 **Effective Date:** October 23, 2026
 **Last Updated:** October 23, 2026
-**Jurisdiction:** Union Territory of Chandigarh, Republic of India
+**Jurisdiction:** Mohali, Punjab, Republic of India
 
 ---
 
 ## 1. Acceptance of Terms and Agreement to Bound
 
-These Terms of Service ("Terms" or "Agreement") constitute a legally binding agreement between you (the "User", "Authorized Officer", or "Field Worker") and the **Arogya Drishti Platform Authority**, operating in administrative coordination with the **Municipal Corporation of Chandigarh (MCC)** and the **Directorate of Health & Family Welfare** ("Authority", "We", "Us", or "Our").
+These Terms of Service ("Terms" or "Agreement") constitute a legally binding agreement between you (the "User", "Authorized Officer", or "Field Worker") and **Arogya Drishti** ("Authority", "We", "Us", or "Our").
 
 BY AUTHENTICATING INTO THE AROGYA DRISHTI MOBILE APPLICATION VIA MOBILE NUMBER AND ONE-TIME PASSCODE (OTP), ACCESSING THE ADMINISTRATIVE COMMAND DASHBOARD, OR CONSUMING PLATFORM APIS, YOU EXPRESSLY ACKNOWLEDGE, AGREE, AND COVENANT THAT:
 1. You have read, understood, and agreed to be legally bound by every provision of these Terms of Service;
@@ -116,8 +116,8 @@ Officer personal data is collected and processed in strict adherence to the **Di
 ## 10. Governing Law, Dispute Resolution, and Judicial Jurisdiction
 
 1. **Governing Law:** These Terms of Service, their interpretation, validity, and enforcement shall be governed strictly and exclusively by the substantive laws of the **Republic of India**.
-2. **Administrative Amicable Resolution:** In the event of any operational dispute, administrative grievance, or interpretation ambiguity between field staff and the platform administration, the parties shall first submit the matter for amicable resolution to the **Nodal Grievance Officer** and the **Commissioner, Municipal Corporation of Chandigarh**.
-3. **Exclusive Judicial Jurisdiction:** Any unresolved legal proceeding, dispute, or lawsuit arising out of or in connection with these Terms or the use of Arogya Drishti shall be instituted exclusively in the competent Courts, Tribunals, or Forums located within the territorial limits of **Chandigarh, India**.
+2. **Administrative Amicable Resolution:** In the event of any operational dispute, administrative grievance, or interpretation ambiguity between field staff and the platform administration, the parties shall first submit the matter for amicable resolution to the **Data Protection Officer (DPO)** at `grievance.dpo@example.com`.
+3. **Exclusive Judicial Jurisdiction:** Any unresolved legal proceeding, dispute, or lawsuit arising out of or in connection with these Terms or the use of Arogya Drishti shall be instituted exclusively in the competent Courts, Tribunals, or Forums located within the territorial limits of **Mohali, Punjab, India**.
 
 ---
 
@@ -125,8 +125,18 @@ Officer personal data is collected and processed in strict adherence to the **Di
 
 For legal inquiries, regulatory compliance queries, or statutory notifications, contact:
 
-* **Authority:** Arogya Drishti Legal & Technical Compliance Cell
-* **Nodal Officer:** Shri Shivam Yadav, Lead System Architect
-* **Administrative Complex:** Municipal Corporation Building, Sector 17, Chandigarh — 160017, India
-* **Legal Compliance Email:** `legal@arogyadrishti.in` / `academyxshivam@gmail.com`
-* **Official Nodal Telephone:** +91 172 2700000 / +91 99155 49458
+* **Entity Name:** Arogya Drishti
+* **Headquarters:** Mohali, Punjab (India)
+* **Data Sovereignty Region:** Mumbai (asia-south1)
+* **Official Institutional Email:** `support@example.com`
+* **Official Grievance Desk:** `grievance.dpo@example.com`
+
+**Data Protection Officer (DPO):**
+* **Officer Name:** Shivam Yadav
+* **Official Designation:** Data Protection Officer (DPO)
+* **Institutional Department:** Arogya Drishti Project Secretariat
+* **Physical Office Address:** Mohali, Punjab (India)
+* **Dedicated Redressal Email:** `grievance.dpo@example.com`
+* **Emergency Escalation Email:** `emergency@example.com`
+* **Telephone Helpline:** +91 172 2700000
+* **Statutory Turnaround Time (SLA):** All grievances will be acknowledged within 24 hours of receipt and formally redressed within 7 calendar days.

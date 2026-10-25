@@ -22,12 +22,11 @@ This Privacy Policy delineates the precise technical and legal framework governi
 
 Under Section 2(i) of the Digital Personal Data Protection Act, 2023, the designated **Data Fiduciary** responsible for determining the purpose and means of data processing is:
 
-* **Entity Name:** Arogya Drishti Sovereign DPI Project Authority
-  *(Operating under joint municipal delegation with the Municipal Corporation of Chandigarh and the Directorate of Health & Family Welfare)*
-* **Headquarters:** Sector 17, Urban Health Governance Complex, Chandigarh — 160017, India
-* **Data Sovereignty Region:** Mumbai (`asia-south1`), Republic of India
-* **Official Institutional Email:** `compliance@arogyadrishti.in` / `academyxshivam@gmail.com`
-* **Official Grievance Desk:** `grievance.dpo@arogyadrishti.in`
+* **Entity Name:** Arogya Drishti
+* **Headquarters:** Mohali, Punjab (India)
+* **Data Sovereignty Region:** Mumbai (asia-south1)
+* **Official Institutional Email:** `support@example.com`
+* **Official Grievance Desk:** `grievance.dpo@example.com`
 
 ---
 
@@ -152,14 +151,14 @@ To exercise any of these rights, submit a written or electronic request to the G
 
 In compliance with Section 13(2) of the DPDP Act, 2023 and Rule 5(9) of the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011, the designated **Data Protection & Grievance Redressal Officer** is:
 
-* **Officer Name:** Shri Shivam Yadav
-* **Official Designation:** Lead Cloud Architect, Information Security Officer & Data Protection Officer (DPO)
-* **Institutional Department:** Arogya Drishti Project Secretariat & Municipal Health IT Cell
-* **Physical Office Address:** Municipal Corporation Building, Sector 17-C, Chandigarh — 160017, Union Territory of Chandigarh, India
-* **Dedicated Redressal Email:** `grievance.dpo@arogyadrishti.in`
-* **Emergency Escalation Email:** `academyxshivam@gmail.com`
-* **Telephone Helpline:** +91 172 2700000 / +91 99155 49458
-* **Statutory Turnaround Time (SLA):** All grievances will be acknowledged within 24 hours of receipt and formally redressed within **7 calendar days**.
+* **Officer Name:** Shivam Yadav
+* **Official Designation:** Data Protection Officer (DPO)
+* **Institutional Department:** Arogya Drishti Project Secretariat
+* **Physical Office Address:** Mohali, Punjab (India)
+* **Dedicated Redressal Email:** `grievance.dpo@example.com`
+* **Emergency Escalation Email:** `emergency@example.com`
+* **Telephone Helpline:** +91 172 2700000
+* **Statutory Turnaround Time (SLA):** All grievances will be acknowledged within 24 hours of receipt and formally redressed within 7 calendar days.
 
 If a Data Principal is unsatisfied with the grievance resolution provided by our Data Protection Officer, they hold the statutory right to escalate the matter to the **Data Protection Board of India**.
 
