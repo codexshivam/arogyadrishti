@@ -1,6 +1,6 @@
 import React from 'react';
 import {Img} from 'remotion';
-import logoPng from './arogya_logo.png';
+import logoPng from './nidaniq_logo.png';
 
 const paths = {
   home: (
@@ -200,7 +200,7 @@ export const Icon: React.FC<{
   </svg>
 );
 
-/** Official Arogya Drishti app logo from flutter_app/assets/logo/arogya_logo.png */
+/** Official NidanIQ app logo from flutter_app/assets/logo/nidaniq_logo.png */
 export const AppLogo: React.FC<{
   size?: number;
   monochromeWhite?: boolean;

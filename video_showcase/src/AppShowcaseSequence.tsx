@@ -13,7 +13,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, Img, useCurrentFrame} from 'remotion';
 import T from './timeline.json';
 import soundtrack from './Soundtrack.wav';
-import splashLogoPng from './splash_logo_4k.png';
+import {NidanIQLogoVector} from './NidanIQLogoVector';
 import {C, FONT, SPRING, clamp, lerp, sp} from './theme';
 import {
   AuthScreen,
@@ -503,14 +503,7 @@ const ClosingEndCard: React.FC<{f: number}> = ({f}) => {
           justifyContent: 'center',
         }}
       >
-        <Img
-          src={splashLogoPng}
-          style={{
-            width: 440,
-            height: 'auto',
-            objectFit: 'contain',
-          }}
-        />
+        <NidanIQLogoVector width={680} />
       </div>
     </AbsoluteFill>
   );
