@@ -171,35 +171,40 @@ $$
 
 #### Step 2: Satellite Bio-Climate Score ($E_{\text{GEE}}$)
 
-* **Thermal Development Envelope ($S_{\text{temp}}$):**
-  $$
-  S_{\text{temp}} = \exp\left(-\frac{(29.0 - 29.0)^2}{2 \cdot (4.5)^2}\right) = \exp(0) = 1.0000
-  $$
+**A. Thermal Development Envelope ($S_{\text{temp}}$):**
 
-* **Hydrological Stagnation Pooling ($S_{\text{water}}$):**
-  $$
-  \begin{aligned}
-  S_{\text{water}} &= 0.60 \cdot \left(\frac{0.26 + 0.25}{0.65}\right) + 0.40 \cdot \left(\frac{0.40}{0.60}\right) \\
-  &= 0.60 \cdot (0.7846) + 0.40 \cdot (0.6667) \\
-  &= 0.4708 + 0.2667 = 0.7375
-  \end{aligned}
-  $$
+$$
+S_{\text{temp}} = \exp\left(-\frac{(29.0 - 29.0)^2}{2 \cdot (4.5)^2}\right) = \exp(0) = 1.0000
+$$
 
-* **Precipitation & Aquatic Flushing ($S_{\text{rain}}$):**
-  Since $60.0 \le 90.0 \le 150.0\,\text{mm}$ (optimal pooling without larvae washout):
-  $$
-  S_{\text{rain}} = 1.0000
-  $$
+**B. Hydrological Stagnation Pooling ($S_{\text{water}}$):**
 
-* **Composite Bio-Climate Score ($E_{\text{GEE}}$):**
-  $$
-  \begin{aligned}
-  E_{\text{GEE}} &= 0.45 \cdot S_{\text{temp}} + 0.30 \cdot S_{\text{water}} + 0.25 \cdot S_{\text{rain}} \\
-  &= 0.45 \cdot (1.0000) + 0.30 \cdot (0.7375) + 0.25 \cdot (1.0000) \\
-  &= 0.4500 + 0.2212 + 0.2500 \\
-  &= \mathbf{0.9212}
-  \end{aligned}
-  $$
+$$
+\begin{aligned}
+S_{\text{water}} &= 0.60 \cdot \left(\frac{0.26 + 0.25}{0.65}\right) + 0.40 \cdot \left(\frac{0.40}{0.60}\right) \\
+&= 0.60 \cdot (0.7846) + 0.40 \cdot (0.6667) \\
+&= 0.4708 + 0.2667 = 0.7375
+\end{aligned}
+$$
+
+**C. Precipitation & Aquatic Flushing ($S_{\text{rain}}$):**
+
+Since $60.0 \le 90.0 \le 150.0\,\text{mm}$ (optimal pooling without larvae washout):
+
+$$
+S_{\text{rain}} = 1.0000
+$$
+
+**D. Composite Bio-Climate Score ($E_{\text{GEE}}$):**
+
+$$
+\begin{aligned}
+E_{\text{GEE}} &= 0.45 \cdot S_{\text{temp}} + 0.30 \cdot S_{\text{water}} + 0.25 \cdot S_{\text{rain}} \\
+&= 0.45 \cdot (1.0000) + 0.30 \cdot (0.7375) + 0.25 \cdot (1.0000) \\
+&= 0.4500 + 0.2212 + 0.2500 \\
+&= \mathbf{0.9212}
+\end{aligned}
+$$
 
 #### Step 3: Master Composite Risk Fusion
 
