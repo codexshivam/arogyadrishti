@@ -112,12 +112,12 @@ class ActiveWardNotifier extends StateNotifier<ActiveWardState> {
       wardName: wardName,
       isAuthenticated: true,
     );
-    ArogyaTelemetryService.setOfficerContext(
+    NidanIQTelemetryService.setOfficerContext(
       officerUid: uid,
       lgdCode: lgdCode,
       wardName: wardName,
     );
-    ArogyaTelemetryService.logEvent(
+    NidanIQTelemetryService.logEvent(
       'officer_sign_in',
       parameters: <String, Object>{'lgd_code': lgdCode, 'ward_name': wardName},
     );

@@ -90,7 +90,7 @@
   <text x="160" y="240" font-size="7.5" font-weight="500" fill="#94A3B8" text-anchor="middle">Satellite LST/NDWI Warning</text>
 
   <text x="320" y="228" font-size="9" font-weight="800" fill="#10B981" text-anchor="middle">DAY -10</text>
-  <text x="320" y="240" font-size="7.5" font-weight="600" fill="#6EE7B7" text-anchor="middle">Arogya Drishti Interception</text>
+  <text x="320" y="240" font-size="7.5" font-weight="600" fill="#6EE7B7" text-anchor="middle">NidanIQ Interception</text>
 
   <text x="560" y="228" font-size="9" font-weight="800" fill="#EF4444" text-anchor="middle">DAY 0</text>
   <text x="560" y="240" font-size="7.5" font-weight="500" fill="#FCA5A5" text-anchor="middle">Unmitigated Admissions Spike</text>
@@ -101,7 +101,7 @@
   <!-- Filled Area Under Unmitigated Curve -->
   <path d="M 120,210 C 260,208 420,180 500,100 C 560,40 600,45 660,110 C 740,185 840,205 920,210 Z" fill="url(#unmitigatedFill)" />
 
-  <!-- Filled Area Under Arogya Drishti Mitigated Curve -->
+  <!-- Filled Area Under NidanIQ Mitigated Curve -->
   <path d="M 120,210 C 240,208 300,195 340,180 C 440,145 520,152 620,165 C 720,180 820,202 920,210 Z" fill="url(#mitigatedFill)" />
 
   <!-- Unmitigated Hospital Outbreak Curve Line (Crimson) -->
@@ -140,6 +140,6 @@
     <text x="48" y="18" font-size="8" font-weight="600" fill="#FCA5A5">Reactive Hospital Surveillance (Unmitigated)</text>
     <!-- Item 2 -->
     <line x1="15" y1="30" x2="40" y2="30" stroke="#10B981" stroke-width="2.5" />
-    <text x="48" y="33" font-size="8" font-weight="700" fill="#6EE7B7">Arogya Drishti Proactive Interception (-14d)</text>
+    <text x="48" y="33" font-size="8" font-weight="700" fill="#6EE7B7">NidanIQ Proactive Interception (-14d)</text>
   </g>
 </svg>

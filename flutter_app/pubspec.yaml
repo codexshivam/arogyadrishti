@@ -1,5 +1,5 @@
-name: arogya_drishti
-description: "Arogya Drishti — National Vector-Borne Disease Surveillance DPI Client"
+name: nidaniq
+description: "NidanIQ — National Vector-Borne Disease Surveillance DPI Client"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -50,6 +50,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/logo/arogya_logo.png
+    - assets/logo/nidaniq_logo.png
     - assets/docs/
     - assets/data/

@@ -32,7 +32,7 @@ from app.core.config import Settings, get_settings
 from app.tools.gee_climate_tool.client import GEEClimateTelemetry
 from app.tools.vision_paligemma_tool.exceptions import VisionScanException
 
-logger = logging.getLogger("arogya_drishti.tools.vision_paligemma")
+logger = logging.getLogger("nidaniq.tools.vision_paligemma")
 
 # Indian vehicle registration plate pattern (e.g. CH-01-GA-4920, DL3C8812, PB65AA1234)
 _INDIAN_PLATE_RE = re.compile(

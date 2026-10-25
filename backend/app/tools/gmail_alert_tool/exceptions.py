@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from fastapi import status
 
-from app.core.exceptions import ArogyaException
+from app.core.exceptions import NidanIQException
 
 
-class EmailDispatchException(ArogyaException):
+class EmailDispatchException(NidanIQException):
     """Raised when recipient email fails DNS MX validation or SMTP delivery fails."""
 
     def __init__(
@@ -19,5 +19,5 @@ class EmailDispatchException(ArogyaException):
             title="Emergency Alert Email Dispatch Error",
             detail=detail,
             status_code=status_code,
-            problem_type="https://arogyadrishti.gov.in/problems/email-dispatch-error",
+            problem_type="https://NidanIQ.gov.in/problems/email-dispatch-error",
         )

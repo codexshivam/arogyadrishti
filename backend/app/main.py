@@ -1,4 +1,4 @@
-"""FastAPI entry point for Arogya Drishti National Vector Surveillance DPI Backend."""
+"""FastAPI entry point for NidanIQ National Vector Surveillance DPI Backend."""
 
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from app.core.config import Settings, get_settings
-from app.core.exceptions import ArogyaException, register_exception_handlers
+from app.core.exceptions import NidanIQException, register_exception_handlers
 from app.core.security import (
     optional_firebase_jwt,
     scrub_pii_text,
@@ -79,7 +79,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='{"severity": "%(levelname)s", "logger": "%(name)s", "message": "%(message)s"}',
 )
-logger = logging.getLogger("arogya_drishti.main")
+logger = logging.getLogger("nidaniq.main")
 
 settings = get_settings()
 limiter = Limiter(key_func=get_remote_address)
@@ -119,7 +119,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="Arogya Drishti — National Vector-Borne Disease Surveillance DPI API",
+    title="NidanIQ — National Vector-Borne Disease Surveillance DPI API",
     description=(
         "Government of India (NCVBDC / ICMR / IHIP / DPDP Act 2023) production backend "
         "integrating Cloud Firestore, Google Sheets v4 Master Ledger, Google Earth Engine (GEE), "
@@ -226,7 +226,7 @@ async def security_and_cloud_armor_headers(
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["X-Cloud-Armor-Policy"] = "arogya-drishti-dpi-waf-south1"
+    response.headers["X-Cloud-Armor-Policy"] = "nidaniq-dpi-waf-south1"
     response.headers["X-Data-Residency-Region"] = settings.gcp_region
     response.headers["X-KMS-Encryption-At-Rest"] = "Google Cloud KMS AES-256-GCM (asia-south1)"
     response.headers["X-TLS-Enforcement"] = "TLS 1.3 / CERT-In Certified"
@@ -246,7 +246,7 @@ def healthz() -> dict[str, Any]:
     """Liveness check for Cloud Run."""
     return {
         "status": "ok",
-        "service": "arogya-drishti-dpi-backend",
+        "service": "nidaniq-dpi-backend",
         "region": settings.gcp_region,
         "timestamp_utc": datetime.now(UTC).isoformat(),
     }
@@ -289,11 +289,11 @@ def verify_staff_endpoint(
             phone=payload.phone, email=payload.email
         )
     except Exception as exc:
-        raise ArogyaException(
+        raise NidanIQException(
             title="Unauthorized Staff Access Forbidden",
             detail=f"Forbidden: Phone number or email '{payload.phone or payload.email}' is not pre-authorized in 3_Staff_Directory.",
             status_code=status.HTTP_403_FORBIDDEN,
-            problem_type="https://arogyadrishti.gov.in/problems/unauthorized-staff",
+            problem_type="https://NidanIQ.gov.in/problems/unauthorized-staff",
         ) from exc
     role = (
         "NODAL_OFFICER"
@@ -501,9 +501,9 @@ def get_app_metadata(db: firestore.Client = Depends(get_firestore_db)) -> dict[s
         return _sanitize_firestore_dict(meta_ref.to_dict())
     default_meta = {
         "app_version": "v1.0.0",
-        "privacy_policy_url": "https://arogyadrishti.in/privacy",
-        "terms_of_service_url": "https://arogyadrishti.in/terms",
-        "open_source_licenses_url": "https://arogyadrishti.in/licenses",
+        "privacy_policy_url": "https://NidanIQ.in/privacy",
+        "terms_of_service_url": "https://NidanIQ.in/terms",
+        "open_source_licenses_url": "https://NidanIQ.in/licenses",
     }
     try:
         db.collection("app_config").document("metadata").set(default_meta)
@@ -519,18 +519,18 @@ def get_legal_document(doc: str = Query("privacy", description="Legal document t
     if normalized in ("privacy", "privacy_policy", "privacy-policy"):
         filename = "privacy_policy.md"
         doc_key = "privacy"
-        title = "Privacy Policy — Arogya Drishti"
+        title = "Privacy Policy — NidanIQ"
     elif normalized in ("terms", "terms_of_service", "terms-of-service", "tos"):
         filename = "terms_of_service.md"
         doc_key = "terms"
-        title = "Terms of Service — Arogya Drishti"
+        title = "Terms of Service — NidanIQ"
     else:
         raise HTTPException(status_code=400, detail="Invalid legal document type. Expected 'privacy' or 'terms'.")
 
     base_dir = Path(__file__).resolve().parent.parent.parent
     legal_path = base_dir / "docs" / "legal" / filename
     if not legal_path.exists():
-        legal_path = Path("/Users/shivamyadav/Projects/arogyadrishti/docs/legal") / filename
+        legal_path = Path("/Users/shivamyadav/Projects/NidanIQ/docs/legal") / filename
 
     if not legal_path.exists():
         raise HTTPException(status_code=404, detail=f"Legal document '{filename}' not found.")
@@ -647,7 +647,7 @@ def handle_dispatch_action(
                 if v.status.strip().lower() == "available"
             ]
         if not available_vans:
-            raise ArogyaException(
+            raise NidanIQException(
                 title="Fleet Capacity Exceeded",
                 detail="All fogging and larvicidal vans in Chandigarh are currently Dispatched or in maintenance. No available units.",
                 status_code=status.HTTP_409_CONFLICT,
@@ -831,7 +831,7 @@ async def scan_breeding_site(
 
     raw_bytes = await image.read()
     if not raw_bytes or len(raw_bytes) > 15 * 1024 * 1024:
-        raise ArogyaException(
+        raise NidanIQException(
             title="Invalid Image Payload",
             detail="Uploaded image must be non-empty and <= 15 MB.",
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -1877,7 +1877,7 @@ def get_support_overview(
         {
             "initials": "TO",
             "name": "Technical Operations Desk",
-            "role": "Arogya Drishti 24x7 Escalation Desk",
+            "role": "NidanIQ 24x7 Escalation Desk",
             "phone": "1800-11-VECTOR",
             "email": "academyxshivam@gmail.com",
             "color_hex": "0xFF059669",
@@ -1956,7 +1956,7 @@ def admin_hydrate_district_endpoint(
         )
     except Exception as exc:
         logger.error("District hydration failed: %s", exc)
-        raise ArogyaException(
+        raise NidanIQException(
             title="District Hydration Failed",
             detail=f"Live data hydration error for {payload.district}, {payload.state}: {exc}",
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -1975,7 +1975,7 @@ def admin_sync_chandigarh_endpoint() -> dict[str, Any]:
         return hydrate_chandigarh_all()
     except Exception as exc:
         logger.error("Chandigarh sync failed: %s", exc)
-        raise ArogyaException(
+        raise NidanIQException(
             title="Chandigarh Hydration Failed",
             detail=f"Live Chandigarh hydration error: {exc}",
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -2070,7 +2070,7 @@ def get_ward_stats(
             if first_ward:
                 w_dict = _sanitize_firestore_dict(first_ward[0].to_dict())
             else:
-                raise ArogyaException(
+                raise NidanIQException(
                     title="Ward Not Found",
                     detail=f"No ward record found for '{ward_id}' in Firestore.",
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -2599,7 +2599,7 @@ def get_support_directory_and_tickets(
         {
             "initials": "TO",
             "name": "Technical Operations Desk",
-            "role": "Arogya Drishti 24x7 Escalation Desk",
+            "role": "NidanIQ 24x7 Escalation Desk",
             "phone": "1800-11-VECTOR",
             "email": "academyxshivam@gmail.com",
             "color_hex": "0xFF059669",

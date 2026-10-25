@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 
 class StatsScreen extends ConsumerStatefulWidget {
   const StatsScreen({super.key});
@@ -215,7 +215,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: const ArogyaTopShellBar(activeTabIndex: 2),
+      appBar: const NidanIQTopShellBar(activeTabIndex: 2),
       body: RefreshIndicator(
         color: const Color(0xFF8B0000),
         onRefresh: _loadWardStats,

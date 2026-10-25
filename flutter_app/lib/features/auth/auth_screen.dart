@@ -12,7 +12,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 import '../../firebase_options.dart';
 import '../settings/legal_viewer_screen.dart';
 
@@ -169,7 +169,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         });
         _startResendTimer();
         _otpFocusNodes[0].requestFocus();
-        showArogyaToast(
+        showNidanIQToast(
           context,
           title: 'OTP Dispatched',
           message: '6-digit verification code sent to +91 $rawDigits.',
@@ -229,7 +229,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               });
               _startResendTimer();
               _otpFocusNodes[0].requestFocus();
-              showArogyaToast(
+              showNidanIQToast(
                 context,
                 title: 'OTP Dispatched',
                 message: '6-digit verification code sent to +91 $rawDigits.',
@@ -377,7 +377,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           email:
               (profile['email'] ??
                       firebaseUser?.email ??
-                      'officer@arogya.gov.in')
+                      'officer@nidaniq.gov.in')
                   .toString(),
           lgdCode: (profile['assigned_lgd_code'] ?? '0404400017').toString(),
           wardName: profile['ward_village'] != null
@@ -471,7 +471,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: ArogyaTheme.backgroundCanvas,
+        backgroundColor: NidanIQTheme.backgroundCanvas,
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -489,14 +489,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
-                        color: ArogyaTheme.slateHeading,
+                        color: NidanIQTheme.slateHeading,
                       ),
                     ),
                     const SizedBox(height: 10.5),
                     Text(
                       'Access restricted to verified field epidemiologists, sanitary inspectors, and district health nodal teams.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: ArogyaTheme.slateMuted,
+                        color: NidanIQTheme.slateMuted,
                         height: 1.4,
                       ),
                     ),
@@ -506,7 +506,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     Container(
                       padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        color: ArogyaTheme.surfaceWhite,
+                        color: NidanIQTheme.surfaceWhite,
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: const [
                           BoxShadow(
@@ -544,14 +544,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,
-                                    color: ArogyaTheme.slateHeading,
+                                    color: NidanIQTheme.slateHeading,
                                   ),
                                 ),
                                 const SizedBox(width: 2),
                                 const Icon(
                                   Icons.arrow_drop_down_rounded,
                                   size: 20,
-                                  color: ArogyaTheme.slateMuted,
+                                  color: NidanIQTheme.slateMuted,
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
@@ -582,7 +582,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
-                                      color: ArogyaTheme.slateHeading,
+                                      color: NidanIQTheme.slateHeading,
                                       letterSpacing: 0.4,
                                     ),
                                     decoration: const InputDecoration(
@@ -613,7 +613,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     icon: const Icon(
                                       Icons.edit_outlined,
                                       size: 19,
-                                      color: ArogyaTheme.slateMuted,
+                                      color: NidanIQTheme.slateMuted,
                                     ),
                                   ),
                               ],
@@ -628,7 +628,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               height: 50,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: ArogyaTheme.primaryCrimson,
+                                  backgroundColor: NidanIQTheme.primaryCrimson,
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -701,7 +701,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 18,
-                                          color: ArogyaTheme.slateHeading,
+                                          color: NidanIQTheme.slateHeading,
                                         ),
                                         decoration: InputDecoration(
                                           counterText: '',
@@ -755,14 +755,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     const Icon(
                                       Icons.timer_outlined,
                                       size: 16,
-                                      color: ArogyaTheme.slateMuted,
+                                      color: NidanIQTheme.slateMuted,
                                     ),
                                     const SizedBox(width: 6),
                                     Flexible(
                                       child: Text(
                                         'Resend code in $_resendCountdown seconds',
                                         style: const TextStyle(
-                                          color: ArogyaTheme.slateMuted,
+                                          color: NidanIQTheme.slateMuted,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 13,
                                         ),
@@ -785,7 +785,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                       Icon(
                                         Icons.refresh_rounded,
                                         size: 16,
-                                        color: ArogyaTheme.primaryCrimsonDark,
+                                        color: NidanIQTheme.primaryCrimsonDark,
                                       ),
                                       SizedBox(width: 6),
                                       Flexible(
@@ -793,7 +793,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                           'Resend Code',
                                           style: TextStyle(
                                             color:
-                                                ArogyaTheme.primaryCrimsonDark,
+                                                NidanIQTheme.primaryCrimsonDark,
                                             fontWeight: FontWeight.w700,
                                             fontSize: 13,
                                           ),
@@ -811,7 +811,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               height: 50,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: ArogyaTheme.primaryCrimson,
+                                  backgroundColor: NidanIQTheme.primaryCrimson,
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -851,10 +851,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 const Text(
-                                  'By signing into ArogyaDrishti app, you agree to our ',
+                                  'By signing into NidanIQ app, you agree to our ',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: ArogyaTheme.slateMuted,
+                                    color: NidanIQTheme.slateMuted,
                                     height: 1.5,
                                   ),
                                 ),
@@ -873,7 +873,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     'Privacy Policy',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: ArogyaTheme.primaryCrimsonDark,
+                                      color: NidanIQTheme.primaryCrimsonDark,
                                       fontWeight: FontWeight.w700,
                                       decoration: TextDecoration.underline,
                                     ),
@@ -883,7 +883,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   ' and ',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: ArogyaTheme.slateMuted,
+                                    color: NidanIQTheme.slateMuted,
                                   ),
                                 ),
                                 InkWell(
@@ -901,7 +901,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     'Terms of Services',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: ArogyaTheme.primaryCrimsonDark,
+                                      color: NidanIQTheme.primaryCrimsonDark,
                                       fontWeight: FontWeight.w700,
                                       decoration: TextDecoration.underline,
                                     ),
@@ -911,7 +911,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   '.',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: ArogyaTheme.slateMuted,
+                                    color: NidanIQTheme.slateMuted,
                                   ),
                                 ),
                               ],
@@ -934,7 +934,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         children: [
                           Icon(
                             Icons.gavel_rounded,
-                            color: ArogyaTheme.primaryCrimson,
+                            color: NidanIQTheme.primaryCrimson,
                             size: 18,
                           ),
                           SizedBox(width: 10),
@@ -947,7 +947,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
                                     fontSize: 12.5,
-                                    color: ArogyaTheme.triageRedText,
+                                    color: NidanIQTheme.triageRedText,
                                   ),
                                 ),
                                 SizedBox(height: 3),
@@ -956,7 +956,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   style: TextStyle(
                                     fontSize: 11.5,
                                     height: 1.4,
-                                    color: ArogyaTheme.triageRedText,
+                                    color: NidanIQTheme.triageRedText,
                                   ),
                                 ),
                               ],
@@ -981,7 +981,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               Icon(
                                 Icons.help_outline_rounded,
                                 size: 15,
-                                color: ArogyaTheme.slateMuted,
+                                color: NidanIQTheme.slateMuted,
                               ),
                               SizedBox(width: 5),
                               Text(
@@ -989,7 +989,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: ArogyaTheme.slateMuted,
+                                  color: NidanIQTheme.slateMuted,
                                 ),
                               ),
                             ],
@@ -1003,7 +1003,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               Icon(
                                 Icons.support_agent_rounded,
                                 size: 15,
-                                color: ArogyaTheme.primaryCrimsonDark,
+                                color: NidanIQTheme.primaryCrimsonDark,
                               ),
                               SizedBox(width: 5),
                               Text(
@@ -1011,7 +1011,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: ArogyaTheme.primaryCrimsonDark,
+                                  color: NidanIQTheme.primaryCrimsonDark,
                                 ),
                               ),
                             ],
@@ -1023,11 +1023,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                     Center(
                       child: Text(
-                        'Arogya Drishti by Team Rocket',
+                        'NidanIQ by Team Rocket',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
-                          color: ArogyaTheme.slateMuted,
+                          color: NidanIQTheme.slateMuted,
                         ),
                       ),
                     ),

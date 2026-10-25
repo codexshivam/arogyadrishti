@@ -1,10 +1,10 @@
 ---
-name: arogya-drishti-vector-surveillance
+name: nidaniq-vector-surveillance
 version: 1.0.0
 license: Apache-2.0
 author: Team Rocket (Chandigarh University)
-repository: https://github.com/codexshivam/arogyadrishti
-homepage: https://arogyadrishti.in
+repository: https://github.com/codexshivam/NidanIQ
+homepage: https://NidanIQ.in
 models:
   - google/gemma-4-26b-it
   - google/gemma-4-4b
@@ -21,10 +21,10 @@ keywords:
 description: Autonomous epidemiological agent skill for vector-borne disease triage, micro-climate GEE extraction, and municipal fogging van dispatch conforming to the Agent Skill Open Standard and powered by open-weight Gemma 4.
 ---
 
-# Arogya Drishti — Vector Surveillance & Autonomous Triage Agent Skill
+# NidanIQ — Vector Surveillance & Autonomous Triage Agent Skill
 
 **Compliant with the Agent Skill Open Standard | Licensed under Apache 2.0 | Powered by Open-Weight Gemma 4**
-*Repository: [https://github.com/codexshivam/arogyadrishti](https://github.com/codexshivam/arogyadrishti)*
+*Repository: [https://github.com/codexshivam/NidanIQ](https://github.com/codexshivam/NidanIQ)*
 *License: [Apache License, Version 2.0](../../LICENSE)*
 
 This Agent Skill equips open-weight foundational models (**Gemma 4 26B-IT** and **Gemma 4 4B**), open-weight vision-language models (**PaliGemma 3B**), and sovereign cloud models (**Gemini 3.8 Flash**) with deterministic tool execution and NCVBDC/WHO epidemiological protocols for Indian municipal sanitary inspectors, district nodal officers, and frontline ASHA health workers.
@@ -82,4 +82,4 @@ When advising field officers in English, Hindi, Hinglish, or Punjabi, quote the 
 The skill is executed through [`harness/gemma_agent_harness.py`](harness/gemma_agent_harness.py) and [`harness/skill_executor.py`](harness/skill_executor.py):
 * **Self-Hosted / Edge Deployment:** Gemma 4 open-weight weights running via vLLM, Ollama, or llama.cpp in local municipal environments with zero cloud egress.
 * **Deterministic Sandboxing:** Tool calls undergo strict allow-list validation and parameter type casting against [`schema.json`](schema.json) before touching databases or external gateways.
-* **Full Open-Source License:** Released under the [Apache License, Version 2.0](../../LICENSE) as part of the public Arogya Drishti repository.
+* **Full Open-Source License:** Released under the [Apache License, Version 2.0](../../LICENSE) as part of the public NidanIQ repository.

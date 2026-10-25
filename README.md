@@ -1,22 +1,22 @@
 <div align="center">
 
-<!-- Arogya Header Banner -->
-<img src="./assets/readme/arogya_banner.svg" width="100%" alt="Arogya" />
+<!-- NidanIQ Header Banner -->
+<img src="./assets/readme/nidaniq_banner.svg" width="100%" alt="NidanIQ" />
 
 </div>
 
 ## Executive Overview & Architectural Mission
 
-**Arogya Drishti** is a production-grade **National Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration. Operating in strict alignment with the **National Center for Vector Borne Diseases Control (NCVBDC)**, the **Integrated Disease Surveillance Programme (IDSP/IHIP)**, and the **Ministry of Health and Family Welfare (MoHFW)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated chemical larviciding.
+**NidanIQ** is a production-grade **National Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration. Operating in strict alignment with the **National Center for Vector Borne Diseases Control (NCVBDC)**, the **Integrated Disease Surveillance Programme (IDSP/IHIP)**, and the **Ministry of Health and Family Welfare (MoHFW)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated chemical larviciding.
 
 Traditional public health surveillance operates reactively: municipal authorities learn of an outbreak only after clinical blood tests (NS1 antigen / IgM ELISA) appear in hospital diagnostic registries. By this stage, *Aedes aegypti* and *Anopheles stephensi* mosquito vectors have already completed their 8–10 day aquatic life cycle and multiple blood-feeding cycles, resulting in exponential community transmission.
 
-**Arogya Drishti closes this 14-day surveillance blindspot.** By continuously fusing **orbital C-band synthetic aperture radar (SAR)**, **multispectral thermal infrared indices**, **offline-first frontline entomological surveys**, and **open-weight multimodal smartphone vision**, the platform predicts micro-focal vector breeding and dispatches targeted municipal vector-control squads up to **14 days before clinical hospital admissions surge**.
+**NidanIQ closes this 14-day surveillance blindspot.** By continuously fusing **orbital C-band synthetic aperture radar (SAR)**, **multispectral thermal infrared indices**, **offline-first frontline entomological surveys**, and **open-weight multimodal smartphone vision**, the platform predicts micro-focal vector breeding and dispatches targeted municipal vector-control squads up to **14 days before clinical hospital admissions surge**.
 
 <br/>
 
 <div align="center">
-  <img src="./assets/readme/mockup.png" width="94%" alt="Arogya Drishti Mobile DPI Interface Showcase" />
+  <img src="./assets/readme/mockup.png" width="94%" alt="NidanIQ Mobile DPI Interface Showcase" />
 </div>
 
 <br/>
@@ -36,7 +36,7 @@ PUBLIC HEALTH     │              │              │              │        
 RESPONSE          │              │              │              │              │              │ Blood Drawn  │ Delayed Fogging
                   │              │              │              │              │              │              │
 ──────────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────
-AROGYA DRISHTI    │ SATELLITE    │ AI INSTAR    │ AUTOMATED    │ TARGETED     │ BREEDING     │ ZERO         │ TRANSMISSION
+NidanIQ    │ SATELLITE    │ AI INSTAR    │ AUTOMATED    │ TARGETED     │ BREEDING     │ ZERO         │ TRANSMISSION
 PREDICTIVE DPI    │ GEE Radar    │ CAMERA SCAN  │ VAN ROUTING  │ LARVICIDING  │ NEUTRALIZED  │ HOSPITAL     │ CYCLE
 RESPONSE          │ Water Detect │ LGD Ward 17  │ 4 Min ETA    │ Temephos 1ppm│ 0 Adults     │ ADMISSIONS   │ BROKEN
 ========================================================================================================================
@@ -46,7 +46,7 @@ RESPONSE          │ Water Detect │ LGD Ward 17  │ 4 Min ETA    │ Temepho
 
 ## 1. Core Epidemiological & Mathematical Foundations
 
-Arogya Drishti synthesizes raw observation streams into deterministic indices governed by the mathematical models of epidemiology, fluid stagnation dynamics, and thermal biology.
+NidanIQ synthesizes raw observation streams into deterministic indices governed by the mathematical models of epidemiology, fluid stagnation dynamics, and thermal biology.
 
 ### 1.1 Statutory Entomological Ground Truth Indices (NCVBDC & WHO)
 
@@ -261,7 +261,7 @@ Every day at **06:00 AM IST (00:30 UTC)**, Cloud Scheduler fires an authenticate
 
 ## 4. Open-Weight AI Architecture & Agent Skill Specification
 
-Arogya Drishti runs exclusively on **open-weight foundational AI**, guaranteeing national sovereign independence, zero third-party data leakage, and offline edge execution.
+NidanIQ runs exclusively on **open-weight foundational AI**, guaranteeing national sovereign independence, zero third-party data leakage, and offline edge execution.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
@@ -296,7 +296,7 @@ When advising field officers via the AI copilot, dosages are grounded strictly i
 
 ## 5. Resilient Tiered Offline Architecture
 
-Frontline health workers operate in informal settlements, basements, and rural cellular dead zones where 2G/3G connectivity is intermittent or absent. Arogya Drishti implements a **Three-Tier Offline Engine**:
+Frontline health workers operate in informal settlements, basements, and rural cellular dead zones where 2G/3G connectivity is intermittent or absent. NidanIQ implements a **Three-Tier Offline Engine**:
 
 ```text
 [ FRONT-LINE OFFLINE CLIENT (FLUTTER 3.24) ]
@@ -321,7 +321,7 @@ Frontline health workers operate in informal settlements, basements, and rural c
 
 ## 6. Zero-Training Municipal CRM: 7-Tab Master Ledger Matrix
 
-To ensure immediate adoption across municipal corporations without requiring staff to learn proprietary software, Arogya Drishti synchronizes bi-directionally with a master Google Spreadsheet (`gspread` with tenacity exponential backoff):
+To ensure immediate adoption across municipal corporations without requiring staff to learn proprietary software, NidanIQ synchronizes bi-directionally with a master Google Spreadsheet (`gspread` with tenacity exponential backoff):
 
 | Tab Index | Worksheet Name | Data Structure & Key Fields | Administrative Purpose |
 | :--- | :--- | :--- | :--- |
@@ -337,7 +337,7 @@ To ensure immediate adoption across municipal corporations without requiring sta
 
 ## 7. Pan-India Scale & Local Government Directory (LGD) Onboarding
 
-Arogya Drishti scales nationally using India's standard **Local Government Directory (LGD)** hierarchy established by the Ministry of Panchayati Raj:
+NidanIQ scales nationally using India's standard **Local Government Directory (LGD)** hierarchy established by the Ministry of Panchayati Raj:
 
 ```text
 [ REPUBLIC OF INDIA ]
@@ -431,9 +431,9 @@ External municipal dashboards, state health portals, and citizen apps query real
 
 ## 9. Operational Economics & Cost Optimization
 
-Arogya Drishti achieves a **~90% cost reduction** compared to legacy health IT contracts by leveraging serverless scale-to-zero infrastructure and open-weight AI:
+NidanIQ achieves a **~90% cost reduction** compared to legacy health IT contracts by leveraging serverless scale-to-zero infrastructure and open-weight AI:
 
-| Cost Driver | Legacy Public Health Systems | Arogya Drishti DPI Model | Elimination Mechanism |
+| Cost Driver | Legacy Public Health Systems | NidanIQ DPI Model | Elimination Mechanism |
 | :--- | :--- | :--- | :--- |
 | **Vector AI Inference** | Proprietary Cloud AI ($0.03–$0.05 / call) | Open-Weight Gemma 4 on Cloud Run | Scales to zero when idle; negligible inference costs (~₹0.04/scan). |
 | **Satellite Imagery** | Commercial High-Res Imagery ($100s/km²) | Open Copernicus & NASA GEE Datasets | Uses open public satellite feeds (Sentinel-1/2, MODIS, GPM). |
@@ -459,7 +459,7 @@ from typing import Any
 from pydantic import BaseModel
 from google import genai
 
-logger = logging.getLogger("arogya_drishti.gemma_harness")
+logger = logging.getLogger("nidaniq.gemma_harness")
 
 class AgentSkillHarness:
     """Executes open-weight Gemma 4 agent turns with deterministic tool calling."""
@@ -470,7 +470,7 @@ class AgentSkillHarness:
 
     async def execute_turn(self, query: str, context: dict[str, Any]) -> dict[str, Any]:
         system_instruction = (
-            "You are Arogya Drishti's Statutory Epidemiological Copilot. "
+            "You are NidanIQ's Statutory Epidemiological Copilot. "
             "You strictly follow NCVBDC and WHO vector control guidelines. "
             "Always invoke statutory tools before giving chemical recommendations."
         )
@@ -546,7 +546,7 @@ from datetime import UTC, datetime
 from app.services.data_fusion_engine import get_data_fusion_engine
 from app.tools.sheets_admin_tool import get_sheets_client
 
-logger = logging.getLogger("arogya_drishti.scheduler")
+logger = logging.getLogger("nidaniq.scheduler")
 
 async def execute_daily_0600_am_fusion():
     """Runs 5-pillar fusion across all 35 Chandigarh wards concurrently in < 8 seconds."""
@@ -596,7 +596,7 @@ def dispatch_optimal_fogging_van(ward_id: str, ward_lat: float, ward_lng: float)
 
 ## 11. Tools Used & Technology Stack
 
-Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed for zero data egress, sub-second latency, and Tier-3 offline resilience in resource-constrained environments:
+NidanIQ leverages an end-to-end, sovereign, open-source stack designed for zero data egress, sub-second latency, and Tier-3 offline resilience in resource-constrained environments:
 
 ### 11.1 Core Engineering & Architecture Matrix
 
@@ -676,7 +676,7 @@ Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed fo
       <td><strong>📂 Sovereign Source Repository</strong></td>
       <td>Complete production codebase containing the Flutter mobile DPI client (Android & iOS), FastAPI Cloud Run backend, Earth Engine satellite pipelines, and verified test suites.</td>
       <td><code>Open Source DPI</code><br/>Apache 2.0 License</td>
-      <td><a href="https://github.com/codexshivam/arogyadrishti"><strong>GitHub Repository</strong></a></td>
+      <td><a href="https://github.com/codexshivam/NidanIQ"><strong>GitHub Repository</strong></a></td>
     </tr>
   </tbody>
 </table>
@@ -685,7 +685,7 @@ Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed fo
 
 ## 13. License & Sovereign Open-Source Adoption
 
-Arogya Drishti is licensed under the **Apache License, Version 2.0**.
+NidanIQ is licensed under the **Apache License, Version 2.0**.
 See the [LICENSE](LICENSE) file for complete terms.
 
 ```text

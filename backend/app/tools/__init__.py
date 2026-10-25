@@ -1,1 +1,1 @@
-"""Isolated backend tools for Arogya Drishti."""
+"""Isolated backend tools for NidanIQ."""

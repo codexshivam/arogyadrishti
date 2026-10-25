@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Arogya Drishti</string>
+	<string>NidanIQ</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>arogya_drishti</string>
+	<string>nidaniq</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -29,13 +29,13 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>Arogya Drishti requires camera access to photograph suspected mosquito larvae breeding sites and water containers for automated AI entomological analysis.</string>
+	<string>NidanIQ requires camera access to photograph suspected mosquito larvae breeding sites and water containers for automated AI entomological analysis.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Arogya Drishti requires photo library access to upload images of water containers and stagnant breeding sites for larval detection.</string>
+	<string>NidanIQ requires photo library access to upload images of water containers and stagnant breeding sites for larval detection.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Arogya Drishti uses your location to geotag field vector inspections, locate nearby health centers, and coordinate emergency fogging vans in your ward.</string>
+	<string>NidanIQ uses your location to geotag field vector inspections, locate nearby health centers, and coordinate emergency fogging vans in your ward.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Arogya Drishti uses your location to track vector surveillance routes and ensure accurate municipal ward allocation during field duty.</string>
+	<string>NidanIQ uses your location to track vector surveillance routes and ensure accurate municipal ward allocation during field duty.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

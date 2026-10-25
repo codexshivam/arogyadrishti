@@ -471,17 +471,17 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
-        systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
+        systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
         title: const Text(
           'Support & Escalations',
           style: TextStyle(
-            color: ArogyaTheme.slateHeading,
+            color: NidanIQTheme.slateHeading,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.white,
-        foregroundColor: ArogyaTheme.slateHeading,
-        iconTheme: const IconThemeData(color: ArogyaTheme.slateHeading),
+        foregroundColor: NidanIQTheme.slateHeading,
+        iconTheme: const IconThemeData(color: NidanIQTheme.slateHeading),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
@@ -493,7 +493,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           tooltip: 'Back',
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: ArogyaTheme.slateHeading,
+            color: NidanIQTheme.slateHeading,
           ),
           onPressed: () {
             if (context.canPop()) {
@@ -1367,7 +1367,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
             {
               'initials': 'TO',
               'name': 'Technical Operations Desk',
-              'role': 'Arogya Drishti 24x7 Helpdesk & Dispatch',
+              'role': 'NidanIQ 24x7 Helpdesk & Dispatch',
               'phone': '1800118328',
               'email': 'academyxshivam@gmail.com',
               'color_hex': '0xFF059669',

@@ -3,24 +3,24 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Spacing & semantic tokens used across clinical screens.
-class ArogyaSpacing {
-  ArogyaSpacing._();
+class NidanIQSpacing {
+  NidanIQSpacing._();
 
   static const double cardRadius = 12.0;
-  static const Color primary = ArogyaTheme.primaryCrimson;
-  static const Color surfaceLowest = ArogyaTheme.surfaceWhite;
-  static const Color surfaceLow = ArogyaTheme.surfaceContainerLow;
-  static const Color onSurface = ArogyaTheme.slateHeading;
-  static const Color onSurfaceVariant = ArogyaTheme.slateMuted;
-  static const Color outlineVariant = ArogyaTheme.borderHairline;
+  static const Color primary = NidanIQTheme.primaryCrimson;
+  static const Color surfaceLowest = NidanIQTheme.surfaceWhite;
+  static const Color surfaceLow = NidanIQTheme.surfaceContainerLow;
+  static const Color onSurface = NidanIQTheme.slateHeading;
+  static const Color onSurfaceVariant = NidanIQTheme.slateMuted;
+  static const Color outlineVariant = NidanIQTheme.borderHairline;
   static const Color riskCritical = Color(0xFFBA1A1A);
   static const Color riskModerate = Color(0xFFD97706);
   static const Color riskSafe = Color(0xFF16A34A);
 }
 
-/// Design tokens and Material 3 theme strictly implementing DESIGN.md ("Arogya Drishti").
-class ArogyaTheme {
-  ArogyaTheme._();
+/// Design tokens and Material 3 theme strictly implementing DESIGN.md ("NidanIQ").
+class NidanIQTheme {
+  NidanIQTheme._();
 
   static const List<BoxShadow> ambientElevation = [
     BoxShadow(color: Color(0x0D0F172A), blurRadius: 16, offset: Offset(0, 6)),

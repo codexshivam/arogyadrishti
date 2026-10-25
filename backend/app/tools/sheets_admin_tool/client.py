@@ -32,7 +32,7 @@ from app.tools.sheets_admin_tool.exceptions import (
     StaffContactNotFoundException,
 )
 
-logger = logging.getLogger("arogya_drishti.tools.sheets_admin")
+logger = logging.getLogger("nidaniq.tools.sheets_admin")
 
 _SHEETS_SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",

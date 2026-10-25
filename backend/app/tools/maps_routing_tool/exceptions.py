@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from fastapi import status
 
-from app.core.exceptions import ArogyaException
+from app.core.exceptions import NidanIQException
 
 
-class RoutingUnavailableException(ArogyaException):
+class RoutingUnavailableException(NidanIQException):
     """Raised when Google Maps Routes API v2 returns ZERO_RESULTS or no vans are available."""
 
     def __init__(
@@ -19,5 +19,5 @@ class RoutingUnavailableException(ArogyaException):
             title="Fogging Van Routing Unavailable",
             detail=detail,
             status_code=status_code,
-            problem_type="https://arogyadrishti.gov.in/problems/routing-unavailable",
+            problem_type="https://NidanIQ.gov.in/problems/routing-unavailable",
         )

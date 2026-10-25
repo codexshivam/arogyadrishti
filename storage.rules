@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Arogya Drishti — Cloud Storage Security Rules (asia-south1 Mumbai)
+// NidanIQ — Cloud Storage Security Rules (asia-south1 Mumbai)
 // Enforces authenticated image-only uploads <= 10MB for breeding-site scans.
 service firebase.storage {
   match /b/{bucket}/o {

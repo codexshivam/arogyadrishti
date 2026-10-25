@@ -1,4 +1,4 @@
-"""Epidemiology Mathematics & Scientific Formula Engine for ArogyaDrishti.
+"""Epidemiology Mathematics & Scientific Formula Engine for NidanIQ.
 
 Calculates entomological indices (HI, CI, BI, PDI), Google Earth Engine (GEE)
 bio-climatic suitability scores, and composite vector transmission risk scores

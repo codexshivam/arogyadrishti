@@ -1,5 +1,5 @@
 """
-Live Data Hydration & Seeder Pipeline for Arogya Drishti.
+Live Data Hydration & Seeder Pipeline for NidanIQ.
 
 Usage:
     python -m app.scripts.hydrate_live_data --state "Chandigarh" --district "Chandigarh"
@@ -26,13 +26,13 @@ from app.tools.ogd_india_gov_tool.client import (
 )
 from app.tools.sheets_admin_tool.client import get_sheets_client
 
-logger = logging.getLogger("arogya_drishti.scripts.hydrate_live_data")
+logger = logging.getLogger("nidaniq.scripts.hydrate_live_data")
 
 _GEOHASH_BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz"
 
 _HTTP_HEADERS = {
     "User-Agent": (
-        "ArogyaDrishti-DPI-Hydrator/1.0 (Government-Vector-Surveillance; "
+        "NidanIQ-DPI-Hydrator/1.0 (Government-Vector-Surveillance; "
         "contact: shivam@revlet.me)"
     ),
     "Accept": "application/json",

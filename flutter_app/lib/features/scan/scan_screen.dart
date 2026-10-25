@@ -16,7 +16,7 @@ import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/services/offline_sync_manager.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 
 /// AI Vector Scan Screen: Core computer vision and micro-climate diagnostic interface.
 /// Combines PaliGemma/Gemma Vision bounding boxes, live Google Earth Engine satellite telemetry,
@@ -285,17 +285,17 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
-        systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
+        systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
         title: const Text(
           'AI Vector Scan',
           style: TextStyle(
-            color: ArogyaTheme.slateHeading,
+            color: NidanIQTheme.slateHeading,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.white,
-        foregroundColor: ArogyaTheme.slateHeading,
-        iconTheme: const IconThemeData(color: ArogyaTheme.slateHeading),
+        foregroundColor: NidanIQTheme.slateHeading,
+        iconTheme: const IconThemeData(color: NidanIQTheme.slateHeading),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
@@ -307,7 +307,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
           tooltip: 'Back',
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: ArogyaTheme.slateHeading,
+            color: NidanIQTheme.slateHeading,
           ),
           onPressed: () {
             if (context.canPop()) {

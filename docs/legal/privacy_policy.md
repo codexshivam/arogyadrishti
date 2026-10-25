@@ -1,4 +1,4 @@
-# Privacy Policy — Arogya Drishti
+# Privacy Policy — NidanIQ
 
 **National Digital Public Infrastructure for Vector-Borne Disease Control**
 *Aligned with the Digital Personal Data Protection (DPDP) Act, 2023, Information Technology Act, 2000, and NCVBDC / MoHFW Standards*
@@ -12,9 +12,9 @@
 
 ## 1. Preamble and Executive Overview
 
-Arogya Drishti ("Platform", "We", "Us", or "Our") is the sovereign National Digital Public Infrastructure (DPI) for automated vector-borne disease surveillance, micro-climate predictive modeling, and municipal response orchestration. The Platform operates in strict compliance with the **Digital Personal Data Protection (DPDP) Act, 2023 (Act No. 22 of 2023)**, the **Information Technology Act, 2000**, the **Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011**, and statutory public health operational guidelines issued by the **National Center for Vector Borne Diseases Control (NCVBDC)** and the **Ministry of Health and Family Welfare (MoHFW)**, Government of India.
+NidanIQ ("Platform", "We", "Us", or "Our") is the sovereign National Digital Public Infrastructure (DPI) for automated vector-borne disease surveillance, micro-climate predictive modeling, and municipal response orchestration. The Platform operates in strict compliance with the **Digital Personal Data Protection (DPDP) Act, 2023 (Act No. 22 of 2023)**, the **Information Technology Act, 2000**, the **Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011**, and statutory public health operational guidelines issued by the **National Center for Vector Borne Diseases Control (NCVBDC)** and the **Ministry of Health and Family Welfare (MoHFW)**, Government of India.
 
-This Privacy Policy delineates the precise technical and legal framework governing the collection, processing, storage, pseudonymization, redaction, and protection of personal data and field telemetry gathered through the Arogya Drishti mobile application, administrative command consoles, automated IoT telemetry, and public epidemiological APIs.
+This Privacy Policy delineates the precise technical and legal framework governing the collection, processing, storage, pseudonymization, redaction, and protection of personal data and field telemetry gathered through the NidanIQ mobile application, administrative command consoles, automated IoT telemetry, and public epidemiological APIs.
 
 ---
 
@@ -22,7 +22,7 @@ This Privacy Policy delineates the precise technical and legal framework governi
 
 Under Section 2(i) of the Digital Personal Data Protection Act, 2023, the designated **Data Fiduciary** responsible for determining the purpose and means of data processing is:
 
-* **Entity Name:** Arogya Drishti
+* **Entity Name:** NidanIQ
 * **Headquarters:** Mohali, Punjab (India)
 * **Data Sovereignty Region:** Mumbai (asia-south1)
 * **Official Institutional Email:** `support@example.com`
@@ -41,7 +41,7 @@ This Policy governs:
 
 ## 4. Categories of Data Collected
 
-Arogya Drishti enforces strict **Data Minimization** as mandated under Section 6(1) of the DPDP Act, 2023. The platform collects only data strictly necessary for disease surveillance and rapid municipal vector control:
+NidanIQ enforces strict **Data Minimization** as mandated under Section 6(1) of the DPDP Act, 2023. The platform collects only data strictly necessary for disease surveillance and rapid municipal vector control:
 
 ### A. Authenticated Officer Identity & Account Data
 * **Mobile Telephone Number:** Processed via Firebase Phone Authentication using one-time cryptographic SMS passcodes (OTP). Phone numbers are cross-referenced solely against the accredited Municipal Staff Directory.
@@ -61,7 +61,7 @@ Arogya Drishti enforces strict **Data Minimization** as mandated under Section 6
 
 ### D. Geotagged Site Inspection Imagery & Automated DPDP PII Redaction
 * **Photographic Evidence:** Digital photographs captured by field officers to document standing water, larval clusters, or discarded solid waste breeding sites.
-* **Automated Zero-PII Sanitization Pipeline:** Prior to persisting any visual artifact into cloud storage (`gs://arogyadrishti-field-telemetry`), the image stream is processed through an automated in-memory Google Cloud Vision SafeSearch and computer vision redaction filter.
+* **Automated Zero-PII Sanitization Pipeline:** Prior to persisting any visual artifact into cloud storage (`gs://NidanIQ-field-telemetry`), the image stream is processed through an automated in-memory Google Cloud Vision SafeSearch and computer vision redaction filter.
   * **Facial Blurring:** All detected human faces, bystanders, and field personnel are permanently and irreversibly blurred.
   * **License Plate Blurring:** All vehicular registration plates are masked.
   * **EXIF Scrubbing:** Non-epidemiological metadata (device serials, user profile tags) is stripped.
@@ -74,7 +74,7 @@ Arogya Drishti enforces strict **Data Minimization** as mandated under Section 6
 
 ## 5. Lawful Grounds and Purpose of Data Processing
 
-Under the DPDP Act, 2023, data processing by Arogya Drishti is founded upon two statutory legal bases:
+Under the DPDP Act, 2023, data processing by NidanIQ is founded upon two statutory legal bases:
 
 ### A. Legitimate Uses for State Functions & Public Health Emergencies (Section 7)
 Under Section 7(b) and Section 7(d) of the DPDP Act, 2023, personal data may be processed without explicit separate consent where such processing is necessary for:
@@ -92,7 +92,7 @@ Under Section 7(b) and Section 7(d) of the DPDP Act, 2023, personal data may be 
 
 ## 6. Sovereign Indian Data Residency and Cloud Security
 
-Arogya Drishti adheres to the highest sovereign cybersecurity protocols:
+NidanIQ adheres to the highest sovereign cybersecurity protocols:
 
 ```mermaid
 flowchart LR
@@ -114,7 +114,7 @@ flowchart LR
 
 ## 7. Data Sharing, Disclosures, and Cross-Border Transfers
 
-* **No Commercial Sharing:** Personal data collected by Arogya Drishti is never monetized, sold, leased, rented, or shared with commercial entities, advertising networks, or third-party brokers.
+* **No Commercial Sharing:** Personal data collected by NidanIQ is never monetized, sold, leased, rented, or shared with commercial entities, advertising networks, or third-party brokers.
 * **Authorized Government Disclosures:** Data is shared exclusively with:
   * Municipal Corporation Health & Sanitation Departments;
   * State Directorate of Health Services and District Collectorates;
@@ -153,7 +153,7 @@ In compliance with Section 13(2) of the DPDP Act, 2023 and Rule 5(9) of the Info
 
 * **Officer Name:** Shivam Yadav
 * **Official Designation:** Data Protection Officer (DPO)
-* **Institutional Department:** Arogya Drishti Project Secretariat
+* **Institutional Department:** NidanIQ Project Secretariat
 * **Physical Office Address:** Mohali, Punjab (India)
 * **Dedicated Redressal Email:** `grievance.dpo@example.com`
 * **Emergency Escalation Email:** `emergency@example.com`

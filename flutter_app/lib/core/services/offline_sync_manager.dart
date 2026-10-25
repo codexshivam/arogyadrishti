@@ -68,7 +68,7 @@ class OfflineQueueItem {
 class OfflineSyncManager {
   OfflineSyncManager({required this.apiClient});
 
-  final ArogyaApiClient apiClient;
+  final NidanIQApiClient apiClient;
   Database? _db;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
   bool _isDraining = false;

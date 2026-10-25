@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Multi-stage production Dockerfile for Arogya Drishti FastAPI Backend (Google Cloud Run asia-south1)
+# Multi-stage production Dockerfile for NidanIQ FastAPI Backend (Google Cloud Run asia-south1)
 
 FROM python:3.12-slim AS builder
 
@@ -22,7 +22,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8080 \
     GCP_REGION=asia-south1
 
-RUN groupadd -r arogya && useradd -r -g arogya -d /app -s /sbin/nologin arogya
+RUN groupadd -r nidaniq && useradd -r -g nidaniq -d /app -s /sbin/nologin nidaniq
 
 COPY --from=builder /install /usr/local
 COPY backend /app/backend
@@ -31,7 +31,7 @@ COPY docs /app/docs
 COPY LICENSE /app/LICENSE
 
 WORKDIR /app/backend
-USER arogya
+USER nidaniq
 
 EXPOSE 8080
 

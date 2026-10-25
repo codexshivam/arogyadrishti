@@ -87,11 +87,11 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ArogyaTheme.backgroundCanvas,
+      backgroundColor: NidanIQTheme.backgroundCanvas,
       appBar: AppBar(
-        systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
+        systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
         backgroundColor: Colors.white,
-        foregroundColor: ArogyaTheme.slateHeading,
+        foregroundColor: NidanIQTheme.slateHeading,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
@@ -104,7 +104,7 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: ArogyaTheme.slateHeading,
+            color: NidanIQTheme.slateHeading,
           ),
         ),
       ),
@@ -120,7 +120,7 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
           children: [
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(
-                ArogyaTheme.primaryCrimson,
+                NidanIQTheme.primaryCrimson,
               ),
             ),
             const SizedBox(height: 16),
@@ -129,7 +129,7 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: ArogyaTheme.slateBody,
+                color: NidanIQTheme.slateBody,
               ),
             ),
             const SizedBox(height: 6),
@@ -137,7 +137,7 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
               'Verifying DPDP Act 2023 Sovereign Cryptographic Signatures',
               style: GoogleFonts.ibmPlexMono(
                 fontSize: 11,
-                color: ArogyaTheme.slateMuted,
+                color: NidanIQTheme.slateMuted,
               ),
             ),
           ],
@@ -163,7 +163,7 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: ArogyaTheme.slateHeading,
+                  color: NidanIQTheme.slateHeading,
                 ),
               ),
               const SizedBox(height: 8),
@@ -171,14 +171,14 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
                 _errorMessage!,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: ArogyaTheme.slateMuted,
+                  color: NidanIQTheme.slateMuted,
                   fontSize: 13,
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ArogyaTheme.primaryCrimson,
+                  backgroundColor: NidanIQTheme.primaryCrimson,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
@@ -251,35 +251,35 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
                   h1: GoogleFonts.plusJakartaSans(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: ArogyaTheme.slateHeading,
+                    color: NidanIQTheme.slateHeading,
                     height: 1.3,
                   ),
                   h2: GoogleFonts.plusJakartaSans(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: ArogyaTheme.primaryCrimson,
+                    color: NidanIQTheme.primaryCrimson,
                     height: 1.3,
                   ),
                   h3: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: ArogyaTheme.slateHeading,
+                    color: NidanIQTheme.slateHeading,
                     height: 1.3,
                   ),
                   p: GoogleFonts.inter(
                     fontSize: 13.5,
                     height: 1.6,
-                    color: ArogyaTheme.slateBody,
+                    color: NidanIQTheme.slateBody,
                   ),
                   listBullet: GoogleFonts.inter(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
-                    color: ArogyaTheme.primaryCrimson,
+                    color: NidanIQTheme.primaryCrimson,
                   ),
                   code: GoogleFonts.ibmPlexMono(
                     fontSize: 12,
                     backgroundColor: const Color(0xFFF1F5F9),
-                    color: ArogyaTheme.primaryCrimson,
+                    color: NidanIQTheme.primaryCrimson,
                   ),
                   codeblockDecoration: BoxDecoration(
                     color: const Color(0xFF0F172A),
@@ -289,7 +289,7 @@ class _LegalViewerScreenState extends ConsumerState<LegalViewerScreen> {
                     color: const Color(0xFFF8FAFC),
                     border: const Border(
                       left: BorderSide(
-                        color: ArogyaTheme.primaryCrimson,
+                        color: NidanIQTheme.primaryCrimson,
                         width: 4,
                       ),
                     ),

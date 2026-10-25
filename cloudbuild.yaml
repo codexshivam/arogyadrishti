@@ -1,12 +1,12 @@
-# Arogya Drishti — Cloud Build CI/CD Pipeline (Pinned to asia-south1 Mumbai)
+# NidanIQ — Cloud Build CI/CD Pipeline (Pinned to asia-south1 Mumbai)
 options:
   logging: CLOUD_LOGGING_ONLY
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
 
 substitutions:
   _REGION: asia-south1
-  _SERVICE_NAME: arogya-drishti-api
-  _REPO_NAME: arogya-drishti-repo
+  _SERVICE_NAME: nidaniq-api
+  _REPO_NAME: nidaniq-repo
   _TAG: latest
 
 steps:

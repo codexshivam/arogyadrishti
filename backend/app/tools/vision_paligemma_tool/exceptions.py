@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from fastapi import status
 
-from app.core.exceptions import ArogyaException
+from app.core.exceptions import NidanIQException
 
 
-class VisionScanException(ArogyaException):
+class VisionScanException(NidanIQException):
     """Raised when an uploaded image fails validation, redaction, or vision inference."""
 
     def __init__(
@@ -19,5 +19,5 @@ class VisionScanException(ArogyaException):
             title="AI Vector Breeding Site Scan Error",
             detail=detail,
             status_code=status_code,
-            problem_type="https://arogyadrishti.gov.in/problems/vision-scan-error",
+            problem_type="https://NidanIQ.gov.in/problems/vision-scan-error",
         )

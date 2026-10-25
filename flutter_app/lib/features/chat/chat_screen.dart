@@ -10,10 +10,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 import 'local_triage_engine.dart';
 
-/// Screen 2: ChatScreen (`/chat`) — Multilingual Gemma 4 / Vertex AI Officer Copilot (`Dr. Arogya`).
+/// Screen 2: ChatScreen (`/chat`) — Multilingual Gemma 4 / Vertex AI Officer Copilot (`Dr. NidanIQ`).
 /// Zero-hardcoded data: All indices, dosages, satellite metrics, and tool cards stream from live backend & Firestore.
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -52,10 +52,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _messages.clear();
       _messages.add(<String, dynamic>{
         'role': 'assistant',
-        'sender': 'Dr. Arogya',
+        'sender': 'Dr. NidanIQ',
         'time': 'Just now',
         'text':
-            'Greetings $officer! I am Dr. Arogya, your AI Vector Surveillance Copilot for $ward. How can I assist your field operations today?',
+            'Greetings $officer! I am Dr. NidanIQ, your AI Vector Surveillance Copilot for $ward. How can I assist your field operations today?',
         'tool_cards': <Map<String, dynamic>>[],
       });
     });
@@ -90,7 +90,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         ? (wardState.officerName.isNotEmpty
                               ? wardState.officerName
                               : 'Field Officer')
-                        : 'Dr. Arogya',
+                        : 'Dr. NidanIQ',
                     'time': _formatTimestamp(data['timestamp']),
                     'text': (data['text'] ?? '').toString(),
                     'tool_cards':
@@ -184,7 +184,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         _sending = false;
         _messages.add(<String, dynamic>{
           'role': 'assistant',
-          'sender': 'Dr. Arogya (NCVBDC Offline)',
+          'sender': 'Dr. NidanIQ (NCVBDC Offline)',
           'time': 'Now',
           'text': triage.answer,
           'tool_cards': <Map<String, dynamic>>[],
@@ -217,7 +217,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         _sending = false;
         _messages.add(<String, dynamic>{
           'role': 'assistant',
-          'sender': 'Dr. Arogya',
+          'sender': 'Dr. NidanIQ',
           'time': 'Now',
           'text': (res['reply_text'] ?? '').toString(),
           'tool_cards': (res['tool_cards'] as List<dynamic>? ?? <dynamic>[])
@@ -234,7 +234,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         _sending = false;
         _messages.add(<String, dynamic>{
           'role': 'assistant',
-          'sender': 'Dr. Arogya (NCVBDC Offline)',
+          'sender': 'Dr. NidanIQ (NCVBDC Offline)',
           'time': 'Now',
           'text': triage.answer,
           'tool_cards': <Map<String, dynamic>>[],
@@ -265,7 +265,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: const ArogyaTopShellBar(activeTabIndex: 1),
+      appBar: const NidanIQTopShellBar(activeTabIndex: 1),
       body: SafeArea(
         top: false,
         child: Column(
@@ -371,7 +371,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    '${msg['sender'] ?? 'Dr. Arogya'} • ${msg['time'] ?? ''}',
+                                    '${msg['sender'] ?? 'Dr. NidanIQ'} • ${msg['time'] ?? ''}',
                                     style: const TextStyle(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w600,
@@ -516,7 +516,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           onSubmitted: (_) => _sendPrompt(),
                           decoration: InputDecoration(
                             hintText:
-                                'Ask Dr. Arogya (English, हिंदी, ਪੰਜਾਬੀ)...',
+                                'Ask Dr. NidanIQ (English, हिंदी, ਪੰਜਾਬੀ)...',
                             hintStyle: const TextStyle(
                               fontSize: 12.5,
                               color: Color(0xFF94A3B8),

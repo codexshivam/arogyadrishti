@@ -20,7 +20,7 @@ from tenacity import (
 from app.core.config import Settings, get_settings
 from app.tools.ogd_india_gov_tool.exceptions import OGDIntegrationException
 
-logger = logging.getLogger("arogya_drishti.tools.ogd_india_gov")
+logger = logging.getLogger("nidaniq.tools.ogd_india_gov")
 
 _OGD_HEADERS = {
     "User-Agent": (

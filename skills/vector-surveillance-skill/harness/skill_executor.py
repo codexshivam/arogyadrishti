@@ -26,7 +26,7 @@ from app.tools.sheets_admin_tool import get_sheets_client
 from google.cloud import firestore
 from google.oauth2.service_account import Credentials
 
-logger = logging.getLogger("arogya_drishti.skill_executor")
+logger = logging.getLogger("nidaniq.skill_executor")
 
 ALLOWED_TOOLS = frozenset(
     {

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="teamrocket.arogyadrishti.android">
+    package="teamrocket.NidanIQ.android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:label="Arogya"
+        android:label="NidanIQ"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">

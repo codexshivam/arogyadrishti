@@ -13,7 +13,7 @@ import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/services/offline_sync_manager.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 
 /// State representation for Home Screen Command Center
 class HomeState {
@@ -520,7 +520,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               Icon(
                                 Icons.lock_rounded,
                                 size: 16,
-                                color: ArogyaTheme.slateMuted,
+                                color: NidanIQTheme.slateMuted,
                               ),
                               SizedBox(width: 4),
                               Text(
@@ -528,7 +528,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  color: ArogyaTheme.slateMuted,
+                                  color: NidanIQTheme.slateMuted,
                                 ),
                               ),
                             ],
@@ -540,7 +540,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             'Mobile number is verified and non-editable',
                         helperStyle: TextStyle(
                           fontSize: 11,
-                          color: ArogyaTheme.slateMuted,
+                          color: NidanIQTheme.slateMuted,
                         ),
                       ),
                     ),
@@ -560,7 +560,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               Icon(
                                 Icons.lock_rounded,
                                 size: 16,
-                                color: ArogyaTheme.slateMuted,
+                                color: NidanIQTheme.slateMuted,
                               ),
                               SizedBox(width: 4),
                               Text(
@@ -568,7 +568,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  color: ArogyaTheme.slateMuted,
+                                  color: NidanIQTheme.slateMuted,
                                 ),
                               ),
                             ],
@@ -580,7 +580,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             'Ward allocation is statutory and non-editable',
                         helperStyle: TextStyle(
                           fontSize: 11,
-                          color: ArogyaTheme.slateMuted,
+                          color: NidanIQTheme.slateMuted,
                         ),
                       ),
                     ),
@@ -789,7 +789,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       setState(() => _savingLog = false);
       ref.read(homeViewModelProvider.notifier).setSyncing(false);
 
-      showArogyaToast(
+      showNidanIQToast(
         context,
         title: 'Inspection Synced',
         message:
@@ -799,7 +799,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       if (!mounted) return;
       setState(() => _savingLog = false);
       ref.read(homeViewModelProvider.notifier).setSyncing(false);
-      showArogyaToast(
+      showNidanIQToast(
         context,
         title: 'Inspection Queued Offline',
         message:
@@ -815,7 +815,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: const ArogyaTopShellBar(activeTabIndex: 0),
+      appBar: const NidanIQTopShellBar(activeTabIndex: 0),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -953,7 +953,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            gradient: ArogyaTheme.crimsonHeaderGradient,
+                            gradient: NidanIQTheme.crimsonHeaderGradient,
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: const [
                               BoxShadow(

@@ -33,7 +33,7 @@ from app.tools.gee_climate_tool.client import (
 )
 from app.tools.sheets_admin_tool.client import get_sheets_client
 
-logger = logging.getLogger("arogya_drishti.scripts.hydrate_chandigarh_all")
+logger = logging.getLogger("nidaniq.scripts.hydrate_chandigarh_all")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 _GEOHASH_BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz"

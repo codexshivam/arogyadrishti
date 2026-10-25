@@ -12,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 
 class VansScreen extends ConsumerStatefulWidget {
   const VansScreen({super.key});
@@ -283,7 +283,7 @@ class _VansScreenState extends ConsumerState<VansScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
+        systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
         title: const Text('Nearby Vans'),
         actions: [
           IconButton(

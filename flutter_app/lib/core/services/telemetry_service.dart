@@ -5,12 +5,12 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-/// Unified Firebase Observability Service for Arogya Drishti:
+/// Unified Firebase Observability Service for NidanIQ:
 /// - Firebase Analytics (Screen views + custom NCVBDC epidemiological events)
 /// - Firebase Crashlytics (Fatal & non-fatal error reporting + custom ward/LGD keys)
 /// - Firebase Performance Monitoring (Custom traces + Dio HTTP metric instrumentation)
-class ArogyaTelemetryService {
-  ArogyaTelemetryService._();
+class NidanIQTelemetryService {
+  NidanIQTelemetryService._();
 
   static bool _initialized = false;
 
@@ -23,7 +23,7 @@ class ArogyaTelemetryService {
       await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
       await FirebaseAnalytics.instance
           .setDefaultEventParameters(<String, Object>{
-            'app_package': 'teamrocket.arogyadrishti.android',
+            'app_package': 'teamrocket.NidanIQ.android',
             'gcp_region': 'asia-south1',
           });
 
@@ -37,7 +37,7 @@ class ArogyaTelemetryService {
         );
         await FirebaseCrashlytics.instance.setCustomKey(
           'app_package',
-          'teamrocket.arogyadrishti.android',
+          'teamrocket.NidanIQ.android',
         );
         await FirebaseCrashlytics.instance.setCustomKey(
           'data_residency_region',
@@ -61,7 +61,7 @@ class ArogyaTelemetryService {
 
       _initialized = true;
     } catch (e) {
-      debugPrint('ArogyaTelemetryService initialization note: $e');
+      debugPrint('NidanIQTelemetryService initialization note: $e');
     }
   }
 
@@ -165,7 +165,7 @@ class ArogyaTelemetryService {
   /// Send a verification telemetry pulse (Analytics event + Performance trace + Crashlytics log).
   static Future<void> sendVerificationPulse({required String lgdCode}) async {
     await traceOperation(
-      'arogya_telemetry_verification_pulse',
+      'nidaniq_telemetry_verification_pulse',
       () async {
         await logEvent(
           'telemetry_verification_pulse',
@@ -220,7 +220,7 @@ class FirebasePerformanceAndCrashlyticsDioInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (ArogyaTelemetryService.isInitialized) {
+    if (NidanIQTelemetryService.isInitialized) {
       try {
         final metric = FirebasePerformance.instance.newHttpMetric(
           options.uri.toString(),
@@ -263,7 +263,7 @@ class FirebasePerformanceAndCrashlyticsDioInterceptor extends Interceptor {
         await metric.stop();
       } catch (_) {}
     }
-    await ArogyaTelemetryService.recordNonFatalError(
+    await NidanIQTelemetryService.recordNonFatalError(
       err,
       err.stackTrace,
       reason:

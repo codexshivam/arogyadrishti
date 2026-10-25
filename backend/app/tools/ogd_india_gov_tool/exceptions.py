@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from fastapi import status
 
-from app.core.exceptions import ArogyaException
+from app.core.exceptions import NidanIQException
 
 
-class OGDIntegrationException(ArogyaException):
+class OGDIntegrationException(NidanIQException):
     """Raised when api.data.gov.in returns an error or no matching LGD records."""
 
     def __init__(
@@ -19,5 +19,5 @@ class OGDIntegrationException(ArogyaException):
             title="Open Government Data (data.gov.in) Integration Error",
             detail=detail,
             status_code=status_code,
-            problem_type="https://arogyadrishti.gov.in/problems/ogd-integration-error",
+            problem_type="https://NidanIQ.gov.in/problems/ogd-integration-error",
         )

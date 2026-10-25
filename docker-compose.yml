@@ -8,7 +8,7 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ~/.config/arogyadrishti:/secrets:ro
+      - ~/.config/NidanIQ:/secrets:ro
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/teamrocket_service.json
     healthcheck:

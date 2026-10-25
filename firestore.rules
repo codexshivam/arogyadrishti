@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // ===============================================================
-// Assumed Data Model — Arogya Drishti (NCVBDC / IHIP / DPDP 2023)
+// Assumed Data Model — NidanIQ (NCVBDC / IHIP / DPDP 2023)
 // ===============================================================
 //
 // This security rules file enforces role-based access control (RBAC),

@@ -19,7 +19,7 @@ from google.oauth2.service_account import Credentials
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("update_staff_directory")
 
-CRED_PATH = "/Users/shivamyadav/.config/arogyadrishti/teamrocket_service.json"
+CRED_PATH = "/Users/shivamyadav/.config/NidanIQ/teamrocket_service.json"
 SPREADSHEET_ID = "1n112XEhTjsZx9dHwhzPGjKX56mq4D6KdMnowBto2iUo"
 GCP_PROJECT = "teamrocketnp"
 DISTRICT_REP_EMAIL_UNIVERSAL = "academyxshivam@gmail.com"

@@ -1,4 +1,4 @@
-"""Standardized RFC 7807 Problem Details exception handlers for Arogya Drishti."""
+"""Standardized RFC 7807 Problem Details exception handlers for NidanIQ."""
 
 from __future__ import annotations
 
@@ -9,10 +9,10 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-logger = logging.getLogger("arogya_drishti.exceptions")
+logger = logging.getLogger("nidaniq.exceptions")
 
 
-class ArogyaException(Exception):
+class NidanIQException(Exception):
     """Base RFC 7807 Problem Details exception."""
 
     def __init__(
@@ -49,9 +49,9 @@ class ArogyaException(Exception):
 def register_exception_handlers(app: FastAPI) -> None:
     """Attach RFC 7807 Problem Details handlers to the FastAPI application."""
 
-    @app.exception_handler(ArogyaException)
-    async def handle_arogya_exception(
-        request: Request, exc: ArogyaException
+    @app.exception_handler(NidanIQException)
+    async def handle_nidaniq_exception(
+        request: Request, exc: NidanIQException
     ) -> JSONResponse:
         logger.warning(
             "Domain exception on %s: [%d] %s - %s",
@@ -74,7 +74,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
-                "type": "https://arogyadrishti.gov.in/problems/validation-error",
+                "type": "https://NidanIQ.gov.in/problems/validation-error",
                 "title": "Request Validation Failed",
                 "status": status.HTTP_422_UNPROCESSABLE_ENTITY,
                 "detail": "One or more request parameters failed schema validation.",
@@ -92,7 +92,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
-                "type": "https://arogyadrishti.gov.in/problems/internal-error",
+                "type": "https://NidanIQ.gov.in/problems/internal-error",
                 "title": "Internal Server Error",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "detail": "An unexpected internal error occurred while processing the request.",

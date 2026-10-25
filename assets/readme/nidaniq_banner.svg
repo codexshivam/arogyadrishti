@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="100%" height="100%">
+  <defs>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F83227" />
+      <stop offset="100%" stop-color="#E21116" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1200" height="280" rx="16" fill="url(#redGrad)" />
+
+  <!-- NidanIQ Wordmark -->
+  <text x="600" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="118" font-weight="800" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" letter-spacing="-1.5">NidanIQ</text>
+</svg>

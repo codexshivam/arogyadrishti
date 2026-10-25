@@ -1,5 +1,5 @@
 """
-Multi-Source Epidemiological Data Fusion & Outbreak Intelligence Engine for Arogya Drishti.
+Multi-Source Epidemiological Data Fusion & Outbreak Intelligence Engine for NidanIQ.
 
 Ingests data from 5 independent pillars:
 1. Pillar 1: Google Earth Engine (GEE) Satellite Telemetry (MODIS LST, Sentinel-2 NDWI/NDVI, GPM Precipitation, SAR fallback)
@@ -38,7 +38,7 @@ from app.core.epidemiology_math import (
 from app.tools.gee_climate_tool.client import fetch_live_gee_telemetry_for_points
 from app.tools.ogd_india_gov_tool.client import get_ogd_client
 
-logger = logging.getLogger("arogya_drishti.services.data_fusion")
+logger = logging.getLogger("nidaniq.services.data_fusion")
 
 # Keyword weights for Google News NLP entity extraction
 _OUTBREAK_KEYWORDS: dict[str, float] = {

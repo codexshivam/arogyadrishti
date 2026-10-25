@@ -294,7 +294,7 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
+        systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
         title: const Text('Healthcare Centers Nearby'),
       ),
       body: SafeArea(

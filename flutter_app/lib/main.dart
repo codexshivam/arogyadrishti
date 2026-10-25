@@ -29,7 +29,7 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(ArogyaTheme.whiteSystemUiOverlay);
+  SystemChrome.setSystemUIOverlayStyle(NidanIQTheme.whiteSystemUiOverlay);
 
   bool firebaseReady = false;
   try {
@@ -89,13 +89,13 @@ Future<void> main() async {
     }
 
     try {
-      await ArogyaTelemetryService.initialize();
+      await NidanIQTelemetryService.initialize();
     } catch (e) {
-      debugPrint('ArogyaTelemetryService init bypassed: $e');
+      debugPrint('NidanIQTelemetryService init bypassed: $e');
     }
   }
 
-  runApp(const ProviderScope(child: ArogyaDrishtiApp()));
+  runApp(const ProviderScope(child: NidanIQApp()));
 }
 
 /// Converts a Stream into a Listenable for GoRouter refresh notifications.
@@ -132,7 +132,7 @@ bool _isUserAuthenticated() {
   }
 }
 
-final GoRouter arogyaRouter = GoRouter(
+final GoRouter nidaniqRouter = GoRouter(
   initialLocation: '/auth',
   refreshListenable: GoRouterRefreshStream(_safeAuthStream()),
   redirect: (BuildContext context, GoRouterState state) {
@@ -160,7 +160,7 @@ final GoRouter arogyaRouter = GoRouter(
     return null;
   },
   observers: <NavigatorObserver>[
-    ArogyaTelemetryService.createNavigationObserver(),
+    NidanIQTelemetryService.createNavigationObserver(),
   ],
   routes: [
     GoRoute(
@@ -210,14 +210,14 @@ final GoRouter arogyaRouter = GoRouter(
   ],
 );
 
-class ArogyaDrishtiApp extends ConsumerStatefulWidget {
-  const ArogyaDrishtiApp({super.key});
+class NidanIQApp extends ConsumerStatefulWidget {
+  const NidanIQApp({super.key});
 
   @override
-  ConsumerState<ArogyaDrishtiApp> createState() => _ArogyaDrishtiAppState();
+  ConsumerState<NidanIQApp> createState() => _NidanIQAppState();
 }
 
-class _ArogyaDrishtiAppState extends ConsumerState<ArogyaDrishtiApp> {
+class _NidanIQAppState extends ConsumerState<NidanIQApp> {
   StreamSubscription<User?>? _authSub;
 
   @override
@@ -297,15 +297,15 @@ class _ArogyaDrishtiAppState extends ConsumerState<ArogyaDrishtiApp> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: ArogyaTheme.whiteSystemUiOverlay,
+      value: NidanIQTheme.whiteSystemUiOverlay,
       child: MaterialApp.router(
-        title: 'Arogya Drishti',
+        title: 'NidanIQ',
         debugShowCheckedModeBanner: false,
-        theme: ArogyaTheme.lightTheme(),
-        routerConfig: arogyaRouter,
+        theme: NidanIQTheme.lightTheme(),
+        routerConfig: nidaniqRouter,
         builder: (context, child) {
           return AnnotatedRegion<SystemUiOverlayStyle>(
-            value: ArogyaTheme.whiteSystemUiOverlay,
+            value: NidanIQTheme.whiteSystemUiOverlay,
             child: child ?? const SizedBox.shrink(),
           );
         },

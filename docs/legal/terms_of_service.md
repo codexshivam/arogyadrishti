@@ -1,4 +1,4 @@
-# Terms of Service — Arogya Drishti
+# Terms of Service — NidanIQ
 
 **National Digital Public Infrastructure for Vector-Borne Disease Control**
 *Operating under the Information Technology Act, 2000, DPDP Act, 2023, and Municipal Public Health By-Laws*
@@ -12,9 +12,9 @@
 
 ## 1. Acceptance of Terms and Agreement to Bound
 
-These Terms of Service ("Terms" or "Agreement") constitute a legally binding agreement between you (the "User", "Authorized Officer", or "Field Worker") and **Arogya Drishti** ("Authority", "We", "Us", or "Our").
+These Terms of Service ("Terms" or "Agreement") constitute a legally binding agreement between you (the "User", "Authorized Officer", or "Field Worker") and **NidanIQ** ("Authority", "We", "Us", or "Our").
 
-BY AUTHENTICATING INTO THE AROGYA DRISHTI MOBILE APPLICATION VIA MOBILE NUMBER AND ONE-TIME PASSCODE (OTP), ACCESSING THE ADMINISTRATIVE COMMAND DASHBOARD, OR CONSUMING PLATFORM APIS, YOU EXPRESSLY ACKNOWLEDGE, AGREE, AND COVENANT THAT:
+BY AUTHENTICATING INTO THE NidanIQ MOBILE APPLICATION VIA MOBILE NUMBER AND ONE-TIME PASSCODE (OTP), ACCESSING THE ADMINISTRATIVE COMMAND DASHBOARD, OR CONSUMING PLATFORM APIS, YOU EXPRESSLY ACKNOWLEDGE, AGREE, AND COVENANT THAT:
 1. You have read, understood, and agreed to be legally bound by every provision of these Terms of Service;
 2. You have read and accepted the companion [Privacy Policy](privacy_policy.md);
 3. You possess the requisite legal and departmental authorization to act as an accredited health or sanitation agent of the Government of India or the relevant State/Union Territory Administration.
@@ -26,7 +26,7 @@ If you do not agree to these Terms in their entirety, you must immediately cease
 ## 2. Authorized Personnel and Access Eligibility
 
 ### A. Restrictive User Classification
-The Arogya Drishti mobile client is a specialized Government Digital Public Infrastructure (DPI) tool engineered strictly for authorized public health and municipal vector control operations. Access is restricted exclusively to:
+The NidanIQ mobile client is a specialized Government Digital Public Infrastructure (DPI) tool engineered strictly for authorized public health and municipal vector control operations. Access is restricted exclusively to:
 * **Accredited Frontline Workers:** Accredited Social Health Activists (ASHA), Auxiliary Nurse Midwives (ANM), and Multi-Purpose Health Workers (MPHW);
 * **Municipal Sanitation Cadre:** Sanitary Sub-Inspectors, Sanitary Inspectors (SI), and Chief Sanitary Inspectors (CSI);
 * **Clinical & Entomological Leadership:** Medical Officers of Health (MOH), District Surveillance Officers (DSO), Chief Medical Officers (CMO), and State Nodal Officers;
@@ -41,7 +41,7 @@ The Arogya Drishti mobile client is a specialized Government Digital Public Infr
 
 ## 3. Truthfulness, Integrity, and Accuracy of Field Surveillance Data
 
-The mathematical accuracy of Arogya Drishti's 14-day predictive epidemiological models directly depends upon the empirical authenticity of on-ground entomological surveys:
+The mathematical accuracy of NidanIQ's 14-day predictive epidemiological models directly depends upon the empirical authenticity of on-ground entomological surveys:
 
 1. **Mandatory Duty of Truthfulness:** Officers entering household inspection counts, container audits, and larval findings covenant that all logged metrics reflect genuine, physical, in-person surveys conducted at the specified geotagged coordinates.
 2. **Prohibition of Fabricated Records ("Ghost Inspections"):** The submission of synthetic, fictitious, or falsified surveillance records—including logging uninspected houses, fabricating negative container counts, or simulating field presence via mock GPS locations—is strictly prohibited.
@@ -52,7 +52,7 @@ The mathematical accuracy of Arogya Drishti's 14-day predictive epidemiological 
 ## 4. Artificial Intelligence, Computer Vision, and Decision Support Disclaimers
 
 ### A. Nature of AI Diagnostic Assistance
-Arogya Drishti integrates cutting-edge artificial intelligence, including Google Earth Engine (GEE) satellite micro-climate telemetry, multi-variable epidemiological fusion models, and PaliGemma-powered edge computer vision:
+NidanIQ integrates cutting-edge artificial intelligence, including Google Earth Engine (GEE) satellite micro-climate telemetry, multi-variable epidemiological fusion models, and PaliGemma-powered edge computer vision:
 * The automated detection of mosquito breeding sites, stagnant water surface classification, and larval identification bounding boxes represent **assistive, probabilistic decision-support diagnostics**.
 * AI outputs are engineered to alert and prioritize vector hotspots; they do **not** replace professional clinical diagnosis or the statutory discretion of licensed entomologists and public health officers.
 
@@ -63,7 +63,7 @@ The ultimate operational decision to dispatch municipal chemical fogging vans, c
 
 ## 5. Prohibited Conduct and System Security
 
-Users of Arogya Drishti are strictly forbidden from engaging in any of the following activities:
+Users of NidanIQ are strictly forbidden from engaging in any of the following activities:
 1. **Malicious Payloads & Cyber Exploits:** Attempting to inject SQL code, NoSQL payloads, cross-site scripting (XSS), malware, or harmful scripts into inspection forms, support ticket dialogues, or API parameters;
 2. **Reverse Engineering & Scraping:** Decompiling, reverse engineering, disassembling, modifying, or scraping the Flutter application binary, backend APIs, or proprietary transmission index algorithms;
 3. **Falsification of Emergency SOS Alerts:** Submitting false, malicious, or prank emergency vector outbreak tickets or van dispatch requests;
@@ -76,7 +76,7 @@ Violations will result in instantaneous revocation of system privileges and imme
 
 ## 6. Intellectual Property Rights and Open Source Standards
 
-* **Platform Ownership:** The visual layout, graphic trademarks, backend algorithms, architectural schematics, and system documentation of Arogya Drishti are the intellectual property of the project creators (Team Rocket, Chandigarh University) and the sovereign Government of India / Municipal Corporation.
+* **Platform Ownership:** The visual layout, graphic trademarks, backend algorithms, architectural schematics, and system documentation of NidanIQ are the intellectual property of the project creators (Team Rocket, Chandigarh University) and the sovereign Government of India / Municipal Corporation.
 * **Open Source Agent Skill Standards:** Specific sub-modules—including the Autonomous Vector Surveillance Agent Skill (`skills/vector-surveillance-skill/`) and open integration harnesses—are released under the **Apache License, Version 2.0**. Use of these open components is governed by the terms specified in the root [`LICENSE`](../../LICENSE) file.
 * **Epidemiological Data Sovereignty:** All aggregate disease surveillance indices, GIS vectors, and municipal inspection ledgers generated through the platform remain the permanent, sovereign public property of the Republic of India.
 
@@ -85,7 +85,7 @@ Violations will result in instantaneous revocation of system privileges and imme
 ## 7. Limitation of Liability and Disclaimer of Warranties
 
 ### A. "As-Is" and "As-Available" Operational Basis
-Arogya Drishti is provided on an "AS-IS" and "AS-AVAILABLE" basis for governmental public service. While engineered to achieve 99.9% uptime with high-availability serverless infrastructure, the Authority does not warrant that:
+NidanIQ is provided on an "AS-IS" and "AS-AVAILABLE" basis for governmental public service. While engineered to achieve 99.9% uptime with high-availability serverless infrastructure, the Authority does not warrant that:
 * The application will operate without uninterrupted, error-free periods during nationwide telecommunication outages;
 * GPS coordinates provided by field devices will remain free of atmospheric or urban canyon drift;
 * Earth Engine satellite passes will be free from temporary cloud cover obstruction (mitigated by automated Sentinel-1 SAR radar fallbacks).
@@ -117,7 +117,7 @@ Officer personal data is collected and processed in strict adherence to the **Di
 
 1. **Governing Law:** These Terms of Service, their interpretation, validity, and enforcement shall be governed strictly and exclusively by the substantive laws of the **Republic of India**.
 2. **Administrative Amicable Resolution:** In the event of any operational dispute, administrative grievance, or interpretation ambiguity between field staff and the platform administration, the parties shall first submit the matter for amicable resolution to the **Data Protection Officer (DPO)** at `grievance.dpo@example.com`.
-3. **Exclusive Judicial Jurisdiction:** Any unresolved legal proceeding, dispute, or lawsuit arising out of or in connection with these Terms or the use of Arogya Drishti shall be instituted exclusively in the competent Courts, Tribunals, or Forums located within the territorial limits of **Mohali, Punjab, India**.
+3. **Exclusive Judicial Jurisdiction:** Any unresolved legal proceeding, dispute, or lawsuit arising out of or in connection with these Terms or the use of NidanIQ shall be instituted exclusively in the competent Courts, Tribunals, or Forums located within the territorial limits of **Mohali, Punjab, India**.
 
 ---
 
@@ -125,7 +125,7 @@ Officer personal data is collected and processed in strict adherence to the **Di
 
 For legal inquiries, regulatory compliance queries, or statutory notifications, contact:
 
-* **Entity Name:** Arogya Drishti
+* **Entity Name:** NidanIQ
 * **Headquarters:** Mohali, Punjab (India)
 * **Data Sovereignty Region:** Mumbai (asia-south1)
 * **Official Institutional Email:** `support@example.com`
@@ -134,7 +134,7 @@ For legal inquiries, regulatory compliance queries, or statutory notifications, 
 **Data Protection Officer (DPO):**
 * **Officer Name:** Shivam Yadav
 * **Official Designation:** Data Protection Officer (DPO)
-* **Institutional Department:** Arogya Drishti Project Secretariat
+* **Institutional Department:** NidanIQ Project Secretariat
 * **Physical Office Address:** Mohali, Punjab (India)
 * **Dedicated Redressal Email:** `grievance.dpo@example.com`
 * **Emergency Escalation Email:** `emergency@example.com`

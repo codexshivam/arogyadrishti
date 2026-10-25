@@ -1,1 +1,1 @@
-"""Arogya Drishti Backend Package."""
+"""NidanIQ Backend Package."""

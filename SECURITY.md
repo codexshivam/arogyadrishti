@@ -1,6 +1,6 @@
-# Security & Compliance Policy — Arogya Drishti
+# Security & Compliance Policy — NidanIQ
 
-Arogya Drishti is engineered as sovereign National Digital Public Infrastructure (DPI) for predictive vector-borne disease surveillance in India, adhering strictly to **MeitY**, **CERT-In Cyber Security Directions**, the **Digital Personal Data Protection (DPDP) Act, 2023**, and **OWASP MASVS L1** requirements.
+NidanIQ is engineered as sovereign National Digital Public Infrastructure (DPI) for predictive vector-borne disease surveillance in India, adhering strictly to **MeitY**, **CERT-In Cyber Security Directions**, the **Digital Personal Data Protection (DPDP) Act, 2023**, and **OWASP MASVS L1** requirements.
 
 ---
 
@@ -45,10 +45,10 @@ Security updates, vulnerability patches, and cryptographic dependency remediatio
 
 We welcome responsible security disclosures from cybersecurity researchers, academic institutions, and authorized public health agencies.
 
-If you believe you have identified a potential security vulnerability within Arogya Drishti:
+If you believe you have identified a potential security vulnerability within NidanIQ:
 
 1. **Do Not Open a Public GitHub Issue:** Please refrain from disclosing suspected vulnerabilities publicly or in community forums.
-2. **Submit a Private Vulnerability Report:** Submit a detailed advisory via [GitHub Private Vulnerability Reporting](https://github.com/codexshivam/arogyadrishti/security/advisories/new) or email our designated Data Protection Officer.
+2. **Submit a Private Vulnerability Report:** Submit a detailed advisory via [GitHub Private Vulnerability Reporting](https://github.com/codexshivam/NidanIQ/security/advisories/new) or email our designated Data Protection Officer.
 3. **Include Reproduction Details:** Provide proof-of-concept steps, affected endpoints, request/response samples, and impact assessment.
 
 ### Statutory Turnaround Time (SLA)
@@ -64,14 +64,14 @@ Under Section 13(2) of the DPDP Act, 2023 and Rule 5(9) of the IT Rules, 2011:
 
 | Attribute | Official Specification |
 | :--- | :--- |
-| **Entity Name** | **Arogya Drishti** |
+| **Entity Name** | **NidanIQ** |
 | **Headquarters** | Mohali, Punjab (India) |
 | **Data Sovereignty Region** | Mumbai (`asia-south1`), Republic of India |
 | **Official Institutional Email** | `support@example.com` |
 | **Official Grievance Desk** | `grievance.dpo@example.com` |
 | **Data Protection Officer (DPO)** | **Shivam Yadav** |
 | **Official Designation** | Data Protection Officer (DPO) |
-| **Institutional Department** | Arogya Drishti Project Secretariat |
+| **Institutional Department** | NidanIQ Project Secretariat |
 | **Physical Office Address** | Mohali, Punjab (India) |
 | **Dedicated Redressal Email** | `grievance.dpo@example.com` |
 | **Emergency Escalation Email** | `emergency@example.com` |

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "openapi": "3.1.0",
   "info": {
-    "title": "Arogya Drishti Vector Surveillance Agent Skill Tools",
+    "title": "NidanIQ Vector Surveillance Agent Skill Tools",
     "version": "1.0.0",
     "license": {
       "name": "Apache-2.0",

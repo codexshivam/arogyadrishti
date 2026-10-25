@@ -20,7 +20,7 @@ try:
 except (ImportError, ValueError):
     from skill_executor import SkillExecutor
 
-logger = logging.getLogger("arogya_drishti.gemma_harness")
+logger = logging.getLogger("nidaniq.gemma_harness")
 
 _SKILL_DIR = Path(__file__).resolve().parents[1]
 _HARNESS_DIR = Path(__file__).resolve().parent
@@ -52,7 +52,7 @@ class AgentChatTurnResult(BaseModel):
     model_used: str
     language_detected: str = Field(default="en")
     tool_cards: list[AgentToolCallCard] = Field(default_factory=list)
-    skill_name: str = Field(default="arogya-drishti-vector-surveillance")
+    skill_name: str = Field(default="nidaniq-vector-surveillance")
 
 
 class GemmaAgentHarness:
@@ -235,8 +235,8 @@ class GemmaAgentHarness:
         )
 
         system_prompt = (
-            "You are Dr. Arogya, the official Government of India NCVBDC / IHIP Vector Surveillance AI Copilot.\n"
-            "Follow the Arogya Drishti Agent Skill specification strictly:\n"
+            "You are Dr. NidanIQ, the official Government of India NCVBDC / IHIP Vector Surveillance AI Copilot.\n"
+            "Follow the NidanIQ Agent Skill specification strictly:\n"
             f"{self.skill_markdown}\n\n"
             "Live tool execution outputs for this turn:\n"
             f"{tool_context_json}\n\n"
@@ -382,7 +382,7 @@ def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Arogya Drishti — Open-Weight Gemma 4 Agent Skill Execution Loop"
+        description="NidanIQ — Open-Weight Gemma 4 Agent Skill Execution Loop"
     )
     parser.add_argument(
         "--message",

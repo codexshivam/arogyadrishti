@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 
 /// Publicly accessible Pre-Authentication Privacy Policy & Terms of Service Screen (`/privacy`)
 /// Designed for Google Cloud / Firebase Phone Auth Brand Verification & DPDP Act 2023 compliance.
@@ -14,31 +14,31 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
-        backgroundColor: ArogyaTheme.surfaceWhite,
+        systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
+        backgroundColor: NidanIQTheme.surfaceWhite,
         surfaceTintColor: Colors.transparent,
         title: Row(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.asset(
-                'assets/logo/arogya_logo.png',
+                'assets/logo/nidaniq_logo.png',
                 width: 32,
                 height: 32,
                 errorBuilder: (_, _, _) => const Icon(
                   Icons.shield_rounded,
-                  color: ArogyaTheme.primaryCrimson,
+                  color: NidanIQTheme.primaryCrimson,
                 ),
               ),
             ),
             const SizedBox(width: 10),
             const Expanded(
               child: Text(
-                'Arogya — Privacy Policy & Terms',
+                'NidanIQ — Privacy Policy & Terms',
                 style: TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
-                  color: ArogyaTheme.slateHeading,
+                  color: NidanIQTheme.slateHeading,
                 ),
               ),
             ),
@@ -59,10 +59,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: ArogyaTheme.surfaceWhite,
+              color: NidanIQTheme.surfaceWhite,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: ArogyaTheme.borderHairline),
-              boxShadow: ArogyaTheme.ambientElevation,
+              border: Border.all(color: NidanIQTheme.borderHairline),
+              boxShadow: NidanIQTheme.ambientElevation,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,13 +72,13 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(14),
                       child: Image.asset(
-                        'assets/logo/arogya_logo.png',
+                        'assets/logo/nidaniq_logo.png',
                         width: 64,
                         height: 64,
                         errorBuilder: (_, _, _) => const Icon(
                           Icons.health_and_safety_rounded,
                           size: 56,
-                          color: ArogyaTheme.primaryCrimson,
+                          color: NidanIQTheme.primaryCrimson,
                         ),
                       ),
                     ),
@@ -89,20 +89,20 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         children: [
                           const StatusPillChip(
                             label: 'PUBLIC PRE-AUTH DISCLOSURE',
-                            color: ArogyaSpacing.riskSafe,
+                            color: NidanIQSpacing.riskSafe,
                             icon: Icons.verified_user_rounded,
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Arogya (Arogya Drishti DPI)',
+                            'NidanIQ (NidanIQ DPI)',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           Text(
-                            'Android Package ID: teamrocket.arogyadrishti.android',
+                            'Android Package ID: teamrocket.NidanIQ.android',
                             style: GoogleFonts.ibmPlexMono(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: ArogyaTheme.primaryCrimson,
+                              color: NidanIQTheme.primaryCrimson,
                             ),
                           ),
                         ],
@@ -112,7 +112,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Arogya Drishti ("Arogya") is a Vector-Borne Disease Surveillance Digital Public Infrastructure (DPI) platform developed by Team Rocket (Chandigarh University) aligned with National Center for Vector Borne Diseases Control (NCVBDC), Integrated Health Information Platform (IHIP), and India\'s Digital Personal Data Protection (DPDP) Act 2023.',
+                  'NidanIQ ("NidanIQ") is a Vector-Borne Disease Surveillance Digital Public Infrastructure (DPI) platform developed by Team Rocket (Chandigarh University) aligned with National Center for Vector Borne Diseases Control (NCVBDC), Integrated Health Information Platform (IHIP), and India\'s Digital Personal Data Protection (DPDP) Act 2023.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -185,9 +185,9 @@ class _PolicySectionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ArogyaTheme.surfaceWhite,
+        color: NidanIQTheme.surfaceWhite,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ArogyaTheme.borderHairline),
+        border: Border.all(color: NidanIQTheme.borderHairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,13 +196,13 @@ class _PolicySectionCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 13,
-                backgroundColor: ArogyaTheme.triageRedBg,
+                backgroundColor: NidanIQTheme.triageRedBg,
                 child: Text(
                   number,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
-                    color: ArogyaTheme.primaryCrimson,
+                    color: NidanIQTheme.primaryCrimson,
                   ),
                 ),
               ),

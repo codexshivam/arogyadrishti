@@ -22,7 +22,7 @@ from app.tools.maps_routing_tool.exceptions import RoutingUnavailableException
 from app.tools.ogd_india_gov_tool.client import haversine_km
 from app.tools.sheets_admin_tool.client import VanFleetRecord
 
-logger = logging.getLogger("arogya_drishti.tools.maps_routing")
+logger = logging.getLogger("nidaniq.tools.maps_routing")
 
 _ROUTES_API_V2_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 _FIELD_MASK = "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"

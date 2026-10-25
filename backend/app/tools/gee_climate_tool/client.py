@@ -24,7 +24,7 @@ from tenacity import (
 from app.core.config import Settings, get_settings
 from app.tools.gee_climate_tool.exceptions import GEEClimateException
 
-logger = logging.getLogger("arogya_drishti.tools.gee_climate")
+logger = logging.getLogger("nidaniq.tools.gee_climate")
 
 
 class GEEClimateTelemetry(BaseModel):

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "teamrocket.arogyadrishti.android"
+    namespace = "teamrocket.NidanIQ.android"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "teamrocket.arogyadrishti.android"
+        applicationId = "teamrocket.NidanIQ.android"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

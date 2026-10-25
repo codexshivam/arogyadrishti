@@ -28,7 +28,7 @@ from app.services.data_fusion_engine import get_data_fusion_engine
 from app.tools.gmail_alert_tool import get_email_alert_client
 from app.tools.sheets_admin_tool import get_sheets_client
 
-logger = logging.getLogger("arogya_drishti.automation.daily_scheduler")
+logger = logging.getLogger("nidaniq.automation.daily_scheduler")
 
 _scheduler: AsyncIOScheduler | None = None
 
@@ -303,7 +303,7 @@ def start_scheduler() -> AsyncIOScheduler | None:
 
     enable_scheduler = os.getenv("ENABLE_BACKGROUND_SCHEDULER", "false").lower() in ("true", "1")
     if not enable_scheduler:
-        logger.info("ArogyaDrishti AsyncIOScheduler is PAUSED (ENABLE_BACKGROUND_SCHEDULER=false).")
+        logger.info("NidanIQ AsyncIOScheduler is PAUSED (ENABLE_BACKGROUND_SCHEDULER=false).")
         return None
 
     global _scheduler
@@ -331,7 +331,7 @@ def start_scheduler() -> AsyncIOScheduler | None:
 
     _scheduler.start()
     logger.info(
-        "ArogyaDrishti AsyncIOScheduler started successfully: "
+        "NidanIQ AsyncIOScheduler started successfully: "
         "[1] 06:00 AM IST (00:30 UTC) Fusion Engine | "
         "[2] 06:05 AM IST (00:35 UTC) Morning Digest Dispatch."
     )
@@ -344,4 +344,4 @@ def shutdown_scheduler() -> None:
     if _scheduler is not None and _scheduler.running:
         _scheduler.shutdown(wait=False)
         _scheduler = None
-        logger.info("ArogyaDrishti AsyncIOScheduler shut down.")
+        logger.info("NidanIQ AsyncIOScheduler shut down.")

@@ -10,19 +10,19 @@ import '../services/telemetry_service.dart';
 
 /// Primary direct Cloud Run API endpoint (Mumbai, asia-south1)
 const String kPrimaryCloudRunUrl =
-    'https://arogya-drishti-api-234323362711.asia-south1.run.app';
+    'https://nidaniq-api-234323362711.asia-south1.run.app';
 
 /// Secondary CDN / Firebase Hosting proxy endpoint
-const String kSecondaryProxyUrl = 'https://arogya.shivm.co';
+const String kSecondaryProxyUrl = 'https://nidaniq.shivm.co';
 
 /// Resolves backend base URL: fully pinned to production backend in all builds (debug & release).
 String resolveBackendBaseUrl() {
-  const fromEnv = String.fromEnvironment('AROGYA_API_BASE_URL');
+  const fromEnv = String.fromEnvironment('NIDANIQ_API_BASE_URL');
   if (fromEnv.isNotEmpty) return fromEnv;
   if (kIsWeb) {
     final host = Uri.base.host;
     if (host.isNotEmpty &&
-        (host.contains('arogya.shivm.co') ||
+        (host.contains('nidaniq.shivm.co') ||
             host.contains('web.app') ||
             host.contains('firebaseapp.com'))) {
       return '';
@@ -33,13 +33,13 @@ String resolveBackendBaseUrl() {
   return kPrimaryCloudRunUrl;
 }
 
-final apiClientProvider = Provider<ArogyaApiClient>((ref) {
-  return ArogyaApiClient(baseUrl: resolveBackendBaseUrl());
+final apiClientProvider = Provider<NidanIQApiClient>((ref) {
+  return NidanIQApiClient(baseUrl: resolveBackendBaseUrl());
 });
 
 /// Production Dio client with Firebase JWT + App Check interceptor, retry policy, and TLS 1.3 verification.
-class ArogyaApiClient {
-  ArogyaApiClient({required this.baseUrl}) {
+class NidanIQApiClient {
+  NidanIQApiClient({required this.baseUrl}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -47,7 +47,7 @@ class ArogyaApiClient {
         receiveTimeout: const Duration(seconds: 25),
         headers: const <String, String>{
           'Accept': 'application/json',
-          'X-Client-Platform': 'arogya-drishti-flutter-dpi',
+          'X-Client-Platform': 'nidaniq-flutter-dpi',
         },
       ),
     );
@@ -120,7 +120,7 @@ class ArogyaApiClient {
                 : kPrimaryCloudRunUrl;
 
             debugPrint(
-              'ArogyaApiClient: Connection error on $currentBase. Failing over to $fallbackBase',
+              'NidanIQApiClient: Connection error on $currentBase. Failing over to $fallbackBase',
             );
 
             try {
@@ -225,8 +225,8 @@ class ArogyaApiClient {
   }) async {
     final idem =
         idempotencyKey ?? 'idem-${DateTime.now().millisecondsSinceEpoch}';
-    return ArogyaTelemetryService.traceOperation(
-      'arogya_dispatch_action',
+    return NidanIQTelemetryService.traceOperation(
+      'nidaniq_dispatch_action',
       () async {
         final resp = await _dio.post<Map<String, dynamic>>(
           '/api/v1/dispatch-action',
@@ -242,7 +242,7 @@ class ArogyaApiClient {
           },
           options: Options(headers: <String, String>{'Idempotency-Key': idem}),
         );
-        await ArogyaTelemetryService.logEvent(
+        await NidanIQTelemetryService.logEvent(
           'dispatch_action',
           parameters: <String, Object>{
             'action_type': actionType,
@@ -457,14 +457,14 @@ class ArogyaApiClient {
         contentType: DioMediaType('image', 'png'),
       ),
     });
-    return ArogyaTelemetryService.traceOperation(
-      'arogya_scan_breeding_site',
+    return NidanIQTelemetryService.traceOperation(
+      'nidaniq_scan_breeding_site',
       () async {
         final resp = await _dio.post<Map<String, dynamic>>(
           '/api/v1/scan-breeding-site',
           data: formData,
         );
-        await ArogyaTelemetryService.logEvent(
+        await NidanIQTelemetryService.logEvent(
           'breeding_site_scanned',
           parameters: <String, Object>{
             'lgd_code': effectiveLgd,

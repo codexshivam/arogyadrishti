@@ -12,9 +12,9 @@ from fastapi import Depends, Header, Request, status
 from firebase_admin import app_check, auth, credentials
 
 from app.core.config import Settings, get_settings
-from app.core.exceptions import ArogyaException
+from app.core.exceptions import NidanIQException
 
-logger = logging.getLogger("arogya_drishti.security")
+logger = logging.getLogger("nidaniq.security")
 
 # Regex patterns for DPDP Act 2023 PII scrubbing in logs and free-text prompts
 _INDIAN_PHONE_RE = re.compile(r"(?:\+91[\-\s]?|0)?[6-9]\d{9}\b")
@@ -66,28 +66,28 @@ async def verify_firebase_jwt(
 
     if settings.enforce_app_check:
         if not x_firebase_appcheck:
-            raise ArogyaException(
+            raise NidanIQException(
                 title="Missing App Check Token",
                 detail="X-Firebase-AppCheck header is required by CERT-In/MASVS policy.",
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                problem_type="https://arogyadrishti.gov.in/problems/app-check-missing",
+                problem_type="https://NidanIQ.gov.in/problems/app-check-missing",
             )
         try:
             app_check.verify_token(x_firebase_appcheck)
         except Exception as exc:
-            raise ArogyaException(
+            raise NidanIQException(
                 title="Invalid App Check Token",
                 detail=f"App Check attestation failed: {exc}",
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                problem_type="https://arogyadrishti.gov.in/problems/app-check-invalid",
+                problem_type="https://NidanIQ.gov.in/problems/app-check-invalid",
             ) from exc
 
     if not authorization or not authorization.startswith("Bearer "):
-        raise ArogyaException(
+        raise NidanIQException(
             title="Authentication Required",
             detail="Missing or malformed Authorization: Bearer <id_token> header.",
             status_code=status.HTTP_401_UNAUTHORIZED,
-            problem_type="https://arogyadrishti.gov.in/problems/unauthorized",
+            problem_type="https://NidanIQ.gov.in/problems/unauthorized",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -97,11 +97,11 @@ async def verify_firebase_jwt(
         return decoded
     except Exception as exc:
         logger.warning("Firebase JWT verification failed: %s", scrub_pii_text(str(exc)))
-        raise ArogyaException(
+        raise NidanIQException(
             title="Invalid Authentication Token",
             detail="Firebase ID token is expired, revoked, or invalid.",
             status_code=status.HTTP_401_UNAUTHORIZED,
-            problem_type="https://arogyadrishti.gov.in/problems/invalid-token",
+            problem_type="https://NidanIQ.gov.in/problems/invalid-token",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Arogya Drishti — Automated Production Deployment Script (asia-south1 Mumbai)
+# NidanIQ — Automated Production Deployment Script (asia-south1 Mumbai)
 set -euo pipefail
 
 PROJECT_ID="${GCP_PROJECT_ID:-teamrocketnp}"
 REGION="asia-south1"
-SERVICE_NAME="arogya-drishti-api"
+SERVICE_NAME="nidaniq-api"
 
 echo "=== [1/4] Verifying Gitleaks Zero-Secret-Leak Gate ==="
 gitleaks detect --source . --no-git -v

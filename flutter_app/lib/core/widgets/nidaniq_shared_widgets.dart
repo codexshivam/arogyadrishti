@@ -25,8 +25,8 @@ class _ShellTab {
 
 /// Top brand header + 5-tab navigation bar matching `ui_design.png` (Home, Chat, Stats, Map, Settings)
 /// implemented as an [AppBar] widget with white background and dark system UI overlay icons.
-class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
-  const ArogyaTopShellBar({super.key, required this.activeTabIndex});
+class NidanIQTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
+  const NidanIQTopShellBar({super.key, required this.activeTabIndex});
 
   final int activeTabIndex;
 
@@ -75,15 +75,15 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      systemOverlayStyle: ArogyaTheme.whiteSystemUiOverlay,
+      systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
       toolbarHeight: 56,
       title: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'ArogyaDrishti',
+            'NidanIQ',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: ArogyaTheme.primaryCrimson,
+              color: NidanIQTheme.primaryCrimson,
               fontWeight: FontWeight.w800,
               fontSize: 18,
               letterSpacing: 0.2,
@@ -93,7 +93,7 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
           Text(
             'developed and managed by Team Rocket',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: ArogyaTheme.slateMuted,
+              color: NidanIQTheme.slateMuted,
               fontSize: 10,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.1,
@@ -135,7 +135,7 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
                       border: Border(
                         bottom: BorderSide(
                           color: isSelected
-                              ? ArogyaTheme.primaryCrimson
+                              ? NidanIQTheme.primaryCrimson
                               : Colors.transparent,
                           width: 2.5,
                         ),
@@ -146,8 +146,8 @@ class ArogyaTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
                         isSelected ? tab.solidIcon : tab.lineIcon,
                         size: 24,
                         color: isSelected
-                            ? ArogyaTheme.primaryCrimson
-                            : ArogyaTheme.slateMuted,
+                            ? NidanIQTheme.primaryCrimson
+                            : NidanIQTheme.slateMuted,
                       ),
                     ),
                   ),
@@ -175,20 +175,20 @@ class TriageBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final upper = severity.toUpperCase();
-    Color bg = ArogyaTheme.triageRedBg;
-    Color fg = ArogyaTheme.triageRedText;
+    Color bg = NidanIQTheme.triageRedBg;
+    Color fg = NidanIQTheme.triageRedText;
     if (upper.contains('MOD') ||
         upper.contains('SUSP') ||
         upper.contains('PEND')) {
-      bg = ArogyaTheme.triageAmberBg;
-      fg = ArogyaTheme.triageAmberText;
+      bg = NidanIQTheme.triageAmberBg;
+      fg = NidanIQTheme.triageAmberText;
     } else if (upper.contains('LOW') ||
         upper.contains('SAFE') ||
         upper.contains('CLEAR') ||
         upper.contains('AVAIL') ||
         upper.contains('OPEN')) {
-      bg = ArogyaTheme.triageEmeraldBg;
-      fg = ArogyaTheme.triageEmeraldText;
+      bg = NidanIQTheme.triageEmeraldBg;
+      fg = NidanIQTheme.triageEmeraldText;
     }
 
     return Container(
@@ -221,7 +221,7 @@ class AiSparkChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: ArogyaTheme.aiChipBg,
+        color: NidanIQTheme.aiChipBg,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
@@ -232,7 +232,7 @@ class AiSparkChip extends StatelessWidget {
             height: 7,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              gradient: ArogyaTheme.aiSparkGradient,
+              gradient: NidanIQTheme.aiSparkGradient,
             ),
           ),
           const SizedBox(width: 6),
@@ -241,7 +241,7 @@ class AiSparkChip extends StatelessWidget {
             style: const TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w700,
-              color: ArogyaTheme.aiChipText,
+              color: NidanIQTheme.aiChipText,
             ),
           ),
         ],
@@ -287,7 +287,7 @@ class VectorDensityGauge extends StatelessWidget {
                 bi > 20.0 ? 'CRITICAL (>20)' : 'WITHIN LIMIT (<=20)',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: bi > 20.0
-                      ? ArogyaTheme.primaryCrimson
+                      ? NidanIQTheme.primaryCrimson
                       : const Color(0xFF16A34A),
                 ),
               ),
@@ -314,7 +314,7 @@ class VectorDensityGauge extends StatelessWidget {
                     1,
                     100,
                   ),
-                  child: Container(color: ArogyaTheme.primaryCrimson),
+                  child: Container(color: NidanIQTheme.primaryCrimson),
                 ),
               ],
             ),
@@ -335,7 +335,7 @@ class VectorDensityGauge extends StatelessWidget {
             Text(
               '$activeOutbreakCount Active Outbreak',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: ArogyaTheme.primaryCrimson,
+                color: NidanIQTheme.primaryCrimson,
               ),
             ),
           ],
@@ -404,9 +404,9 @@ class GlassFloatingHud extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: ArogyaTheme.surfaceWhite.withValues(alpha: 0.90),
+        color: NidanIQTheme.surfaceWhite.withValues(alpha: 0.90),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: ArogyaTheme.ambientElevation,
+        boxShadow: NidanIQTheme.ambientElevation,
       ),
       child: child,
     );
@@ -414,8 +414,8 @@ class GlassFloatingHud extends StatelessWidget {
 }
 
 /// Bottom navigation bar for quick switching across core DPI surveillance modules.
-class ArogyaBotNavBar extends StatelessWidget {
-  const ArogyaBotNavBar({
+class NidanIQBotNavBar extends StatelessWidget {
+  const NidanIQBotNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
@@ -429,7 +429,7 @@ class ArogyaBotNavBar extends StatelessWidget {
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
-      backgroundColor: ArogyaTheme.surfaceWhite,
+      backgroundColor: NidanIQTheme.surfaceWhite,
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.dashboard_outlined),
@@ -461,7 +461,7 @@ class ArogyaBotNavBar extends StatelessWidget {
   }
 }
 
-void showArogyaToast(
+void showNidanIQToast(
   BuildContext context, {
   required String title,
   required String message,
@@ -604,7 +604,7 @@ class _ActionDispatchBottomSheetState
         payload: payload,
       );
       if (!mounted) return;
-      showArogyaToast(
+      showNidanIQToast(
         context,
         title: 'Queued Offline',
         message: isVan
@@ -643,7 +643,7 @@ class _ActionDispatchBottomSheetState
             notes: _notesController.text.trim(),
           );
       if (!mounted) return;
-      showArogyaToast(
+      showNidanIQToast(
         context,
         title: isVan ? 'Van Dispatched' : 'Alert Sent',
         message: isVan
@@ -659,7 +659,7 @@ class _ActionDispatchBottomSheetState
         payload: payload,
       );
       if (!mounted) return;
-      showArogyaToast(
+      showNidanIQToast(
         context,
         title: 'Queued Offline',
         message:
@@ -695,7 +695,7 @@ class _ActionDispatchBottomSheetState
       child: Container(
         padding: const EdgeInsets.fromLTRB(22, 18, 22, 32),
         decoration: const BoxDecoration(
-          color: ArogyaTheme.surfaceWhite,
+          color: NidanIQTheme.surfaceWhite,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SingleChildScrollView(
@@ -708,7 +708,7 @@ class _ActionDispatchBottomSheetState
                   width: 42,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: ArogyaTheme.inputBorder,
+                    color: NidanIQTheme.inputBorder,
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
@@ -719,14 +719,14 @@ class _ActionDispatchBottomSheetState
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: ArogyaTheme.triageRedBg,
+                      color: NidanIQTheme.triageRedBg,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       isVan
                           ? Icons.local_shipping_rounded
                           : Icons.notifications_active_rounded,
-                      color: ArogyaTheme.primaryCrimson,
+                      color: NidanIQTheme.primaryCrimson,
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -774,15 +774,15 @@ class _ActionDispatchBottomSheetState
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: ArogyaTheme.surfaceContainerLow,
+                    color: NidanIQTheme.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: ArogyaTheme.borderHairline),
+                    border: Border.all(color: NidanIQTheme.borderHairline),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.my_location_rounded,
-                        color: ArogyaTheme.primaryCrimson,
+                        color: NidanIQTheme.primaryCrimson,
                         size: 20,
                       ),
                       const SizedBox(width: 10),

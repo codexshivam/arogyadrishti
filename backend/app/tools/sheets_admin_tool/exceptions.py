@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from fastapi import status
 
-from app.core.exceptions import ArogyaException
+from app.core.exceptions import NidanIQException
 
 
-class SheetsIntegrationException(ArogyaException):
+class SheetsIntegrationException(NidanIQException):
     """Raised when Google Sheets v4 encounters quota (429), permission (403), or schema errors."""
 
     def __init__(
@@ -23,12 +23,12 @@ class SheetsIntegrationException(ArogyaException):
             title="Google Sheets Municipal Ledger Error",
             detail=detail,
             status_code=status_code,
-            problem_type="https://arogyadrishti.gov.in/problems/sheets-ledger-error",
+            problem_type="https://NidanIQ.gov.in/problems/sheets-ledger-error",
             headers=headers,
         )
 
 
-class StaffContactNotFoundException(ArogyaException):
+class StaffContactNotFoundException(NidanIQException):
     """Raised when neither 3_Staff_Directory nor OGD has a verified staff record."""
 
     def __init__(self, detail: str) -> None:
@@ -36,5 +36,5 @@ class StaffContactNotFoundException(ArogyaException):
             title="Authorized Staff Contact Not Found",
             detail=detail,
             status_code=status.HTTP_404_NOT_FOUND,
-            problem_type="https://arogyadrishti.gov.in/problems/staff-contact-not-found",
+            problem_type="https://NidanIQ.gov.in/problems/staff-contact-not-found",
         )

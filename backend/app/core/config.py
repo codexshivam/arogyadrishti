@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         default="", alias="GOOGLE_APPLICATION_CREDENTIALS"
     )
     gcs_scan_bucket: str = Field(
-        default="teamrocketnp-arogya-scans-south1", alias="GCS_SCAN_BUCKET"
+        default="teamrocketnp-nidaniq-scans-south1", alias="GCS_SCAN_BUCKET"
     )
 
     # --- Vertex AI / Gemini ---
@@ -95,12 +95,12 @@ class Settings(BaseSettings):
     smtp_user: str = Field(default="", alias="SMTP_USER")
     smtp_password: str = Field(default="", alias="SMTP_PASSWORD")
     alert_from_address: str = Field(
-        default="alerts@arogyadrishti.in", alias="ALERT_FROM_ADDRESS"
+        default="alerts@NidanIQ.in", alias="ALERT_FROM_ADDRESS"
     )
 
     cors_allowed_origins: str = Field(
         default=(
-            "https://arogya.shivm.co,"
+            "https://nidaniq.shivm.co,"
             "https://teamrocketnp.web.app,"
             "https://teamrocketnp.firebaseapp.com,"
             "http://localhost:3000,"
@@ -147,7 +147,7 @@ class Settings(BaseSettings):
         if missing:
             import logging
             msg = f"FATAL STARTUP CONFIGURATION ERROR: Missing required environment variables: {', '.join(missing)}"
-            logging.getLogger("arogya_drishti.config").error(msg)
+            logging.getLogger("nidaniq.config").error(msg)
             raise ValueError(msg)
 
 

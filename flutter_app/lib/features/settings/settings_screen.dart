@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 import 'legal_viewer_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -444,7 +444,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: const ArogyaTopShellBar(activeTabIndex: 4),
+      appBar: const NidanIQTopShellBar(activeTabIndex: 4),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('users')
@@ -920,7 +920,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               onTap: () {
                                 showLicensePage(
                                   context: context,
-                                  applicationName: 'Arogya Drishti',
+                                  applicationName: 'NidanIQ',
                                   applicationVersion: appVersion,
                                 );
                               },
@@ -971,7 +971,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               color: Color(0xFFF1F5F9),
                             ),
 
-                            // 4. About Arogya Drishti
+                            // 4. About NidanIQ
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 14,
@@ -995,7 +995,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   const SizedBox(width: 12),
                                   const Expanded(
                                     child: Text(
-                                      'About Arogya Drishti',
+                                      'About NidanIQ',
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w700,
@@ -1068,7 +1068,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: Column(
                           children: const [
                             Text(
-                              'Arogya Drishti by Team Rocket',
+                              'NidanIQ by Team Rocket',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,

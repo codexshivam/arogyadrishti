@@ -1,4 +1,4 @@
-package teamrocket.arogyadrishti.android
+package teamrocket.NidanIQ.android
 
 import io.flutter.embedding.android.FlutterActivity
 

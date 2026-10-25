@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/services/firestore_sync.dart';
-import '../../core/widgets/arogya_shared_widgets.dart';
+import '../../core/widgets/nidaniq_shared_widgets.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -319,7 +319,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: const ArogyaTopShellBar(activeTabIndex: 3),
+      appBar: const NidanIQTopShellBar(activeTabIndex: 3),
       body: RefreshIndicator(
         color: const Color(0xFF8B0000),
         onRefresh: _loadGisData,

@@ -25,7 +25,7 @@ from tenacity import (
 from app.core.config import Settings, get_settings
 from app.tools.gmail_alert_tool.exceptions import EmailDispatchException
 
-logger = logging.getLogger("arogya_drishti.tools.gmail_alert")
+logger = logging.getLogger("nidaniq.tools.gmail_alert")
 
 _STRICT_EMAIL_RE = re.compile(
     r"^[A-Za-z0-9._%+-]+@([A-Za-z0-9.-]+\.[A-Za-z]{2,})$"
@@ -134,7 +134,7 @@ def get_email_theme_by_metrics(bi_value: float, composite_score: float) -> dict[
         }
 
 
-def build_arogya_drishti_email_html(
+def build_nidaniq_email_html(
     ward_name: str,
     lgd_code: str,
     officer_name: str,
@@ -155,7 +155,7 @@ def build_arogya_drishti_email_html(
     van_info: dict[str, Any] | None = None,
 ) -> tuple[str, str]:
     theme = get_email_theme_by_metrics(bi_value, composite_score)
-    subject = f"ArogyaDrishti - BI ({bi_value:.1f}) in your Region"
+    subject = f"NidanIQ - BI ({bi_value:.1f}) in your Region"
     maps_url = f"https://www.google.com/maps/search/?api=1&query={lat},{lng}"
 
     van_section_html = ""
@@ -184,7 +184,7 @@ def build_arogya_drishti_email_html(
               {theme['tier']} • {theme['sla_label']}
             </div>
             <h1 style="margin:10px 0 4px 0;font-size:20px;font-weight:700;color:#FFFFFF;">
-              Arogya Drishti — Regional Vector Surveillance Report
+              NidanIQ — Regional Vector Surveillance Report
             </h1>
             <p style="margin:0;font-size:13px;color:#F1F5F9;">
               <strong>{ward_name}</strong> (<a href="{maps_url}" style="color:#FEE2E2;text-decoration:underline;font-weight:600;">Open in Google Maps</a>)
@@ -265,7 +265,7 @@ def build_arogya_drishti_email_html(
                 Toll-Free 24/7 Helpline: <span style="color:#B71C1C;">1800-11-8328</span>
               </div>
               <div style="font-size:11.5px;color:#64748B;margin-top:2px;">
-                Email: <a href="mailto:support@arogyadrishti.in" style="color:#B71C1C;text-decoration:underline;">support@arogyadrishti.in</a> &nbsp;|&nbsp; NCVBDC Surveillance Cell
+                Email: <a href="mailto:support@NidanIQ.in" style="color:#B71C1C;text-decoration:underline;">support@NidanIQ.in</a> &nbsp;|&nbsp; NCVBDC Surveillance Cell
               </div>
             </div>
           </td>
@@ -278,7 +278,7 @@ def build_arogya_drishti_email_html(
               This email was sent for the purpose of real-time vector surveillance, early epidemic warning, and rapid containment coordination under the National Vector Borne Disease Control Programme (NCVBDC) guidelines.
             </p>
             <div style="font-weight:600;color:#475569;">
-              ArogyaDrishti App | Powered by Team Rocket
+              NidanIQ App | Powered by Team Rocket
             </div>
           </td>
         </tr>
@@ -303,7 +303,7 @@ def build_emergency_alert_html(
 ) -> str:
     """Backward-compatible wrapper utilizing the responsive multi-tier template."""
     comp_score = round(gee_risk_score * 100.0, 1) if gee_risk_score <= 1.0 else round(gee_risk_score, 1)
-    _, html = build_arogya_drishti_email_html(
+    _, html = build_nidaniq_email_html(
         ward_name=ward_village,
         lgd_code="0404400017",
         officer_name="Vector Surveillance Officer",
@@ -337,7 +337,7 @@ def build_ticket_assignment_email_html(
     lng: float | None = None,
 ) -> tuple[str, str]:
     """Build responsive zero-blue crimson HTML email for escalation ticket assignment."""
-    subject = "Ticket assigned to you - Arogya Drishti"
+    subject = "Ticket assigned to you - NidanIQ"
 
     maps_url = ""
     if lat is not None and lng is not None and abs(lat) > 0.1 and abs(lng) > 0.1:
@@ -352,7 +352,7 @@ def build_ticket_assignment_email_html(
         <tr>
           <td style="background-color:#7F1D1D;padding:22px 26px;color:#FFFFFF;">
             <h1 style="margin:0 0 10px 0;font-size:20px;font-weight:700;color:#FFFFFF;">
-              Arogya Drishti — Field Ticket Assignment
+              NidanIQ — Field Ticket Assignment
             </h1>
             <div style="font-size:13px;color:#F1F5F9;line-height:1.6;">
               <div>Ticket ID: <strong>{ticket_id}</strong></div>
@@ -399,7 +399,7 @@ def build_ticket_assignment_email_html(
             </div>
 
             <p style="margin:0;font-size:12px;color:#64748B;line-height:1.4;">
-              Please initiate on-ground verification or dispatch vector response personnel according to standard operating procedures. Update the ticket status in the Arogya Drishti portal once resolved.
+              Please initiate on-ground verification or dispatch vector response personnel according to standard operating procedures. Update the ticket status in the NidanIQ portal once resolved.
             </p>
 
             <!-- Helpline Contact -->
@@ -409,7 +409,7 @@ def build_ticket_assignment_email_html(
                 Toll-Free 24/7 Helpline: <span style="color:#991B1B;">1800-11-8328</span>
               </div>
               <div style="font-size:11.5px;color:#64748B;margin-top:2px;">
-                Email: <a href="mailto:support@arogyadrishti.in" style="color:#991B1B;text-decoration:underline;">support@arogyadrishti.in</a> &nbsp;|&nbsp; NCVBDC Grievance Redressal
+                Email: <a href="mailto:support@NidanIQ.in" style="color:#991B1B;text-decoration:underline;">support@NidanIQ.in</a> &nbsp;|&nbsp; NCVBDC Grievance Redressal
               </div>
             </div>
           </td>
@@ -422,7 +422,7 @@ def build_ticket_assignment_email_html(
               This email was sent for the purpose of vector surveillance field escalation, grievance redressal, and rapid municipal action under NCVBDC guidelines.
             </p>
             <div style="font-weight:600;color:#475569;">
-              ArogyaDrishti App | Powered by Team Rocket
+              NidanIQ App | Powered by Team Rocket
             </div>
           </td>
         </tr>
@@ -511,7 +511,7 @@ class EmailAlertClient:
             f"Focal ULV thermal fogging with Cyphenothrin 5% EC if Breteau Index exceeds epidemic limit."
         )
 
-        subject, html_body = build_arogya_drishti_email_html(
+        subject, html_body = build_nidaniq_email_html(
             ward_name=ward_village,
             lgd_code=lgd_code,
             officer_name=officer_name,
@@ -532,11 +532,11 @@ class EmailAlertClient:
             van_info=van_info,
         )
 
-        msg_id = make_msgid(domain="arogyadrishti.in")
+        msg_id = make_msgid(domain="NidanIQ.in")
         msg = EmailMessage()
         msg["Subject"] = subject
-        from_email = self.settings.smtp_user or self.settings.alert_from_address or "alerts@arogyadrishti.in"
-        msg["From"] = formataddr(("ArogyaDrishti App", from_email))
+        from_email = self.settings.smtp_user or self.settings.alert_from_address or "alerts@NidanIQ.in"
+        msg["From"] = formataddr(("NidanIQ App", from_email))
         msg["To"] = to_email.strip()
         # Strictly no CC in alert emails
         msg["Message-ID"] = msg_id
@@ -552,9 +552,9 @@ class EmailAlertClient:
             f"Coordinates: ({lat}, {lng})\n"
             f"Protocol: {rec}\n"
             f"Notes: {notes}\n\n"
-            f"Helpline: 1800-11-8328 | Email: support@arogyadrishti.in\n\n"
+            f"Helpline: 1800-11-8328 | Email: support@NidanIQ.in\n\n"
             f"Note: This email was sent for the purpose of real-time vector surveillance, early epidemic warning, and rapid containment coordination under NCVBDC guidelines.\n"
-            f"ArogyaDrishti App | Powered by Team Rocket\n"
+            f"NidanIQ App | Powered by Team Rocket\n"
         )
         msg.add_alternative(html_body, subtype="html")
 
@@ -641,11 +641,11 @@ class EmailAlertClient:
             lng=lng,
         )
 
-        msg_id = make_msgid(domain="arogyadrishti.in")
+        msg_id = make_msgid(domain="NidanIQ.in")
         msg = EmailMessage()
         msg["Subject"] = subject
-        from_email = self.settings.smtp_user or self.settings.alert_from_address or "alerts@arogyadrishti.in"
-        msg["From"] = formataddr(("ArogyaDrishti App", from_email))
+        from_email = self.settings.smtp_user or self.settings.alert_from_address or "alerts@NidanIQ.in"
+        msg["From"] = formataddr(("NidanIQ App", from_email))
         msg["To"] = to_email
         if cc_verified:
             msg["Cc"] = ", ".join(cc_verified)
@@ -660,9 +660,9 @@ class EmailAlertClient:
             f"Severity / SLA: {severity_sla}\n"
             f"Logged At (UTC): {now_utc}\n\n"
             f"Observation Notes:\n{observation_notes}\n\n"
-            f"Helpline: 1800-11-8328 | Email: support@arogyadrishti.in\n\n"
+            f"Helpline: 1800-11-8328 | Email: support@NidanIQ.in\n\n"
             f"Note: This email was sent for the purpose of vector surveillance field escalation, grievance redressal, and rapid municipal action under NCVBDC guidelines.\n"
-            f"ArogyaDrishti App | Powered by Team Rocket\n"
+            f"NidanIQ App | Powered by Team Rocket\n"
         )
         msg.add_alternative(html_body, subtype="html")
 
@@ -722,8 +722,8 @@ def send_ward_operational_email(
 
     msg = EmailMessage()
     msg["Subject"] = subject
-    from_email = settings.alert_from_address or settings.smtp_user or "alerts@arogyadrishti.in"
-    msg["From"] = formataddr(("ArogyaDrishti App", from_email))
+    from_email = settings.alert_from_address or settings.smtp_user or "alerts@NidanIQ.in"
+    msg["From"] = formataddr(("NidanIQ App", from_email))
     msg["To"] = cleaned_email
 
     msg.set_content("Please view this email in an HTML-compatible client.")
