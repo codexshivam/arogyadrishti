@@ -292,12 +292,20 @@ async def dispatch_morning_digests_pipeline() -> dict[str, Any]:
     }
 
 
-def start_scheduler() -> AsyncIOScheduler:
+def start_scheduler() -> AsyncIOScheduler | None:
     """
     Initialize and start the background AsyncIOScheduler:
     - 00:30 UTC / 06:00 AM IST: Multi-Source Data Fusion & Ingestion Pipeline (Step 1 to 5).
     - 00:35 UTC / 06:05 AM IST: Executive Morning Digest Delivery to Ward Officers (Step 6).
+    Paused by default to prevent credit consumption and automated dispatches during project pause.
     """
+    import os
+
+    enable_scheduler = os.getenv("ENABLE_BACKGROUND_SCHEDULER", "false").lower() in ("true", "1")
+    if not enable_scheduler:
+        logger.info("ArogyaDrishti AsyncIOScheduler is PAUSED (ENABLE_BACKGROUND_SCHEDULER=false).")
+        return None
+
     global _scheduler
     if _scheduler is not None and _scheduler.running:
         return _scheduler
