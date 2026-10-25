@@ -1,4 +1,4 @@
-# Security & Compliance Policy — NidanIQ
+# Security & Compliance Policy
 
 NidanIQ is engineered as sovereign National Digital Public Infrastructure (DPI) for predictive vector-borne disease surveillance in India, adhering strictly to **MeitY**, **CERT-In Cyber Security Directions**, the **Digital Personal Data Protection (DPDP) Act, 2023**, and **OWASP MASVS L1** requirements.
 
