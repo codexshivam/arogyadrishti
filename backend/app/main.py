@@ -152,7 +152,7 @@ def emit_certin_audit_log(
     actor_uid: str | None,
     action: str,
     resource_id: str,
-    details: dict[str, Any],
+    details: dict[str, Any] | None = None,
 ) -> None:
     """
     Emit a structured audit log meeting CERT-In directions and ISO 27001 compliance.
@@ -160,6 +160,28 @@ def emit_certin_audit_log(
     to gs://teamrocketnp-certin-worm-audit-logs with a 180-day Object Retention Lock.
     """
     now_iso = datetime.now(UTC).isoformat()
+    safe_details: dict[str, Any] = {}
+    for k, v in (details or {}).items():
+        k_str = str(k).lower()
+        if any(
+            sensitive in k_str
+            for sensitive in (
+                "phone",
+                "email",
+                "secret",
+                "token",
+                "password",
+                "key",
+                "auth",
+                "credential",
+                "pin",
+                "code",
+            )
+        ):
+            safe_details[f"{k}_recorded"] = bool(v)
+        else:
+            safe_details[k] = v
+
     record = {
         "event_type": event_type,
         "actor_uid": actor_uid or "anonymous",
@@ -167,7 +189,7 @@ def emit_certin_audit_log(
         "resource_id": resource_id,
         "timestamp_utc": now_iso,
         "compliance": "CERT-In 180-Day WORM Audit Log",
-        "details": details,
+        "details": safe_details,
     }
     # Log with severity INFO and structured JSON representation
     logger.info("CERT-In Audit Trail: %s", json.dumps(record))
@@ -331,7 +353,7 @@ def verify_staff_endpoint(
         action="VERIFY_STAFF_LOGIN",
         resource_id=f"users/{payload.uid}",
         details={
-            "phone": scrub_pii_text(payload.phone or ""),
+            "phone_verified": True,
             "role": role,
             "lgd_code": staff_record.lgd_code,
             "ward_village": staff_record.ward_or_village,
@@ -767,7 +789,7 @@ def handle_dispatch_action(
         resource_id=f"dispatches/{dispatch_id}",
         details={
             "ward_village": payload.ward_village,
-            "target_email": target_to_email,
+            "alert_dispatched": True,
             "breteau_index": ward_bi,
             "lat": payload.latitude,
             "lng": payload.longitude,

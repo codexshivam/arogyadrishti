@@ -265,23 +265,7 @@ Frontline health workers operate in informal settlements, basements, and rural c
 
 ---
 
-## 6. Security, Sovereignty & Ethical Governance
-
-Arogya Drishti is designed to satisfy India's strictest statutory data sovereignty and cyber governance benchmarks:
-
-* **Digital Personal Data Protection (DPDP) Act 2023 Compliance:**
-  * Zero citizen Personally Identifiable Information (PII) is captured during larval inspections. Forms record breeding containers and entomological counts only.
-  * In-memory image anonymization strips EXIF metadata and blurs facial profiles or vehicular license plates prior to cloud analysis.
-* **National Sovereign Cloud Residency:**
-  * 100% of databases, model inference runtimes, storage buckets, and audit sinks are pinned strictly to Google Cloud **Mumbai (`asia-south1`)**. No data ever crosses international borders.
-* **CERT-In 180-Day WORM Audit Trail:**
-  * Pursuant to CERT-In cybersecurity directives, all authentication attempts, van dispatches, and ticket resolutions are mirrored via Cloud Logging sink `certin-audit-worm-sink` to an immutable Cloud Storage bucket (`gs://teamrocketnp-certin-worm-audit-logs`) secured with a mandatory **180-day Object Retention Lock**.
-* **Edge & Transport Security:**
-  * Cloud Run endpoints are protected by `slowapi` rate-limiting (60 calls/minute per IP) and hardened headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Strict-Transport-Security`).
-
----
-
-## 7. Zero-Training Municipal CRM: 7-Tab Master Ledger Matrix
+## 6. Zero-Training Municipal CRM: 7-Tab Master Ledger Matrix
 
 To ensure immediate adoption across municipal corporations without requiring staff to learn proprietary software, Arogya Drishti synchronizes bi-directionally with a master Google Spreadsheet (`gspread` with tenacity exponential backoff):
 
@@ -297,7 +281,7 @@ To ensure immediate adoption across municipal corporations without requiring sta
 
 ---
 
-## 8. Pan-India Scale & Local Government Directory (LGD) Onboarding
+## 7. Pan-India Scale & Local Government Directory (LGD) Onboarding
 
 Arogya Drishti scales nationally using India's standard **Local Government Directory (LGD)** hierarchy established by the Ministry of Panchayati Raj:
 
@@ -320,7 +304,7 @@ Arogya Drishti scales nationally using India's standard **Local Government Direc
 
 ---
 
-## 9. Public Geospatial Risk API Specification
+## 8. Public Geospatial Risk API Specification
 
 External municipal dashboards, state health portals, and citizen apps query real-time vector risk via the high-throughput REST endpoint:
 
@@ -391,7 +375,7 @@ External municipal dashboards, state health portals, and citizen apps query real
 
 ---
 
-## 10. Operational Economics & Cost Optimization
+## 9. Operational Economics & Cost Optimization
 
 Arogya Drishti achieves a **~90% cost reduction** compared to legacy health IT contracts by leveraging serverless scale-to-zero infrastructure and open-weight AI:
 
@@ -407,7 +391,7 @@ Arogya Drishti achieves a **~90% cost reduction** compared to legacy health IT c
 
 ---
 
-## 11. Production Implementation Deep-Dives
+## 10. Production Implementation Deep-Dives
 
 <details>
 <summary><b>1. Open-Weight Gemma 4 Agent Skill Execution Loop (Python)</b></summary>
@@ -556,11 +540,11 @@ def dispatch_optimal_fogging_van(ward_id: str, ward_lat: float, ward_lng: float)
 
 ---
 
-## 12. Tools Used & Technology Stack
+## 11. Tools Used & Technology Stack
 
 Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed for zero data egress, sub-second latency, and Tier-3 offline resilience in resource-constrained environments:
 
-### 12.1 Core Engineering & Architecture Matrix
+### 11.1 Core Engineering & Architecture Matrix
 
 | Domain | Technology / Tool | Version / Standard | Architectural Role & Purpose |
 | :--- | :--- | :--- | :--- |
@@ -586,7 +570,7 @@ Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed fo
 
 ---
 
-## 13. Official Documents and Resources
+## 12. Official Documents and Resources
 
 <table width="100%">
   <thead>
@@ -645,7 +629,7 @@ Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed fo
 
 ---
 
-## 14. License & Sovereign Open-Source Adoption
+## 13. License & Sovereign Open-Source Adoption
 
 Arogya Drishti is licensed under the **Apache License, Version 2.0**.
 See the [LICENSE](LICENSE) file for complete terms.

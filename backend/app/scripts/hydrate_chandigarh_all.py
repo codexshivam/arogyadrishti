@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import argparse
 import datetime
-import json
 import logging
 import os
 from typing import Any
@@ -1615,7 +1614,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Hydrate 100% Real Chandigarh Data into Sheets & Firestore.")
     parser.parse_args()
     summary = hydrate_chandigarh_all()
-    print(json.dumps(summary, indent=2))
+    counts = summary.get("counts", {})
+    logging.info(
+        "Hydration complete for Chandigarh (Status: %s, Wards: %s, Health Centers: %s)",
+        summary.get("status"),
+        counts.get("wards_hydrated_firestore", 0),
+        counts.get("health_centers_hydrated_firestore", 0),
+    )
 
 
 if __name__ == "__main__":

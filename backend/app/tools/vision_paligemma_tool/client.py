@@ -12,6 +12,7 @@ import uuid
 from datetime import UTC, datetime
 from functools import lru_cache
 from typing import Any
+from urllib.parse import urlparse
 
 import google.auth
 import httpx
@@ -378,7 +379,9 @@ class VisionPaliGemmaClient:
                 )
                 headers: dict[str, str] = {}
                 model_for_ep = self.settings.gemma_model_id
-                if "googleapis.com" in base_ep:
+                parsed_ep = urlparse(base_ep)
+                ep_host = (parsed_ep.hostname or "").lower()
+                if ep_host == "googleapis.com" or ep_host.endswith(".googleapis.com"):
                     import google.auth.transport.requests
 
                     creds = self._get_gcp_credentials()

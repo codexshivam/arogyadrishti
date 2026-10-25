@@ -8,7 +8,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import os
 import re
@@ -757,7 +756,15 @@ def main() -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
     summary = hydrate_district_data(state=args.state, district=args.district)
-    print(json.dumps(summary, indent=2))
+    counts = summary.get("counts", {})
+    logging.info(
+        "Hydration complete: %s, %s (Status: %s, Wards: %s, Health Centers: %s)",
+        args.district,
+        args.state,
+        summary.get("status"),
+        counts.get("wards_hydrated_firestore", 0),
+        counts.get("health_centers_hydrated_firestore", 0),
+    )
 
 
 if __name__ == "__main__":

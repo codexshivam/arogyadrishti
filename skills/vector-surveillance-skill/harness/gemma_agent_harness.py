@@ -9,6 +9,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import httpx
 from google import genai
@@ -257,7 +258,9 @@ class GemmaAgentHarness:
                 )
                 headers: dict[str, str] = {}
                 model_for_ep = settings.gemma_model_id
-                if "googleapis.com" in base_ep:
+                parsed_ep = urlparse(base_ep)
+                ep_host = (parsed_ep.hostname or "").lower()
+                if ep_host == "googleapis.com" or ep_host.endswith(".googleapis.com"):
                     import google.auth
                     import google.auth.transport.requests
 

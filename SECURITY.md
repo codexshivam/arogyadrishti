@@ -13,7 +13,6 @@ Security updates, vulnerability patches, and cryptographic dependency remediatio
 | **Mobile DPI Client (Android & iOS)** | `1.0.x` | ✅ Yes | Active Security Maintenance (Flutter 3.24+) |
 | **Backend API Gateway (FastAPI)** | `1.0.x` | ✅ Yes | Active Security Maintenance (Python 3.14) |
 | **Autonomous Agent Skill** | `1.0.0` | ✅ Yes | Apache 2.0 Agent Skill Standard |
-| **Legacy Proof-of-Concept Builds** | `< 1.0.0` | ❌ No | Deprecated |
 
 ---
 
