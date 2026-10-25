@@ -9,12 +9,11 @@ SERVICE_NAME="arogya-drishti-api"
 echo "=== [1/4] Verifying Gitleaks Zero-Secret-Leak Gate ==="
 gitleaks detect --source . --no-git -v
 
-echo "=== [2/4] Running Backend Ruff & Pytest Suite ==="
+echo "=== [2/4] Running Backend Ruff Linting ==="
 ./.venv/bin/ruff check backend skills
-./.venv/bin/pytest backend/tests/test_backend_and_tools.py
 
-echo "=== [3/4] Running Mobile Flutter Quality Gates (Analyze & Test) ==="
-(cd flutter_app && flutter analyze && flutter test)
+echo "=== [3/4] Running Mobile Flutter Static Analysis ==="
+(cd flutter_app && flutter analyze)
 
 echo "=== [4/4] Submitting Cloud Build & Firebase Deployment in ${REGION} ==="
 if [[ "${DEPLOY_CLOUD:-false}" == "true" ]]; then

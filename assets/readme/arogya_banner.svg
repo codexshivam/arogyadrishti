@@ -9,7 +9,7 @@
   <rect width="1200" height="280" rx="16" fill="url(#redGrad)" />
 
   <!-- Arogya Wordmark from App Logo -->
-  <g transform="translate(600.0, 140.0) scale(0.95) translate(-518, -522)">
+  <g transform="translate(600, 140) scale(0.76) translate(-517.5, -508)">
     <g transform="translate(0, 1024) scale(0.100000, -0.100000)" fill="#FFFFFF" stroke="none">
       <path d="M4414 5860 c-289 -62 -499 -335 -480 -625 3 -49 11 -110 19 -135 88
 -291 380 -477 677 -431 272 43 484 255 518 521 l7 55 17 -83 c30 -152 117

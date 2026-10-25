@@ -582,8 +582,7 @@ Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed fo
 | **Object Storage** | **Google Cloud Storage (GCS)** | Sovereign Encrypted Buckets | 180-day WORM-compliant audit logs, field inspection photographs, and automated lifecycle expiration policies. |
 | **Security Scanning** | **GitHub CodeQL Advanced** | CodeQL Bundle v2.27+ | Continuous static application security testing (SAST) for taint tracking, injection vulnerability detection, and code security verification. |
 | **Secret Detection** | **Gitleaks** | Automated Pre-Commit / CI | Zero-credential-leak enforcement across all commits, configurations, and repository branches. |
-| **Code Quality** | **Ruff & Pytest** | Fast Python Tooling | Sub-millisecond Python linting, formatting, and automated epidemiological test suites. |
-| **Motion Graphics** | **Remotion** | React & TypeScript | Programmatic showcase sequences, SVG data visualizations, and animated institutional presentations. |
+| **Code Quality** | **Ruff** | Fast Python Tooling | Sub-millisecond Python linting, strict formatting, and syntax validation. |
 
 ---
 
