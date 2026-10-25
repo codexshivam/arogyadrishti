@@ -55,5 +55,7 @@ ui-debug.log
 Screenshot*.png
 /*.png
 *.tmp
+memory.md
+*.memory.md
 .vscode/*
 !.vscode/extensions.json

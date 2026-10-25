@@ -16,13 +16,7 @@ Traditional public health surveillance operates reactively: municipal authoritie
 <br/>
 
 <div align="center">
-  <a href="https://docs.google.com/presentation/d/1J2fiWyCnKmhVXb0tEsRWMHxopULAneF_/edit?usp=sharing&ouid=109225249232404642044&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer">
-    <img src="./assets/readme/mockup.png" width="94%" alt="Arogya Drishti Mobile DPI Interface Showcase" />
-  </a>
-  <br/><br/>
-  <p>
-    📊 <strong><a href="https://docs.google.com/presentation/d/1J2fiWyCnKmhVXb0tEsRWMHxopULAneF_/edit?usp=sharing&ouid=109225249232404642044&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer">View Executive Pitch Presentation (Google Slides)</a></strong> — Official institutional deck for public health agencies, research institutions, and municipal partners.
-  </p>
+  <img src="./assets/readme/mockup.png" width="94%" alt="Arogya Drishti Mobile DPI Interface Showcase" />
 </div>
 
 <br/>
@@ -636,7 +630,7 @@ Arogya Drishti leverages an end-to-end, sovereign, open-source stack designed fo
       <td><a href="DESIGN.md"><strong>DESIGN.md</strong></a></td>
     </tr>
     <tr>
-      <td><strong>🛡️ Security Policy & Threat Model</strong></td>
+      <td><strong>🛡️ Security & Compliance Policy</strong></td>
       <td>Security governance, vulnerability disclosure guidelines, role-based access controls, and CERT-In compliant 180-day WORM audit log infrastructure in GCP Mumbai (<code>asia-south1</code>).</td>
       <td><code>CERT-In Directions</code><br/>Cyber Security Standard</td>
       <td><a href="SECURITY.md"><strong>SECURITY.md</strong></a></td>
