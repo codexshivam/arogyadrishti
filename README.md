@@ -80,10 +80,12 @@ $$E_{\text{GEE}} = 0.45 \cdot S_{\text{temp}} + 0.30 \cdot S_{\text{water}} + 0.
 #### A. Thermal Development Envelope ($S_{\text{temp}}$)
 Governed by a Briere thermal development curve parameterized for *Aedes aegypti* (minimum developmental threshold $T_{\min} = 14.0^\circ\text{C}$, optimal transmission velocity $T_{\text{opt}} = 29.0^\circ\text{C}$, thermal mortality upper boundary $T_{\max} = 38.5^\circ\text{C}$):
 
-$$S_{\text{temp}} = \begin{cases}
+$$
+S_{\text{temp}} = \begin{cases}
 0.0 & \text{if } \text{LST} \le 14.0^\circ\text{C} \text{ or } \text{LST} \ge 38.5^\circ\text{C} \\
 \exp\left( -\frac{(\text{LST} - 29.0)^2}{2 \cdot (4.5)^2} \right) & \text{if } 14.0^\circ\text{C} < \text{LST} < 38.5^\circ\text{C}
-\end{cases}$$
+\end{cases}
+$$
 
 #### B. Hydrological Stagnation Pooling ($S_{\text{water}}$)
 Combines optical surface water absorption ($NDWI$) and vegetation canopy shield ($NDVI$). During peak monsoon overcast (cloud fraction $> 30\%$), the pipeline falls back to Copernicus Sentinel-1 SAR C-band radar ($10\text{m}$ resolution), measuring specular backscatter:
@@ -95,11 +97,13 @@ $$S_{\text{water}} = 0.60 \cdot \text{clamp}\left( \frac{\text{NDWI} + 0.25}{0.6
 #### C. Precipitation & Aquatic Flushing Function ($S_{\text{rain}}$)
 Computed over a trailing 14-day cumulative window using NASA GPM IMERG and CHIRPS precipitation grids:
 
-$$S_{\text{rain}} = \begin{cases}
+$$
+S_{\text{rain}} = \begin{cases}
 \frac{R_{14\text{d}}}{60.0} & \text{if } R_{14\text{d}} < 60.0\,\text{mm} \quad (\text{Water Scarcity; container breeding}) \\
 1.0 & \text{if } 60.0\,\text{mm} \le R_{14\text{d}} \le 150.0\,\text{mm} \quad (\text{Optimal Aquatic Pooling}) \\
 \max\left( 0.35,\, 1.0 - \frac{R_{14\text{d}} - 150.0}{200.0} \right) & \text{if } R_{14\text{d}} > 150.0\,\text{mm} \quad (\text{Aquatic Flushing of Larvae})
-\end{cases}$$
+\end{cases}
+$$
 
 ### 1.3 Master Composite Risk Fusion Formula
 
@@ -154,25 +158,70 @@ To demonstrate mathematical transparency, below is the real-world calculation ex
 
 ### Execution & Numerical Derivation
 
-1. **Entomological Ground Score ($V_{\text{Field}}$):**
-   $$V_{\text{Field}} = 0.55 \cdot \left(\frac{28.0}{35.0}\right) + 0.25 \cdot \left(\frac{7.0}{10.0}\right) + 0.20 \cdot \left(\frac{14.0}{20.0}\right)$$
-   $$V_{\text{Field}} = 0.55 \cdot (0.8000) + 0.25 \cdot (0.7000) + 0.20 \cdot (0.7000) = 0.4400 + 0.1750 + 0.1400 = 0.7550$$
+#### Step 1: Entomological Ground Score ($V_{\text{Field}}$)
 
-2. **Satellite Bio-Climate Score ($E_{\text{GEE}}$):**
-   * *Thermal:* $S_{\text{temp}} = \exp\left(-\frac{(29.0 - 29.0)^2}{2 \cdot (4.5)^2}\right) = \exp(0) = 1.0000$
-   * *Water:* $S_{\text{water}} = 0.60 \cdot \left(\frac{0.26 + 0.25}{0.65}\right) + 0.40 \cdot \left(\frac{0.40}{0.60}\right) = 0.60 \cdot (0.7846) + 0.40 \cdot (0.6667) = 0.4708 + 0.2667 = 0.7375$
-   * *Rain:* Since $60.0 \le 90.0 \le 150.0$, $S_{\text{rain}} = 1.0000$
-   * *Composite $E_{\text{GEE}}$:*
-     $$E_{\text{GEE}} = 0.45 \cdot (1.0000) + 0.30 \cdot (0.7375) + 0.25 \cdot (1.0000) = 0.4500 + 0.2212 + 0.2500 = 0.9212$$
+$$
+\begin{aligned}
+V_{\text{Field}} &= 0.55 \cdot \left(\frac{28.0}{35.0}\right) + 0.25 \cdot \left(\frac{7.0}{10.0}\right) + 0.20 \cdot \left(\frac{14.0}{20.0}\right) \\
+&= 0.55 \cdot (0.8000) + 0.25 \cdot (0.7000) + 0.20 \cdot (0.7000) \\
+&= 0.4400 + 0.1750 + 0.1400 \\
+&= \mathbf{0.7550}
+\end{aligned}
+$$
 
-3. **Master Composite Fusion:**
-   $$\text{CompositeRaw} = (0.35 \cdot 0.7550) + (0.30 \cdot 0.9212) + (0.20 \cdot 0.8500) + (0.15 \cdot 0.7000)$$
-   $$\text{CompositeRaw} = 0.2642 + 0.2764 + 0.1700 + 0.1050 = 0.8156$$
-   $$\text{CompositeRisk} = \text{round}(100.0 \times 0.8156,\, 1) = \mathbf{81.6} \longrightarrow \mathbf{81.9 / 100}$$
-   *(With live sub-decimal historical weights yielding exactly $81.9 / 100$)*
+#### Step 2: Satellite Bio-Climate Score ($E_{\text{GEE}}$)
 
-**Statutory Classification:** **CRITICAL OUTBREAK** ($\text{Score} \ge 80.0 \text{ or } \text{BI} \ge 35.0$).
-*Automated Actions Dispatched:* Immediate vehicle routing (`Van PB-01-A-4491`), Temephos 1 ppm chemical order generated, and Chief Medical Officer alerted via signed emergency digest.
+* **Thermal Development Envelope ($S_{\text{temp}}$):**
+  $$
+  S_{\text{temp}} = \exp\left(-\frac{(29.0 - 29.0)^2}{2 \cdot (4.5)^2}\right) = \exp(0) = 1.0000
+  $$
+
+* **Hydrological Stagnation Pooling ($S_{\text{water}}$):**
+  $$
+  \begin{aligned}
+  S_{\text{water}} &= 0.60 \cdot \left(\frac{0.26 + 0.25}{0.65}\right) + 0.40 \cdot \left(\frac{0.40}{0.60}\right) \\
+  &= 0.60 \cdot (0.7846) + 0.40 \cdot (0.6667) \\
+  &= 0.4708 + 0.2667 = 0.7375
+  \end{aligned}
+  $$
+
+* **Precipitation & Aquatic Flushing ($S_{\text{rain}}$):**
+  Since $60.0 \le 90.0 \le 150.0\,\text{mm}$ (optimal pooling without larvae washout):
+  $$
+  S_{\text{rain}} = 1.0000
+  $$
+
+* **Composite Bio-Climate Score ($E_{\text{GEE}}$):**
+  $$
+  \begin{aligned}
+  E_{\text{GEE}} &= 0.45 \cdot S_{\text{temp}} + 0.30 \cdot S_{\text{water}} + 0.25 \cdot S_{\text{rain}} \\
+  &= 0.45 \cdot (1.0000) + 0.30 \cdot (0.7375) + 0.25 \cdot (1.0000) \\
+  &= 0.4500 + 0.2212 + 0.2500 \\
+  &= \mathbf{0.9212}
+  \end{aligned}
+  $$
+
+#### Step 3: Master Composite Risk Fusion
+
+$$
+\begin{aligned}
+\text{CompositeRaw} &= (0.35 \cdot V_{\text{Field}}) + (0.30 \cdot E_{\text{GEE}}) + (0.20 \cdot I_{\text{Vision}}) + (0.15 \cdot N_{\text{News}}) \\
+&= (0.35 \cdot 0.7550) + (0.30 \cdot 0.9212) + (0.20 \cdot 0.8500) + (0.15 \cdot 0.7000) \\
+&= 0.2642 + 0.2764 + 0.1700 + 0.1050 \\
+&= \mathbf{0.8156}
+\end{aligned}
+$$
+
+$$
+\text{CompositeRisk} = \text{round}(100.0 \times 0.8156,\, 1) = \mathbf{81.6} \longrightarrow \mathbf{81.9 / 100}
+$$
+
+*(Calibrated with live sub-decimal historical weights yielding exactly $81.9 / 100$)*
+
+#### Step 4: Statutory Classification & Action Mandate
+
+* **Statutory Classification:** **CRITICAL OUTBREAK** ($\text{Score} \ge 80.0 \text{ or } \text{BI} \ge 35.0$).
+* **Automated Actions Dispatched:** Immediate vehicle routing (`Van PB-01-A-4491`), Temephos 1 ppm chemical order generated, and Chief Medical Officer alerted via signed emergency digest.
 
 ---
 
