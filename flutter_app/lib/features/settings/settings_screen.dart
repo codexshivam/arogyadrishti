@@ -1068,7 +1068,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: Column(
                           children: const [
                             Text(
-                              'NidanIQ by Team Rocket',
+                              'NidanIQ by Shivam Yadav',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,
@@ -1077,7 +1077,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ),
                             SizedBox(height: 2),
                             Text(
-                              'Google Developer Groups Chandigarh',
+                              'Official Surveillance Platform',
                               style: TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w500,

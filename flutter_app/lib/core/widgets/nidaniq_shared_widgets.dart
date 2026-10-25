@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,29 +78,14 @@ class NidanIQTopShellBar extends ConsumerWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       systemOverlayStyle: NidanIQTheme.whiteSystemUiOverlay,
       toolbarHeight: 56,
-      title: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'NidanIQ',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: NidanIQTheme.primaryCrimson,
-              fontWeight: FontWeight.w800,
-              fontSize: 18,
-              letterSpacing: 0.2,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            'developed and managed by Team Rocket',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: NidanIQTheme.slateMuted,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.1,
-            ),
-          ),
-        ],
+      title: Text(
+        'NIDANIQ',
+        style: GoogleFonts.museoModerno(
+          color: NidanIQTheme.primaryCrimson,
+          fontSize: 24,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.8,
+        ),
       ),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(48),

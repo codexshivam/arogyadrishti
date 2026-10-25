@@ -1023,7 +1023,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                     Center(
                       child: Text(
-                        'NidanIQ by Team Rocket',
+                        'NidanIQ by Shivam Yadav',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,

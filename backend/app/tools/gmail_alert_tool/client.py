@@ -278,7 +278,7 @@ def build_nidaniq_email_html(
               This email was sent for the purpose of real-time vector surveillance, early epidemic warning, and rapid containment coordination under the National Vector Borne Disease Control Programme (NCVBDC) guidelines.
             </p>
             <div style="font-weight:600;color:#475569;">
-              NidanIQ App | Powered by Team Rocket
+              NidanIQ App | Powered by Shivam Yadav
             </div>
           </td>
         </tr>
@@ -422,7 +422,7 @@ def build_ticket_assignment_email_html(
               This email was sent for the purpose of vector surveillance field escalation, grievance redressal, and rapid municipal action under NCVBDC guidelines.
             </p>
             <div style="font-weight:600;color:#475569;">
-              NidanIQ App | Powered by Team Rocket
+              NidanIQ App | Powered by Shivam Yadav
             </div>
           </td>
         </tr>
@@ -554,7 +554,7 @@ class EmailAlertClient:
             f"Notes: {notes}\n\n"
             f"Helpline: 1800-11-8328 | Email: support@NidanIQ.in\n\n"
             f"Note: This email was sent for the purpose of real-time vector surveillance, early epidemic warning, and rapid containment coordination under NCVBDC guidelines.\n"
-            f"NidanIQ App | Powered by Team Rocket\n"
+            f"NidanIQ App | Powered by Shivam Yadav\n"
         )
         msg.add_alternative(html_body, subtype="html")
 
@@ -662,7 +662,7 @@ class EmailAlertClient:
             f"Observation Notes:\n{observation_notes}\n\n"
             f"Helpline: 1800-11-8328 | Email: support@NidanIQ.in\n\n"
             f"Note: This email was sent for the purpose of vector surveillance field escalation, grievance redressal, and rapid municipal action under NCVBDC guidelines.\n"
-            f"NidanIQ App | Powered by Team Rocket\n"
+            f"NidanIQ App | Powered by Shivam Yadav\n"
         )
         msg.add_alternative(html_body, subtype="html")
 

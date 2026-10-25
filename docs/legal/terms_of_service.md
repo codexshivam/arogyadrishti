@@ -76,7 +76,7 @@ Violations will result in instantaneous revocation of system privileges and imme
 
 ## 6. Intellectual Property Rights and Open Source Standards
 
-* **Platform Ownership:** The visual layout, graphic trademarks, backend algorithms, architectural schematics, and system documentation of NidanIQ are the intellectual property of the project creators (Team Rocket, Chandigarh University) and the sovereign Government of India / Municipal Corporation.
+* **Platform Ownership:** The visual layout, graphic trademarks, backend algorithms, architectural schematics, and system documentation of NidanIQ are the intellectual property of the project creators (Shivam Yadav) and the sovereign Government of India / Municipal Corporation.
 * **Open Source Agent Skill Standards:** Specific sub-modules—including the Autonomous Vector Surveillance Agent Skill (`skills/vector-surveillance-skill/`) and open integration harnesses—are released under the **Apache License, Version 2.0**. Use of these open components is governed by the terms specified in the root [`LICENSE`](../../LICENSE) file.
 * **Epidemiological Data Sovereignty:** All aggregate disease surveillance indices, GIS vectors, and municipal inspection ledgers generated through the platform remain the permanent, sovereign public property of the Republic of India.
 

@@ -112,7 +112,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'NidanIQ ("NidanIQ") is a Vector-Borne Disease Surveillance Digital Public Infrastructure (DPI) platform developed by Team Rocket (Chandigarh University) aligned with National Center for Vector Borne Diseases Control (NCVBDC), Integrated Health Information Platform (IHIP), and India\'s Digital Personal Data Protection (DPDP) Act 2023.',
+                  'NidanIQ ("NidanIQ") is a Vector-Borne Disease Surveillance Digital Public Infrastructure (DPI) platform developed by Shivam Yadav aligned with National Center for Vector Borne Diseases Control (NCVBDC), Integrated Health Information Platform (IHIP), and India\'s Digital Personal Data Protection (DPDP) Act 2023.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -153,7 +153,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             title: 'Data Retention, Revocation & Grievance Redressal Officer',
             body:
                 '• Account & Data Deletion: Authorized officers may request immediate revocation of their phone authentication profile or correction of directory records by contacting their District Nodal Officer or the Data Protection Officer below.\n'
-                '• Data Protection & Grievance Officer: Shivam Yadav (Team Rocket — Chandigarh University) • Email: shivam@revlet.me • Project ID: teamrocketnp (asia-south1).',
+                '• Data Protection & Grievance Officer: Shivam Yadav • Email: shivam@revlet.me • Project ID: teamrocketnp (asia-south1).',
           ),
           const SizedBox(height: 20),
 

@@ -2,7 +2,7 @@
 name: nidaniq-vector-surveillance
 version: 1.0.0
 license: Apache-2.0
-author: Team Rocket (Chandigarh University)
+author: Shivam Yadav
 repository: https://github.com/codexshivam/NidanIQ
 homepage: https://NidanIQ.in
 models:

@@ -36,9 +36,9 @@ class NidanIQTheme {
     systemNavigationBarDividerColor: Colors.white,
   );
 
-  static const Color primaryCrimson = Color(0xFFA50C1F);
-  static const Color primaryCrimsonDark = Color(0xFF7C0012);
-  static const Color primaryCrimsonActive = Color(0xFF991B1B);
+  static const Color primaryCrimson = Color(0xFFF83227);
+  static const Color primaryCrimsonDark = Color(0xFFE21116);
+  static const Color primaryCrimsonActive = Color(0xFFD81015);
   static const Color backgroundCanvas = Color(0xFFF8FAFC);
   static const Color surfaceWhite = Color(0xFFFFFFFF);
   static const Color surfaceContainerLow = Color(0xFFF2F4F6);
@@ -68,7 +68,7 @@ class NidanIQTheme {
   );
 
   static const LinearGradient crimsonHeaderGradient = LinearGradient(
-    colors: [Color(0xFFA50C1F), Color(0xFF7C0012)],
+    colors: [Color(0xFFF83227), Color(0xFFE21116)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
