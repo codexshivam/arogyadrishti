@@ -6,7 +6,7 @@ import timeline from './timeline.json';
 export const Root: React.FC = () => {
   return (
     <Composition
-      id="ArogyaShowcase"
+      id="NidanIQShowcase"
       component={AppShowcaseSequence}
       durationInFrames={timeline.durationInFrames}
       fps={timeline.fps}
