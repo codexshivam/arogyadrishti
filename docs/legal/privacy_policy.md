@@ -1,7 +1,7 @@
 # Privacy Policy — NidanIQ
 
-**National Digital Public Infrastructure for Vector-Borne Disease Control**
-*Aligned with the Digital Personal Data Protection (DPDP) Act, 2023, Information Technology Act, 2000, and NCVBDC / MoHFW Standards*
+**Digital Public Infrastructure Prototype for Vector-Borne Disease Control**
+*Designed in alignment with the Digital Personal Data Protection (DPDP) Act, 2023, Information Technology Act, 2000, and NCVBDC / MoHFW Technical Guidelines*
 
 **Document Version:** 1.0.0
 **Effective Date:** October 23, 2026
@@ -12,7 +12,7 @@
 
 ## 1. Preamble and Executive Overview
 
-NidanIQ ("Platform", "We", "Us", or "Our") is the sovereign National Digital Public Infrastructure (DPI) for automated vector-borne disease surveillance, micro-climate predictive modeling, and municipal response orchestration. The Platform operates in strict compliance with the **Digital Personal Data Protection (DPDP) Act, 2023 (Act No. 22 of 2023)**, the **Information Technology Act, 2000**, the **Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011**, and statutory public health operational guidelines issued by the **National Center for Vector Borne Diseases Control (NCVBDC)** and the **Ministry of Health and Family Welfare (MoHFW)**, Government of India.
+NidanIQ ("Platform", "We", "Us", or "Our") is an open-source Digital Public Infrastructure (DPI) prototype for automated vector-borne disease surveillance, micro-climate predictive modeling, and municipal response orchestration. The Platform is engineered to comply with the privacy principles of the **Digital Personal Data Protection (DPDP) Act, 2023 (Act No. 22 of 2023)**, the **Information Technology Act, 2000**, the **Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011**, and references public health operational methodologies established by the **National Center for Vector Borne Diseases Control (NCVBDC)** and the **Ministry of Health and Family Welfare (MoHFW)**, Government of India. *(Note: NidanIQ is an independent open-source technical initiative; references to government guidelines denote technical alignment and do not imply formal endorsement, accreditation, or partnership.)*
 
 This Privacy Policy delineates the precise technical and legal framework governing the collection, processing, storage, pseudonymization, redaction, and protection of personal data and field telemetry gathered through the NidanIQ mobile application, administrative command consoles, automated IoT telemetry, and public epidemiological APIs.
 

@@ -1,6 +1,6 @@
 # Terms of Service — NidanIQ
 
-**National Digital Public Infrastructure for Vector-Borne Disease Control**
+**Digital Public Infrastructure Prototype for Vector-Borne Disease Control**
 *Operating under the Information Technology Act, 2000, DPDP Act, 2023, and Municipal Public Health By-Laws*
 
 **Document Version:** 1.0.0
@@ -12,7 +12,7 @@
 
 ## 1. Acceptance of Terms and Agreement to Bound
 
-These Terms of Service ("Terms" or "Agreement") constitute a legally binding agreement between you (the "User", "Authorized Officer", or "Field Worker") and **NidanIQ** ("Authority", "We", "Us", or "Our").
+These Terms of Service ("Terms" or "Agreement") constitute a legally binding agreement between you (the "User", "Authorized Officer", or "Field Worker") and **NidanIQ** ("Authority", "We", "Us", or "Our"). *(Note: NidanIQ is an open-source technical prototype designed to assist public health workflows; it does not replace statutory municipal command or clinical judgment.)*
 
 BY AUTHENTICATING INTO THE NidanIQ MOBILE APPLICATION VIA MOBILE NUMBER AND ONE-TIME PASSCODE (OTP), ACCESSING THE ADMINISTRATIVE COMMAND DASHBOARD, OR CONSUMING PLATFORM APIS, YOU EXPRESSLY ACKNOWLEDGE, AGREE, AND COVENANT THAT:
 1. You have read, understood, and agreed to be legally bound by every provision of these Terms of Service;

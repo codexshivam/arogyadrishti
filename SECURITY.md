@@ -1,6 +1,6 @@
 # Security & Compliance Policy
 
-NidanIQ is engineered as sovereign National Digital Public Infrastructure (DPI) for predictive vector-borne disease surveillance in India, adhering strictly to **MeitY**, **CERT-In Cyber Security Directions**, the **Digital Personal Data Protection (DPDP) Act, 2023**, and **OWASP MASVS L1** requirements.
+NidanIQ is engineered as a secure public health technology prototype for predictive vector-borne disease surveillance in India, adhering to security best practices and principles established under **MeitY**, **CERT-In Cyber Security Directions**, the **Digital Personal Data Protection (DPDP) Act, 2023**, and **OWASP MASVS L1** guidelines.
 
 ---
 
@@ -10,7 +10,7 @@ Security updates, vulnerability patches, and cryptographic dependency remediatio
 
 | Component / Distribution | Version | Supported | Security Maintenance Status |
 | :--- | :--- | :---: | :--- |
-| **Mobile DPI Client (Android & iOS)** | `1.0.x` | ✅ Yes | Active Security Maintenance (Flutter 3.24+) |
+| **Mobile Client (Android & iOS)** | `1.0.x` | ✅ Yes | Active Security Maintenance (Flutter 3.24+) |
 | **Backend API Gateway (FastAPI)** | `1.0.x` | ✅ Yes | Active Security Maintenance (Python 3.14) |
 | **Autonomous Agent Skill** | `1.0.0` | ✅ Yes | Apache 2.0 Agent Skill Standard |
 
