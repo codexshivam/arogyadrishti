@@ -1,4 +1,4 @@
-# Terms of Service — Arogya Drishti (आरोग्य दृष्टि)
+# Terms of Service — Arogya Drishti
 
 **National Digital Public Infrastructure for Vector-Borne Disease Control**
 *Operating under the Information Technology Act, 2000, DPDP Act, 2023, and Municipal Public Health By-Laws*

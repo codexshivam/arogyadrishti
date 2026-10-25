@@ -331,7 +331,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       if (perm == LocationPermission.whileInUse ||
           perm == LocationPermission.always) {
         final pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
         );
         String wardLabel = 'Sector 22-B, Chandigarh';
         try {
@@ -1471,7 +1471,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           ),
                                           const SizedBox(height: 4),
                                           DropdownButtonFormField<String>(
-                                            value: _selectedWardLgd.isNotEmpty
+                                            initialValue: _selectedWardLgd.isNotEmpty
                                                 ? _selectedWardLgd
                                                 : null,
                                             isExpanded: true,
@@ -1539,7 +1539,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           ),
                                           const SizedBox(height: 4),
                                           DropdownButtonFormField<String>(
-                                            value: _selectedTreatment,
+                                            initialValue: _selectedTreatment,
                                             isExpanded: true,
                                             decoration: InputDecoration(
                                               contentPadding:

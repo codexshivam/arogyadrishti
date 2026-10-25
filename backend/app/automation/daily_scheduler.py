@@ -266,7 +266,7 @@ async def dispatch_morning_digests_pipeline() -> dict[str, Any]:
                 dispatches.append({
                     "ward": ward_name,
                     "to_email": to_email,
-                    "cc_email": cc_recipient,
+                    "cc_email": None,
                     "bi": bi,
                     "message_id": receipt.message_id,
                     "status": "DELIVERED",
@@ -276,7 +276,7 @@ async def dispatch_morning_digests_pipeline() -> dict[str, Any]:
                 dispatches.append({
                     "ward": ward_name,
                     "to_email": to_email,
-                    "cc_email": cc_recipient,
+                    "cc_email": None,
                     "bi": bi,
                     "status": f"SKIPPED_OR_FAILED: {exc}",
                 })

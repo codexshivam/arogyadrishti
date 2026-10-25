@@ -13,14 +13,14 @@ echo "=== [2/4] Running Backend Ruff & Pytest Suite ==="
 ./.venv/bin/ruff check backend skills
 ./.venv/bin/pytest backend/tests/test_backend_and_tools.py
 
-echo "=== [3/4] Building Flutter Web Release Bundle ==="
-(cd flutter_app && flutter analyze && flutter test && flutter build web --release)
+echo "=== [3/4] Running Mobile Flutter Quality Gates (Analyze & Test) ==="
+(cd flutter_app && flutter analyze && flutter test)
 
 echo "=== [4/4] Submitting Cloud Build & Firebase Deployment in ${REGION} ==="
 if [[ "${DEPLOY_CLOUD:-false}" == "true" ]]; then
   CLOUDSDK_METRICS_REQUEST_ATTRIBUTION="agent-skills/1.0 (skill:gcloud)" \
     gcloud builds submit --config=cloudbuild.yaml --project="${PROJECT_ID}" --region="${REGION}" --quiet
-  firebase deploy --only hosting,firestore:rules,firestore:indexes,storage --project "${PROJECT_ID}"
+  firebase deploy --only firestore:rules,firestore:indexes,storage --project "${PROJECT_ID}"
 else
   echo "Dry-run verification complete. Set DEPLOY_CLOUD=true to push to Cloud Run & Firebase Hosting."
 fi

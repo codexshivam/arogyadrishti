@@ -382,7 +382,7 @@
 
     <!-- Master Hero Title with Radiant Gradient -->
     <text x="0" y="24" font-size="34" font-weight="900" fill="#FFFFFF" letter-spacing="6" filter="url(#glowFilter)">AROGYA DRISHTI</text>
-    <text x="0" y="44" font-size="14" font-weight="700" fill="#F87171" letter-spacing="3">आरोग्य दृष्टि • NATIONAL VECTOR SURVEILLANCE ENGINE</text>
+    <text x="0" y="44" font-size="14" font-weight="700" fill="#F87171" letter-spacing="3">NATIONAL VECTOR SURVEILLANCE ENGINE</text>
 
     <!-- Subtitle Line -->
     <text x="0" y="66" font-size="10.5" font-weight="500" fill="#94A3B8" letter-spacing="0.5">Autonomous Satellite Bio-Climate, Open-Weight Multimodal AI &amp; Last-Mile Vector Control Infrastructure</text>

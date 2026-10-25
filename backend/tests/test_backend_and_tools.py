@@ -337,8 +337,8 @@ def test_epidemiology_math_and_email_themes() -> None:
 
 
 def test_daily_cron_digest_sync() -> None:
-    # Trigger on-demand daily digest & GEE sync endpoint
-    r_cron = client.post("/api/v1/cron/daily-digest-and-gee-sync")
+    # Trigger on-demand daily digest & GEE sync endpoint (bypassing outbound external SMTP spam)
+    r_cron = client.post("/api/v1/cron/daily-digest-and-gee-sync?dispatch_emails=false")
     assert r_cron.status_code == 200
     res = r_cron.json()
     assert res["status"] in (

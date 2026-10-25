@@ -75,7 +75,7 @@ class _CentersScreenState extends ConsumerState<CentersScreen> {
       if (perm == LocationPermission.whileInUse ||
           perm == LocationPermission.always) {
         final pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
         );
         String label = 'Sector 22-B, Chandigarh';
         try {

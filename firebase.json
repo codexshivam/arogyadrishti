@@ -5,49 +5,5 @@
   },
   "storage": {
     "rules": "storage.rules"
-  },
-  "hosting": {
-    "site": "teamrocketnp",
-    "public": "flutter_app/build/web",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/api/**",
-        "run": {
-          "serviceId": "arogya-drishti-api",
-          "region": "asia-south1"
-        }
-      },
-      {
-        "source": "/healthz",
-        "run": {
-          "serviceId": "arogya-drishti-api",
-          "region": "asia-south1"
-        }
-      },
-      {
-        "source": "/readyz",
-        "run": {
-          "serviceId": "arogya-drishti-api",
-          "region": "asia-south1"
-        }
-      },
-      {
-        "source": "/privacy",
-        "destination": "/privacy.html"
-      },
-      {
-        "source": "/privacy-policy",
-        "destination": "/privacy.html"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
   }
 }

@@ -1,4 +1,4 @@
-# Privacy Policy — Arogya Drishti (आरोग्य दृष्टि)
+# Privacy Policy — Arogya Drishti
 
 **National Digital Public Infrastructure for Vector-Borne Disease Control**
 *Aligned with the Digital Personal Data Protection (DPDP) Act, 2023, Information Technology Act, 2000, and NCVBDC / MoHFW Standards*

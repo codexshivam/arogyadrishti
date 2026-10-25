@@ -631,7 +631,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   ),
                                   Switch(
                                     value: pushEnabled,
-                                    activeColor: const Color(0xFF8B0000),
+                                    activeThumbColor: const Color(0xFF8B0000),
                                     activeTrackColor: const Color(0xFFFFCDD2),
                                     onChanged: (val) => _updatePreference(
                                       'push_notifications_enabled',
@@ -696,7 +696,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   ),
                                   Switch(
                                     value: emailEnabled,
-                                    activeColor: const Color(0xFF8B0000),
+                                    activeThumbColor: const Color(0xFF8B0000),
                                     activeTrackColor: const Color(0xFFFFCDD2),
                                     onChanged: (val) => _updatePreference(
                                       'email_notifications_enabled',

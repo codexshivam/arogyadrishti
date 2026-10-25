@@ -7,6 +7,7 @@ useDefault = true
 description = "Ignore untracked local .env, compiled Flutter build artifacts, and public Firebase client SDK config files"
 paths = [
   '''^backend/\.env$''',
+  '''^backend/env_vars\.yaml$''',
   '''^\.env$''',
   '''^flutter_app/build/.*''',
   '''^flutter_app/android/app/google-services\.json$''',
@@ -14,4 +15,5 @@ paths = [
   '''^flutter_app/lib/firebase_options\.dart$''',
   '''^\.venv/.*''',
   '''^\.dart_tool/.*''',
+  '''^flutter_app/\.dart_tool/.*''',
 ]

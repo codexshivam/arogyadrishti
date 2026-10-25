@@ -18,10 +18,7 @@
 [![Backend](https://img.shields.io/badge/Backend-FastAPI_on_Cloud_Run-009688.svg?style=for-the-badge&logo=fastapi)](backend/)
 [![Data Residency](https://img.shields.io/badge/Data_Residency-GCP_asia--south1_(Mumbai)-DC2626.svg?style=for-the-badge&logo=googlecloud)](#6-security-sovereignty--ethical-governance)
 [![CERT-In Compliant](https://img.shields.io/badge/CERT--In-180--Day_WORM_Audit-10B981.svg?style=for-the-badge)](#6-security-sovereignty--ethical-governance)
-
-<br/>
-
-**[📱 Download Android Release APK](https://github.com/codexshivam/arogyadrishti/releases)** • **[⚡ Production Cloud Run API](https://arogya-drishti-api-234323362711.asia-south1.run.app/api/v1/app/metadata)** • **[📜 Privacy Policy](docs/legal/privacy_policy.md)** • **[📄 Terms of Service](docs/legal/terms_of_service.md)** • **[🎯 Agent Skill Specification](skills/vector-surveillance-skill/SKILL.md)**
+[![Platforms](https://img.shields.io/badge/Platforms-Android_%7C_iOS-blue.svg?style=for-the-badge&logo=apple)](flutter_app/)
 
 ---
 
@@ -29,11 +26,19 @@
 
 ## Executive Overview & Architectural Mission
 
-**Arogya Drishti (आरोग्य दृष्टि)** is a production-grade **National Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration. Operating in strict alignment with the **National Center for Vector Borne Diseases Control (NCVBDC)**, the **Integrated Disease Surveillance Programme (IDSP/IHIP)**, and the **Ministry of Health and Family Welfare (MoHFW)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated chemical larviciding.
+**Arogya Drishti** is a production-grade **National Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration. Operating in strict alignment with the **National Center for Vector Borne Diseases Control (NCVBDC)**, the **Integrated Disease Surveillance Programme (IDSP/IHIP)**, and the **Ministry of Health and Family Welfare (MoHFW)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated chemical larviciding.
 
 Traditional public health surveillance operates reactively: municipal authorities learn of an outbreak only after clinical blood tests (NS1 antigen / IgM ELISA) appear in hospital diagnostic registries. By this stage, *Aedes aegypti* and *Anopheles stephensi* mosquito vectors have already completed their 8–10 day aquatic life cycle and multiple blood-feeding cycles, resulting in exponential community transmission.
 
 **Arogya Drishti closes this 14-day surveillance blindspot.** By continuously fusing **orbital C-band synthetic aperture radar (SAR)**, **multispectral thermal infrared indices**, **offline-first frontline entomological surveys**, and **open-weight multimodal smartphone vision**, the platform predicts micro-focal vector breeding and dispatches targeted municipal vector-control squads up to **14 days before clinical hospital admissions surge**.
+
+<br/>
+
+<div align="center">
+  <img src="./assets/readme/app_mockup_showcase.svg" width="100%" alt="Arogya Drishti Mobile DPI Interface Mockup" />
+</div>
+
+<br/>
 
 ```text
 ========================================================================================================================
@@ -593,13 +598,11 @@ The platform is designed and documented for open adoption by municipal corporati
 
 ---
 
-## 13. Official Resources & Documentation Links
+## 13. Official Documents and Resources
 
-| Resource | Scope / Description | Direct Link |
-| :--- | :--- | :--- |
-| 📱 **Android Client Release** | Production APK with Tier-3 Offline Persistence & Local Copilot | **[Download Latest APK (GitHub Releases)](https://github.com/codexshivam/arogyadrishti/releases)** |
-| ⚡ **Production API Gateway** | Live Cloud Run REST API pinned to `asia-south1` (Mumbai) | **[Cloud Run Health Probe (`/readyz`)](https://arogya-drishti-api-234323362711.asia-south1.run.app/readyz)** |
-| 🎯 **Agent Skill Standard** | Canonical open specification for autonomous vector surveillance | **[skills/vector-surveillance-skill/SKILL.md](skills/vector-surveillance-skill/SKILL.md)** |
-| 📜 **Data Privacy Policy** | DPDP Act 2023, data minimization, and residency compliance | **[docs/legal/privacy_policy.md](docs/legal/privacy_policy.md)** |
-| 📄 **Terms of Service** | Public sector digital infrastructure usage terms | **[docs/legal/terms_of_service.md](docs/legal/terms_of_service.md)** |
-| 📂 **Source Repository** | Complete open-source monorepo (Flutter, FastAPI, Agent Skill) | **[github.com/codexshivam/arogyadrishti](https://github.com/codexshivam/arogyadrishti)** |
+| Resource | Direct Link |
+| :--- | :--- |
+| 🎯 **Agent Skill Standard** | **[skills/vector-surveillance-skill/SKILL.md](skills/vector-surveillance-skill/SKILL.md)** |
+| 📜 **Data Privacy Policy** | **[docs/legal/privacy_policy.md](docs/legal/privacy_policy.md)** |
+| 📄 **Terms of Service** | **[docs/legal/terms_of_service.md](docs/legal/terms_of_service.md)** |
+| 📂 **Source Repository** | **[github.com/codexshivam/arogyadrishti](https://github.com/codexshivam/arogyadrishti)** |

@@ -355,7 +355,7 @@ class GemmaAgentHarness:
         ci = idx_metrics.get("container_index_pct", 0.0)
         bi = idx_metrics.get("breteau_index", 0.0)
         lst = gee_metrics.get("lst_celsius")
-        rain = gee_metrics.get("rain_14d_mm")
+        _rain = gee_metrics.get("rain_14d_mm")
 
         if lang in ("hi", "hi-Latn"):
             base = (

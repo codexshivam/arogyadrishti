@@ -7,6 +7,7 @@ import 'package:arogya_drishti/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plump_icons/plump_icons.dart';
 
 class _FakeSupportApiClient extends ArogyaApiClient {
   _FakeSupportApiClient() : super(baseUrl: 'http://localhost:8080');
@@ -107,8 +108,13 @@ void main() {
   );
 
   testWidgets(
-    'AuthScreen renders initial Send OTP button, and reveals OTP input on officer select',
+    'AuthScreen renders initial phone input and Send OTP button',
     (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -121,20 +127,18 @@ void main() {
       expect(find.text('Welcome'), findsOneWidget);
       expect(find.text('Statutory Surveillance Notice'), findsOneWidget);
       expect(find.text('Send OTP'), findsOneWidget);
-
-      // Select pre-authorized officer chip to reveal OTP & Verify button
-      await tester.tap(find.text('Shivam Yadav'));
-      await tester.pump();
-
-      expect(find.text('Verify & Access Portal'), findsOneWidget);
-      expect(find.text('Enter 6-Digit Verification Code'), findsOneWidget);
-      expect(find.textContaining('Resend code in'), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
     },
   );
 
   testWidgets(
     'AuthScreen displays Phone number not registered snackbar for unregistered phone numbers',
     (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -180,9 +184,9 @@ void main() {
       );
 
       expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('Arogya'), findsOneWidget);
+      expect(find.text('ArogyaDrishti'), findsOneWidget);
       expect(find.text('developed and managed by Team Rocket'), findsOneWidget);
-      expect(find.byIcon(Icons.home_rounded), findsOneWidget);
+      expect(find.byType(PlumpIcon), findsNWidgets(5));
 
       final appBar = tester.widget<AppBar>(find.byType(AppBar));
       expect(appBar.backgroundColor, equals(Colors.white));
@@ -212,7 +216,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Support'), findsOneWidget);
+      expect(find.text('Support & Escalations'), findsOneWidget);
       expect(find.text('Outbreak Emergency SOS Hotline'), findsOneWidget);
       expect(find.text('NCDC Vector Control Room'), findsOneWidget);
       expect(find.text('1800-11-VECTOR'), findsOneWidget);

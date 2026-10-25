@@ -968,9 +968,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     const SizedBox(height: 25),
 
                     // Trouble signing in? | Helpdesk: 1800-11-8328 (aligned to end)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         InkWell(
                           onTap: () => context.push('/support'),

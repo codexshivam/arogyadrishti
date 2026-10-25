@@ -323,7 +323,7 @@ class DataFusionEngine:
         db = self._get_db()
         lgd = ward_lgd.zfill(10)
         loop = asyncio.get_running_loop()
-        now_dt = datetime.datetime.now(datetime.UTC)
+        now_dt = datetime.now(UTC)
         current_cal_week = now_dt.isocalendar()[1]  # 1..53
 
         def _fetch_history():
@@ -810,7 +810,7 @@ class DataFusionEngine:
                             "ward_no": fw["ward_no"],
                             "ward_name": fw["ward_name"],
                             "to_email": officer_email,
-                            "cc_email": cc_recipient,
+                            "cc_email": None,
                             "bi": bi,
                             "composite_score": comp_score,
                             "message_id": receipt.message_id,
@@ -822,7 +822,7 @@ class DataFusionEngine:
                             "ward_no": fw["ward_no"],
                             "ward_name": fw["ward_name"],
                             "to_email": officer_email,
-                            "cc_email": cc_recipient,
+                            "cc_email": None,
                             "bi": bi,
                             "status": f"SKIPPED_OR_FAILED: {email_err}",
                         })

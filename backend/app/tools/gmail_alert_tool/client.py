@@ -483,10 +483,8 @@ class EmailAlertClient:
     ) -> EmailDeliveryReceipt:
         """Validate recipient MX records, construct RFC 5322 HTML message, and dispatch via SMTP TLS."""
         mx_host = verify_email_and_mx(to_email)
-        to_norm = to_email.strip().lower()
 
         # User directive: In alert email sent, don't include CC
-        cc_verified: list[str] = []
 
         if not self.settings.smtp_user or not self.settings.smtp_password:
             raise EmailDispatchException(
