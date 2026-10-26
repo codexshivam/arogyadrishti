@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import io
+import os
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -362,10 +364,18 @@ class MunicipalLedgerSyncService:
         xlsx_bytes = buf.getvalue()
         sha256_sig = hashlib.sha256(xlsx_bytes).hexdigest()
 
+        # Sanitize palika_code and enforce safe path containment against traversal
+        clean_palika = re.sub(r"[^A-Za-z0-9_-]", "", os.path.basename(str(palika_code).strip()))
+        if not clean_palika:
+            clean_palika = "default"
+
         settings = get_settings()
-        export_dir = Path(settings.ledger_export_dir)
+        export_dir = Path(settings.ledger_export_dir).resolve()
         export_dir.mkdir(parents=True, exist_ok=True)
-        out_path = export_dir / f"nepal_municipal_ledger_{palika_code}.xlsx"
+        safe_filename = f"nepal_municipal_ledger_{clean_palika}.xlsx"
+        out_path = (export_dir / safe_filename).resolve()
+        if not out_path.is_relative_to(export_dir):
+            raise ValueError(f"Path traversal detected: {out_path} is outside {export_dir}")
         out_path.write_bytes(xlsx_bytes)
 
         meta = {

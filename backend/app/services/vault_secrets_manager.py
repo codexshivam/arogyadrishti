@@ -10,7 +10,6 @@ Eliminates static `.env` secrets in production government servers:
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import os
 import secrets
@@ -192,7 +191,7 @@ class HashiCorpVaultSecretsManager:
         lease_id = str(
             body.get("lease_id", f"database/creds/{self.db_role_name}/{uuid.uuid4().hex[:16]}")
         )
-        masked_pw = f"{raw_pass[:4]}...{hashlib.sha256(raw_pass.encode()).hexdigest()[:6]}"
+        masked_pw = f"{raw_pass[:4]}...****"
         return EphemeralDatabaseLease(
             lease_id=lease_id,
             role_name=self.db_role_name,
@@ -216,9 +215,7 @@ class HashiCorpVaultSecretsManager:
         epoch_tag = int(now_utc.timestamp())
         ephemeral_user = f"v_mohp_{epoch_tag}_{short_rand}"
         ephemeral_secret = secrets.token_urlsafe(32)
-        masked_pw = (
-            f"vlt_{ephemeral_secret[:4]}***{hashlib.sha256(ephemeral_secret.encode()).hexdigest()[:6]}"
-        )
+        masked_pw = f"vlt_{ephemeral_secret[:4]}...****"
         lease_id = f"database/creds/{self.db_role_name}/{secrets.token_hex(12)}"
         return EphemeralDatabaseLease(
             lease_id=lease_id,

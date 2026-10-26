@@ -167,3 +167,10 @@ async def test_idempotent_offline_fchv_batch_sync_and_interoperability(
     )
     assert ledger_xlsx_resp.status_code == 200
     assert "X-Ledger-SHA256" in ledger_xlsx_resp.headers
+
+    # Path traversal injection attempt must be blocked by validation
+    traversal_resp = await client.get(
+        "/api/v1/ledger/export?palika_code=../../etc&format=json",
+        headers=chief_headers,
+    )
+    assert traversal_resp.status_code in (400, 422)

@@ -71,7 +71,7 @@ async def push_dhis2_ihmis_endpoint(
 
 @router.get("/ledger/export")
 async def export_municipal_ledger_endpoint(
-    palika_code: str = Query(default="30608"),
+    palika_code: str = Query(default="30608", pattern=r"^[A-Za-z0-9_-]+$"),
     format_type: str = Query(default="xlsx", alias="format"),
     principal: AuthenticatedStaffPrincipal = Depends(get_current_staff),
     session: AsyncSession = Depends(get_db_session),
