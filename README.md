@@ -832,10 +832,6 @@ NidanIQ leverages an end-to-end sovereign stack designed for zero data egress, s
 
 ---
 
-## 14. Proprietary Rights & Deployment Governance
-
-**Copyright © 2026 NidanIQ. All Rights Reserved.**
-
-NidanIQ is proprietary sovereign digital public infrastructure engineered for the **Government of Nepal** (**Ministry of Health and Population — MoHP**, **Epidemiology and Disease Control Division — EDCD Teku**, and **753 Local Levels / Palikas**).
+**Copyright © 2026 Shivam Yadav. All Rights Reserved.**
 
 Unauthorized copying, distribution, modification, public disclosure, or commercial exploitation of this repository, in whole or in part, without explicit prior written authorization from the project authority is strictly prohibited.
