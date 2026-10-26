@@ -5,9 +5,7 @@ from __future__ import annotations
 import hashlib
 import io
 import os
-import re
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from openpyxl import Workbook
@@ -374,7 +372,7 @@ class MunicipalLedgerSyncService:
         resolved_path = os.path.normpath(os.path.join(safe_root_dir, filename))
 
         if not resolved_path.startswith(root_prefix):
-            raise ValueError(f"Access denied: path traversal detected in export directory")
+            raise ValueError("Access denied: path traversal detected in export directory")
 
         with open(resolved_path, "wb") as f:
             f.write(xlsx_bytes)
