@@ -1,4 +1,4 @@
-"""Pydantic Settings configuration validating environment variables at startup."""
+"""Pydantic v2 Settings for NidanIQ Government of Nepal Sovereign Vector Surveillance DPI."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ _ENV_FILE = _BACKEND_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    """Application settings strictly pinned to Indian data residency (asia-south1 / asia-south2)."""
+    """Sovereign configuration pinned to IDMC Singha Durbar & Asia/Kathmandu (UTC+05:45)."""
 
     model_config = SettingsConfigDict(
         env_file=str(_ENV_FILE) if _ENV_FILE.exists() else ".env",
@@ -21,107 +21,199 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # --- GCP & Data Sovereignty ---
-    gcp_project_id: str = Field(default="teamrocketnp", alias="GCP_PROJECT_ID")
-    gcp_region: str = Field(default="asia-south1", alias="GCP_REGION")
-    google_application_credentials: str = Field(
-        default="", alias="GOOGLE_APPLICATION_CREDENTIALS"
+    env: str = Field(default="development", alias="ENV")
+    sovereign_datacenter_id: str = Field(
+        default="IDMC-SINGHA-DURBAR-NP-01", alias="SOVEREIGN_DATACENTER_ID"
     )
-    gcs_scan_bucket: str = Field(
-        default="teamrocketnp-nidaniq-scans-south1", alias="GCS_SCAN_BUCKET"
+    dr_datacenter_id: str = Field(
+        default="IDMC-HETAUDA-NP-02", alias="DR_DATACENTER_ID"
+    )
+    timezone: str = Field(default="Asia/Kathmandu", alias="TIMEZONE")
+    default_palika_code: str = Field(default="30608", alias="DEFAULT_PALIKA_CODE")
+    fusion_cron_npt: str = Field(default="06:00", alias="FUSION_CRON_NPT")
+
+    # Database & Redis (Singha Durbar Primary + Hetauda DR Read Replica)
+    database_url: str = Field(
+        default="sqlite+aiosqlite:///./nidaniq_nepal_sovereign.db",
+        alias="DATABASE_URL",
+    )
+    database_read_replica_url: str = Field(
+        default="",
+        alias="DATABASE_READ_REPLICA_URL",
+    )
+    redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
+
+    # Anti-Spoofing, GPU Circuit Breaker, OCC Digital Signature & NHRC Research Keys
+    phash_hamming_threshold: int = Field(
+        default=8, alias="PHASH_HAMMING_THRESHOLD"
+    )
+    gpu_vram_circuit_threshold_pct: float = Field(
+        default=90.0, alias="GPU_VRAM_CIRCUIT_THRESHOLD_PCT"
+    )
+    occ_root_ca_issuer: str = Field(
+        default="CN=Nepal Government Root CA G3, O=Office of the Controller of Certification (OCC), C=NP",
+        alias="OCC_ROOT_CA_ISSUER",
+    )
+    nhrc_research_api_keys: str = Field(
+        default="nhrc-nepal-ethics-2083-key,tu-iom-research-key,pahs-research-key,bpkihs-research-key",
+        alias="NHRC_RESEARCH_API_KEYS",
     )
 
-    # --- Vertex AI / Gemini ---
-    vertex_ai_project_id: str = Field(
-        default="teamrocketnp", alias="VERTEX_AI_PROJECT_ID"
+    # Asymmetric JWT (Electronic Transactions Act 2063 & NCSC 2080)
+    jwt_algorithm: str = Field(default="EdDSA", alias="JWT_ALGORITHM")
+    access_token_expire_minutes: int = Field(
+        default=15, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
     )
-    vertex_ai_location: str = Field(
-        default="asia-south1", alias="VERTEX_AI_LOCATION"
+    refresh_token_expire_days: int = Field(
+        default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS"
     )
-    gemini_model_id: str = Field(
-        default="gemini-3.8-flash", alias="GEMINI_MODEL_ID"
-    )
-    google_ai_api_key: str = Field(default="", alias="GOOGLE_AI_API_KEY")
+    jwt_private_key_b64: str = Field(default="", alias="JWT_PRIVATE_KEY_B64")
+    jwt_public_key_b64: str = Field(default="", alias="JWT_PUBLIC_KEY_B64")
 
-    # --- Master Google Sheet Ledger ---
-    master_spreadsheet_id: str = Field(
-        default="", alias="MASTER_SPREADSHEET_ID"
+    # AES-256-GCM At-Rest Field Encryption (Individual Privacy Act 2075)
+    field_encryption_key_hex: str = Field(
+        default="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        alias="FIELD_ENCRYPTION_KEY_HEX",
+    )
+    phone_hmac_secret: str = Field(
+        default="nepal-mohp-edcd-staff-whitelist-hmac-secret-2083",
+        alias="PHONE_HMAC_SECRET",
     )
 
-    # --- Google Maps Platform (Routes API v2) ---
+    # Nepali Telecom Gateways (+977 NTC & Ncell via Sparrow SMS & Aakash SMS 5-Digit Shortcode)
+    sms_provider: str = Field(default="sparrow", alias="SMS_PROVIDER")
+    sparrow_sms_api_url: str = Field(
+        default="https://api.sparrowsms.com/v2/sms/", alias="SPARROW_SMS_API_URL"
+    )
+    sparrow_sms_token: str = Field(default="", alias="SPARROW_SMS_TOKEN")
+    sparrow_sms_identity: str = Field(
+        default="MoHP-EDCD", alias="SPARROW_SMS_IDENTITY"
+    )
+    aakash_sms_api_url: str = Field(
+        default="https://sms.aakashsms.com/sms/v3/send", alias="AAKASH_SMS_API_URL"
+    )
+    aakash_sms_token: str = Field(default="", alias="AAKASH_SMS_TOKEN")
+    sms_webhook_hmac_secret: str = Field(
+        default="nepal-sparrow-aakash-shortcode-hmac-2083",
+        alias="SMS_WEBHOOK_HMAC_SECRET",
+    )
+    sms_shortcode: str = Field(default="31115", alias="SMS_SHORTCODE")
+
+    # Zero-Cost Notification SMTP Relay (Email + In-App Push ONLY for Alerts/Reports; Zero SMS)
+    smtp_host: str = Field(default="smtp.idmc.gov.np", alias="SMTP_HOST")
+    smtp_port: int = Field(default=587, alias="SMTP_PORT")
+    smtp_user: str = Field(default="alerts@nidaniq.gov.np", alias="SMTP_USER")
+    smtp_pass: str = Field(default="", alias="SMTP_PASS")
+    smtp_from_email: str = Field(
+        default="MoHP-EDCD Vector Surveillance <alerts@nidaniq.gov.np>",
+        alias="SMTP_FROM_EMAIL",
+    )
+
+    # NDRRMA BIPAD Portal & DHM Ground Weather Stations
+    bipad_portal_api_url: str = Field(
+        default="https://bipadportal.gov.np/api/v1/incident/",
+        alias="BIPAD_PORTAL_API_URL",
+    )
+    dhm_aws_api_url: str = Field(
+        default="https://dhm.gov.np/api/v1/hydrology-meteorology/",
+        alias="DHM_AWS_API_URL",
+    )
+
+    # MoHP eLMIS Logistics & PHLMC Requisition
+    elmis_api_base_url: str = Field(
+        default="https://elmis.mohp.gov.np/api/v1",
+        alias="ELMIS_API_BASE_URL",
+    )
+
+    # MinIO S3 Object Lock WORM Audit Archive (365-Day COMPLIANCE Retention)
+    minio_endpoint: str = Field(
+        default="http://localhost:9000", alias="MINIO_ENDPOINT"
+    )
+    minio_bucket_worm: str = Field(
+        default="edcd-worm-audit-ledger", alias="MINIO_BUCKET_WORM"
+    )
+    minio_access_key: str = Field(
+        default="idmc_worm_admin", alias="MINIO_ACCESS_KEY"
+    )
+    minio_secret_key: str = Field(
+        default="idmc_worm_sovereign_secret", alias="MINIO_SECRET_KEY"
+    )
+    worm_retention_days: int = Field(default=365, alias="WORM_RETENTION_DAYS")
+
+    # Self-Hosted Open-Weight AI (vLLM / Ollama inside IDMC Singha Durbar)
+    vllm_base_url: str = Field(
+        default="http://vllm-gemma:8000/v1", alias="VLLM_BASE_URL"
+    )
+    vllm_api_key: str = Field(
+        default="sovereign-local-vllm", alias="VLLM_API_KEY"
+    )
+    gemma_model_id: str = Field(
+        default="google/gemma-4-12b-it", alias="GEMMA_MODEL_ID"
+    )
+    paligemma_model_id: str = Field(
+        default="google/paligemma-3b-mix-448", alias="PALIGEMMA_MODEL_ID"
+    )
+
+    # Sovereign Road Routing (OSRM Nepal / Valhalla + Optional Google Maps Routes v2)
+    routing_strategy: str = Field(default="osrm_nepal", alias="ROUTING_STRATEGY")
+    osrm_base_url: str = Field(
+        default="http://osrm-nepal:5000", alias="OSRM_BASE_URL"
+    )
     google_maps_api_key: str = Field(default="", alias="GOOGLE_MAPS_API_KEY")
 
-    # --- Open Government Data India (api.data.gov.in) ---
-    data_gov_in_api_key: str = Field(default="", alias="DATA_GOV_IN_API_KEY")
-    ogd_health_directory_resource_id: str = Field(
-        default="db2e3a80-ea7a-4ead-987a-9564fcee3c08",
-        alias="OGD_HEALTH_DIRECTORY_RESOURCE_ID",
+    # MoHP Health Interoperability (IHMIS / DHIS2, EWARS, NHFR)
+    dhis2_ihmis_base_url: str = Field(
+        default="https://hmis.gov.np/hmis", alias="DHIS2_IHMIS_BASE_URL"
     )
-    ogd_hospital_directory_resource_id: str = Field(
-        default="37670b6f-c236-49a7-8cd7-cc2dc610e32d",
-        alias="OGD_HOSPITAL_DIRECTORY_RESOURCE_ID",
+    dhis2_api_token: str = Field(default="", alias="DHIS2_API_TOKEN")
+    ewars_webhook_secret: str = Field(
+        default="edcd-teku-ewars-sentinel-secret", alias="EWARS_WEBHOOK_SECRET"
     )
-    ogd_nvbdcp_cases_resource_id: str = Field(
-        default="bbfa6042-ec2e-4c28-8135-6fc7b3e4c39c",
-        alias="OGD_NVBDCP_CASES_RESOURCE_ID",
-    )
-    ogd_pincode_lgd_resource_id: str = Field(
-        default="5c2f62fe-5afa-4119-a499-fec9d604d5bd",
-        alias="OGD_PINCODE_LGD_RESOURCE_ID",
-    )
-    ogd_lgd_subdistricts_resource_id: str = Field(
-        default="6be51a29-876a-403a-a6da-42fde795e751",
-        alias="OGD_LGD_SUBDISTRICTS_RESOURCE_ID",
-    )
-    ogd_lgd_local_bodies_resource_id: str = Field(
-        default="1a6c26ed-d67c-40ea-aa20-d38d35f341a5",
-        alias="OGD_LGD_LOCAL_BODIES_RESOURCE_ID",
+    nhfr_api_base_url: str = Field(
+        default="https://nhfr.mohp.gov.np/api/v1", alias="NHFR_API_BASE_URL"
     )
 
-    # --- News API (Real-Time Sentiment & Outbreak Entity Mining) ---
-    news_api_key: str = Field(
-        default="1e67ab7ec9ee4b2389929e5a41a72be3", alias="NEWS_API_KEY"
+    # Sovereign 7-Tab Municipal Command Ledger
+    ledger_export_dir: str = Field(
+        default="./exports/municipal_ledger", alias="LEDGER_EXPORT_DIR"
     )
-
-    # --- Open-weight Gemma 4 Multimodal Model (vLLM on Cloud Run L4 asia-south1 / Ollama) ---
-    gemma_endpoint_url: str = Field(default="", alias="GEMMA_ENDPOINT_URL")
-    gemma_model_id: str = Field(
-        default="google/gemma-4-12B-it", alias="GEMMA_MODEL_ID"
+    google_sheets_enabled: bool = Field(
+        default=False, alias="GOOGLE_SHEETS_ENABLED"
     )
+    master_spreadsheet_id: str = Field(default="", alias="MASTER_SPREADSHEET_ID")
 
-    # --- Alert Email (SMTP TLS / Gmail API) ---
-    smtp_host: str = Field(default="smtp.gmail.com", alias="SMTP_HOST")
-    smtp_port: int = Field(default=587, alias="SMTP_PORT")
-    smtp_user: str = Field(default="", alias="SMTP_USER")
-    smtp_password: str = Field(default="", alias="SMTP_PASSWORD")
-    alert_from_address: str = Field(
-        default="alerts@NidanIQ.in", alias="ALERT_FROM_ADDRESS"
-    )
-
+    # API Hardening & Security Headers
     cors_allowed_origins: str = Field(
-        default=(
-            "https://nidaniq.shivm.co,"
-            "https://teamrocketnp.web.app,"
-            "https://teamrocketnp.firebaseapp.com,"
-            "http://localhost:3000,"
-            "http://localhost:8080,"
-            "http://localhost:5000,"
-            "http://127.0.0.1:8080"
-        ),
+        default="https://edcd.gov.np,https://mohp.gov.np,https://kathmandu.gov.np,http://localhost:3000,http://localhost:8080",
         alias="CORS_ALLOWED_ORIGINS",
+    )
+    max_upload_bytes: int = Field(
+        default=10 * 1024 * 1024, alias="MAX_UPLOAD_BYTES"
     )
     public_api_rate_limit: str = Field(
         default="60/minute", alias="PUBLIC_API_RATE_LIMIT"
     )
-    enforce_app_check: bool = Field(default=False, alias="ENFORCE_APP_CHECK")
+    allowed_ssrf_hosts: str = Field(
+        default="api.sparrowsms.com,sms.aakashsms.com,hmis.gov.np,nhfr.mohp.gov.np,bipadportal.gov.np,dhm.gov.np,elmis.mohp.gov.np,vllm-gemma,osrm-nepal,minio-worm,localhost,127.0.0.1",
+        alias="ALLOWED_SSRF_HOSTS",
+    )
 
-    @field_validator("gcp_region", "vertex_ai_location")
+    @field_validator("timezone")
     @classmethod
-    def validate_indian_sovereignty_region(cls, value: str) -> str:
-        allowed = {"asia-south1", "asia-south2"}
+    def validate_nepal_timezone(cls, value: str) -> str:
+        if value != "Asia/Kathmandu":
+            raise ValueError(
+                f"Sovereign timezone violation: expected 'Asia/Kathmandu' (UTC+05:45), got '{value}'."
+            )
+        return value
+
+    @field_validator("jwt_algorithm")
+    @classmethod
+    def validate_asymmetric_jwt_algorithm(cls, value: str) -> str:
+        allowed = {"EdDSA", "RS256"}
         if value not in allowed:
             raise ValueError(
-                f"Data sovereignty violation: region '{value}' is outside India ({allowed})."
+                f"National Cyber Security Policy 2080 violation: symmetric or unsupported JWT algorithm '{value}' is forbidden. Allowed: {allowed}"
             )
         return value
 
@@ -133,25 +225,24 @@ class Settings(BaseSettings):
             if origin.strip()
         ]
 
-    def validate_production_env(self) -> None:
-        """Validate all required production variables at startup, failing fast with clear logs."""
-        required = {
-            "MASTER_SPREADSHEET_ID": self.master_spreadsheet_id,
-            "GOOGLE_MAPS_API_KEY": self.google_maps_api_key,
-            "DATA_GOV_IN_API_KEY": self.data_gov_in_api_key,
-            "NEWS_API_KEY": self.news_api_key,
-            "SMTP_USER": self.smtp_user,
-            "SMTP_PASSWORD": self.smtp_password,
+    @property
+    def allowed_ssrf_hosts_set(self) -> set[str]:
+        return {
+            host.strip().lower()
+            for host in self.allowed_ssrf_hosts.split(",")
+            if host.strip()
         }
-        missing = [k for k, v in required.items() if not v or not str(v).strip()]
-        if missing:
-            import logging
-            msg = f"FATAL STARTUP CONFIGURATION ERROR: Missing required environment variables: {', '.join(missing)}"
-            logging.getLogger("nidaniq.config").error(msg)
-            raise ValueError(msg)
+
+    @property
+    def nhrc_research_keys_set(self) -> set[str]:
+        return {
+            key.strip()
+            for key in self.nhrc_research_api_keys.split(",")
+            if key.strip()
+        }
 
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """Return cached validated application settings."""
+    """Return cached Nepal Sovereign DPI settings."""
     return Settings()

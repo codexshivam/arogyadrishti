@@ -1,53 +1,19 @@
-# NidanIQ — Cloud Build CI/CD Pipeline (Pinned to asia-south1 Mumbai)
+# NidanIQ — Sovereign Container Build Pipeline (Government of Nepal / MoHP EDCD)
 options:
   logging: CLOUD_LOGGING_ONLY
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
 
 substitutions:
-  _REGION: asia-south1
-  _SERVICE_NAME: nidaniq-api
-  _REPO_NAME: nidaniq-repo
+  _SERVICE_NAME: nidaniq-nepal-api
+  _REPO_NAME: nidaniq-nepal-repo
   _TAG: latest
 
 steps:
-  # 1. Build Container Image for Cloud Run (asia-south1)
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'build-container'
+    id: 'build-sovereign-container'
     args:
       - 'build'
       - '-t'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:${_TAG}'
+      - '${_SERVICE_NAME}:${_TAG}'
       - '-f'
       - 'backend/Dockerfile'
-      - '.'
-
-  # 2. Push Image to Artifact Registry in asia-south1
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'push-container'
-    args:
-      - 'push'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:${_TAG}'
-
-  # 3. Deploy to Cloud Run in asia-south1 with zero cold-start configurations
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'deploy-cloud-run'
-    entrypoint: 'gcloud'
-    args:
-      - 'run'
-      - 'deploy'
-      - '${_SERVICE_NAME}'
-      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:${_TAG}'
-      - '--region=${_REGION}'
-      - '--platform=managed'
-      - '--allow-unauthenticated'
-      - '--min-instances=0'
-      - '--max-instances=10'
-      - '--cpu=2'
-      - '--memory=4Gi'
-      - '--concurrency=80'
-      - '--execution-environment=gen2'
-      - '--update-env-vars=GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=${_REGION}'
-      - '--quiet'
-
-images:
-  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE_NAME}:${_TAG}'
+      - './backend'

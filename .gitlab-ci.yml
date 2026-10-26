@@ -1,0 +1,54 @@
+# ============================================================================
+# NidanIQ — IDMC Singha Durbar GitLab CI/CD DevSecOps Pipeline
+# Every commit automatically runs through:
+# 1. Bandit (Python Security Linting / SAST)
+# 2. SonarQube (Code Quality & Security Hotspots)
+# 3. Trivy (Docker Container & Filesystem Vulnerability Scanning)
+# 4. Automated Pytest & Flutter Sovereign Security Verification
+# ============================================================================
+stages:
+  - sast_security_lint
+  - code_quality_sonarqube
+  - container_scan_trivy
+  - sovereign_verification
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  TZ: "Asia/Kathmandu"
+
+bandit_python_sast:
+  stage: sast_security_lint
+  image: python:3.12-slim
+  script:
+    - pip install --upgrade pip bandit ruff
+    - ruff check backend/
+    - bandit -r backend/app -ll -ii
+
+sonarqube_scan:
+  stage: code_quality_sonarqube
+  image:
+    name: sonarsource/sonar-scanner-cli:11
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  script:
+    - sonar-scanner -Dsonar.projectKey=np.gov.mohp.edcd.nidaniq -Dsonar.QualityGate.wait=true
+  allow_failure: false
+
+trivy_docker_vulnerability_scan:
+  stage: container_scan_trivy
+  image:
+    name: aquasec/trivy:0.56.2
+    entrypoint: [""]
+  script:
+    - trivy fs --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 .
+    - trivy config --severity CRITICAL,HIGH --exit-code 1 backend/Dockerfile backend/docker-compose.sovereign.yml
+
+pytest_sovereign_security_suite:
+  stage: sovereign_verification
+  image: python:3.12-slim
+  script:
+    - pip install --upgrade pip
+    - pip install -r backend/requirements.txt pytest pytest-asyncio httpx aiosqlite
+    - ENV=test TIMEZONE=Asia/Kathmandu pytest backend/tests -q

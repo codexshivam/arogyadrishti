@@ -1,0 +1,100 @@
+name: NidanIQ Sovereign DevSecOps Pipeline (Bandit + SonarQube + Trivy)
+
+on:
+  push:
+    branches: ["main", "master", "develop", "release/**"]
+  pull_request:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  bandit-python-sast:
+    name: "1. Bandit (Python Security Linting & SAST)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Sovereign Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Bandit Security Linter
+        run: pip install --upgrade pip bandit[toml] ruff
+
+      - name: Run Ruff Static Analysis
+        run: ruff check backend/
+
+      - name: Run Bandit SAST Scan on FastAPI Backend
+        run: bandit -r backend/app -ll -ii -f custom
+
+  sonarqube-code-quality:
+    name: "2. SonarQube (Code Quality & Security Hotspots)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Sovereign Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Quality Gate & Security Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  trivy-container-and-fs-scan:
+    name: "3. Trivy (Docker Container & Filesystem Vulnerability Scan)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Sovereign Repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Filesystem & Dependency Vulnerability Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          severity: "CRITICAL,HIGH"
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Build NidanIQ Sovereign Backend Docker Image
+        run: docker build -t nidaniq-nepal-api:${{ github.sha }} ./backend
+
+      - name: Run Trivy Docker Container Image Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: "nidaniq-nepal-api:${{ github.sha }}"
+          format: "table"
+          severity: "CRITICAL,HIGH"
+          ignore-unfixed: true
+          exit-code: "1"
+
+  sovereign-test-and-dast-verification:
+    name: "4. Automated Sovereign Security & API Verification Suite"
+    runs-on: ubuntu-latest
+    needs: [bandit-python-sast]
+    steps:
+      - name: Checkout Sovereign Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Backend Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r backend/requirements.txt pytest pytest-asyncio httpx aiosqlite
+
+      - name: Execute Pytest Security, Vault, mTLS, Wazuh & OAG Verification Suite
+        env:
+          ENV: test
+          TIMEZONE: Asia/Kathmandu
+        run: pytest backend/tests -q

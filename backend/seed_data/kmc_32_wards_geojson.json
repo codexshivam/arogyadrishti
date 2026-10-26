@@ -1,0 +1,1884 @@
+{
+  "type": "FeatureCollection",
+  "name": "nepal_sovereign_palika_wards_srid4326",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W01",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W01",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 1,
+        "locality_name": "Naxal",
+        "locality_name_ne": "वडा नं. 1 - नक्साल",
+        "mean_elevation_m": 1318.0,
+        "centroid_lat": 27.7145,
+        "centroid_lng": 85.3248,
+        "dhis2_org_unit_uid": "NPKMC30608W01"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3203,
+                  27.71
+                ],
+                [
+                  85.3293,
+                  27.71
+                ],
+                [
+                  85.3293,
+                  27.719
+                ],
+                [
+                  85.3203,
+                  27.719
+                ],
+                [
+                  85.3203,
+                  27.71
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W02",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W02",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 2,
+        "locality_name": "Lazimpat",
+        "locality_name_ne": "वडा नं. 2 - लाजिम्पाट",
+        "mean_elevation_m": 1326.0,
+        "centroid_lat": 27.7235,
+        "centroid_lng": 85.3208,
+        "dhis2_org_unit_uid": "NPKMC30608W02"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3163,
+                  27.719
+                ],
+                [
+                  85.3253,
+                  27.719
+                ],
+                [
+                  85.3253,
+                  27.728
+                ],
+                [
+                  85.3163,
+                  27.728
+                ],
+                [
+                  85.3163,
+                  27.719
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W03",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W03",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 3,
+        "locality_name": "Maharajgunj",
+        "locality_name_ne": "वडा नं. 3 - महाराजगञ्ज",
+        "mean_elevation_m": 1348.0,
+        "centroid_lat": 27.7365,
+        "centroid_lng": 85.3315,
+        "dhis2_org_unit_uid": "NPKMC30608W03"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.327,
+                  27.732
+                ],
+                [
+                  85.336,
+                  27.732
+                ],
+                [
+                  85.336,
+                  27.741
+                ],
+                [
+                  85.327,
+                  27.741
+                ],
+                [
+                  85.327,
+                  27.732
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W04",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W04",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 4,
+        "locality_name": "Baluwatar",
+        "locality_name_ne": "वडा नं. 4 - बालुवाटार",
+        "mean_elevation_m": 1332.0,
+        "centroid_lat": 27.7262,
+        "centroid_lng": 85.3324,
+        "dhis2_org_unit_uid": "NPKMC30608W04"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3279,
+                  27.7217
+                ],
+                [
+                  85.3369,
+                  27.7217
+                ],
+                [
+                  85.3369,
+                  27.7307
+                ],
+                [
+                  85.3279,
+                  27.7307
+                ],
+                [
+                  85.3279,
+                  27.7217
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W05",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W05",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 5,
+        "locality_name": "Tangal / Hadigaun",
+        "locality_name_ne": "वडा नं. 5 - टंगाल / हाँडीगाउँ",
+        "mean_elevation_m": 1322.0,
+        "centroid_lat": 27.7178,
+        "centroid_lng": 85.3348,
+        "dhis2_org_unit_uid": "NPKMC30608W05"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3303,
+                  27.7133
+                ],
+                [
+                  85.3393,
+                  27.7133
+                ],
+                [
+                  85.3393,
+                  27.7223
+                ],
+                [
+                  85.3303,
+                  27.7223
+                ],
+                [
+                  85.3303,
+                  27.7133
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W06",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W06",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 6,
+        "locality_name": "Boudha",
+        "locality_name_ne": "वडा नं. 6 - बौद्ध",
+        "mean_elevation_m": 1342.0,
+        "centroid_lat": 27.7214,
+        "centroid_lng": 85.362,
+        "dhis2_org_unit_uid": "NPKMC30608W06"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3575,
+                  27.7169
+                ],
+                [
+                  85.3665,
+                  27.7169
+                ],
+                [
+                  85.3665,
+                  27.7259
+                ],
+                [
+                  85.3575,
+                  27.7259
+                ],
+                [
+                  85.3575,
+                  27.7169
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W07",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W07",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 7,
+        "locality_name": "Chabahil / Mitrapark",
+        "locality_name_ne": "वडा नं. 7 - चाबहिल / मित्रपार्क",
+        "mean_elevation_m": 1328.0,
+        "centroid_lat": 27.7168,
+        "centroid_lng": 85.3478,
+        "dhis2_org_unit_uid": "NPKMC30608W07"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3433,
+                  27.7123
+                ],
+                [
+                  85.3523,
+                  27.7123
+                ],
+                [
+                  85.3523,
+                  27.7213
+                ],
+                [
+                  85.3433,
+                  27.7213
+                ],
+                [
+                  85.3433,
+                  27.7123
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W08",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W08",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 8,
+        "locality_name": "Pashupatinath / Gaushala",
+        "locality_name_ne": "वडा नं. 8 - पशुपतिनाथ / गौशाला",
+        "mean_elevation_m": 1316.0,
+        "centroid_lat": 27.7098,
+        "centroid_lng": 85.3482,
+        "dhis2_org_unit_uid": "NPKMC30608W08"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3437,
+                  27.7053
+                ],
+                [
+                  85.3527,
+                  27.7053
+                ],
+                [
+                  85.3527,
+                  27.7143
+                ],
+                [
+                  85.3437,
+                  27.7143
+                ],
+                [
+                  85.3437,
+                  27.7053
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W09",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W09",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 9,
+        "locality_name": "Sinamangal / Battisputali",
+        "locality_name_ne": "वडा नं. 9 - सिनामंगल / बत्तीसपुतली",
+        "mean_elevation_m": 1312.0,
+        "centroid_lat": 27.6995,
+        "centroid_lng": 85.349,
+        "dhis2_org_unit_uid": "NPKMC30608W09"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3445,
+                  27.695
+                ],
+                [
+                  85.3535,
+                  27.695
+                ],
+                [
+                  85.3535,
+                  27.704
+                ],
+                [
+                  85.3445,
+                  27.704
+                ],
+                [
+                  85.3445,
+                  27.695
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W10",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W10",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 10,
+        "locality_name": "Baneshwor",
+        "locality_name_ne": "वडा नं. 10 - बानेश्वर",
+        "mean_elevation_m": 1315.0,
+        "centroid_lat": 27.6915,
+        "centroid_lng": 85.3368,
+        "dhis2_org_unit_uid": "NPKMC30608W10"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3323,
+                  27.687
+                ],
+                [
+                  85.3413,
+                  27.687
+                ],
+                [
+                  85.3413,
+                  27.696
+                ],
+                [
+                  85.3323,
+                  27.696
+                ],
+                [
+                  85.3323,
+                  27.687
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W11",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W11",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 11,
+        "locality_name": "Tripureshwor / Thapathali",
+        "locality_name_ne": "वडा नं. 11 - त्रिपुरेश्वर / थापाथली",
+        "mean_elevation_m": 1294.0,
+        "centroid_lat": 27.6938,
+        "centroid_lng": 85.3172,
+        "dhis2_org_unit_uid": "NPKMC30608W11"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3127,
+                  27.6893
+                ],
+                [
+                  85.3217,
+                  27.6893
+                ],
+                [
+                  85.3217,
+                  27.6983
+                ],
+                [
+                  85.3127,
+                  27.6983
+                ],
+                [
+                  85.3127,
+                  27.6893
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W12",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W12",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 12,
+        "locality_name": "Teku",
+        "locality_name_ne": "वडा नं. 12 - टेकु",
+        "mean_elevation_m": 1292.0,
+        "centroid_lat": 27.6948,
+        "centroid_lng": 85.3049,
+        "dhis2_org_unit_uid": "NPKMC30608W12"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3004,
+                  27.6903
+                ],
+                [
+                  85.3094,
+                  27.6903
+                ],
+                [
+                  85.3094,
+                  27.6993
+                ],
+                [
+                  85.3004,
+                  27.6993
+                ],
+                [
+                  85.3004,
+                  27.6903
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W13",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W13",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 13,
+        "locality_name": "Kalimati / Bafal",
+        "locality_name_ne": "वडा नं. 13 - कालीमाटी / बाफल",
+        "mean_elevation_m": 1302.0,
+        "centroid_lat": 27.6992,
+        "centroid_lng": 85.2955,
+        "dhis2_org_unit_uid": "NPKMC30608W13"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.291,
+                  27.6947
+                ],
+                [
+                  85.3,
+                  27.6947
+                ],
+                [
+                  85.3,
+                  27.7037
+                ],
+                [
+                  85.291,
+                  27.7037
+                ],
+                [
+                  85.291,
+                  27.6947
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W14",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W14",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 14,
+        "locality_name": "Kalanki / Kuleshwor",
+        "locality_name_ne": "वडा नं. 14 - कलंकी / कुलेश्वर",
+        "mean_elevation_m": 1314.0,
+        "centroid_lat": 27.6932,
+        "centroid_lng": 85.2815,
+        "dhis2_org_unit_uid": "NPKMC30608W14"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.277,
+                  27.6887
+                ],
+                [
+                  85.286,
+                  27.6887
+                ],
+                [
+                  85.286,
+                  27.6977
+                ],
+                [
+                  85.277,
+                  27.6977
+                ],
+                [
+                  85.277,
+                  27.6887
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W15",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W15",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 15,
+        "locality_name": "Swoyambhu / Dallu",
+        "locality_name_ne": "वडा नं. 15 - स्वयम्भू / डल्लु",
+        "mean_elevation_m": 1385.0,
+        "centroid_lat": 27.7148,
+        "centroid_lng": 85.2904,
+        "dhis2_org_unit_uid": "NPKMC30608W15"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.2859,
+                  27.7103
+                ],
+                [
+                  85.2949,
+                  27.7103
+                ],
+                [
+                  85.2949,
+                  27.7193
+                ],
+                [
+                  85.2859,
+                  27.7193
+                ],
+                [
+                  85.2859,
+                  27.7103
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W16",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W16",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 16,
+        "locality_name": "Balaju / Banasthali",
+        "locality_name_ne": "वडा नं. 16 - बालाजु / बनस्थली",
+        "mean_elevation_m": 1324.0,
+        "centroid_lat": 27.7285,
+        "centroid_lng": 85.3012,
+        "dhis2_org_unit_uid": "NPKMC30608W16"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.2967,
+                  27.724
+                ],
+                [
+                  85.3057,
+                  27.724
+                ],
+                [
+                  85.3057,
+                  27.733
+                ],
+                [
+                  85.2967,
+                  27.733
+                ],
+                [
+                  85.2967,
+                  27.724
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W17",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W17",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 17,
+        "locality_name": "Chhetrapati / Dhalko",
+        "locality_name_ne": "वडा नं. 17 - क्षेत्रपाटी / ढल्को",
+        "mean_elevation_m": 1304.0,
+        "centroid_lat": 27.7124,
+        "centroid_lng": 85.3065,
+        "dhis2_org_unit_uid": "NPKMC30608W17"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.302,
+                  27.7079
+                ],
+                [
+                  85.311,
+                  27.7079
+                ],
+                [
+                  85.311,
+                  27.7169
+                ],
+                [
+                  85.302,
+                  27.7169
+                ],
+                [
+                  85.302,
+                  27.7079
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W18",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W18",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 18,
+        "locality_name": "Naradevi / Tengal",
+        "locality_name_ne": "वडा नं. 18 - नरदेवी / तेंगल",
+        "mean_elevation_m": 1301.0,
+        "centroid_lat": 27.7082,
+        "centroid_lng": 85.3058,
+        "dhis2_org_unit_uid": "NPKMC30608W18"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3013,
+                  27.7037
+                ],
+                [
+                  85.3103,
+                  27.7037
+                ],
+                [
+                  85.3103,
+                  27.7127
+                ],
+                [
+                  85.3013,
+                  27.7127
+                ],
+                [
+                  85.3013,
+                  27.7037
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W19",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W19",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 19,
+        "locality_name": "Damaitole / Hanumandhoka",
+        "locality_name_ne": "वडा नं. 19 - दमाईटोल / हनुमानढोका",
+        "mean_elevation_m": 1299.0,
+        "centroid_lat": 27.7042,
+        "centroid_lng": 85.3052,
+        "dhis2_org_unit_uid": "NPKMC30608W19"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3007,
+                  27.6997
+                ],
+                [
+                  85.3097,
+                  27.6997
+                ],
+                [
+                  85.3097,
+                  27.7087
+                ],
+                [
+                  85.3007,
+                  27.7087
+                ],
+                [
+                  85.3007,
+                  27.6997
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W20",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W20",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 20,
+        "locality_name": "Bhimsensthan / Maru",
+        "locality_name_ne": "वडा नं. 20 - भीमसेनस्थान / मरु",
+        "mean_elevation_m": 1295.0,
+        "centroid_lat": 27.7018,
+        "centroid_lng": 85.3038,
+        "dhis2_org_unit_uid": "NPKMC30608W20"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.2993,
+                  27.6973
+                ],
+                [
+                  85.3083,
+                  27.6973
+                ],
+                [
+                  85.3083,
+                  27.7063
+                ],
+                [
+                  85.2993,
+                  27.7063
+                ],
+                [
+                  85.2993,
+                  27.6973
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W21",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W21",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 21,
+        "locality_name": "Jaisidewal / Lagan",
+        "locality_name_ne": "वडा नं. 21 - जैसीदेवल / लगन",
+        "mean_elevation_m": 1297.0,
+        "centroid_lat": 27.6996,
+        "centroid_lng": 85.3075,
+        "dhis2_org_unit_uid": "NPKMC30608W21"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.303,
+                  27.6951
+                ],
+                [
+                  85.312,
+                  27.6951
+                ],
+                [
+                  85.312,
+                  27.7041
+                ],
+                [
+                  85.303,
+                  27.7041
+                ],
+                [
+                  85.303,
+                  27.6951
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W22",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W22",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 22,
+        "locality_name": "New Road / Tebahal",
+        "locality_name_ne": "वडा नं. 22 - न्युरोड / तेबहाल",
+        "mean_elevation_m": 1303.0,
+        "centroid_lat": 27.7032,
+        "centroid_lng": 85.3105,
+        "dhis2_org_unit_uid": "NPKMC30608W22"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.306,
+                  27.6987
+                ],
+                [
+                  85.315,
+                  27.6987
+                ],
+                [
+                  85.315,
+                  27.7077
+                ],
+                [
+                  85.306,
+                  27.7077
+                ],
+                [
+                  85.306,
+                  27.6987
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W23",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W23",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 23,
+        "locality_name": "Om Bahal / Basantapur",
+        "locality_name_ne": "वडा नं. 23 - ओमबहाल / बसन्तपुर",
+        "mean_elevation_m": 1301.0,
+        "centroid_lat": 27.7024,
+        "centroid_lng": 85.3084,
+        "dhis2_org_unit_uid": "NPKMC30608W23"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3039,
+                  27.6979
+                ],
+                [
+                  85.3129,
+                  27.6979
+                ],
+                [
+                  85.3129,
+                  27.7069
+                ],
+                [
+                  85.3039,
+                  27.7069
+                ],
+                [
+                  85.3039,
+                  27.6979
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W24",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W24",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 24,
+        "locality_name": "Makhan / Indrachowk",
+        "locality_name_ne": "वडा नं. 24 - मखन / इन्द्रचोक",
+        "mean_elevation_m": 1304.0,
+        "centroid_lat": 27.7058,
+        "centroid_lng": 85.3092,
+        "dhis2_org_unit_uid": "NPKMC30608W24"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3047,
+                  27.7013
+                ],
+                [
+                  85.3137,
+                  27.7013
+                ],
+                [
+                  85.3137,
+                  27.7103
+                ],
+                [
+                  85.3047,
+                  27.7103
+                ],
+                [
+                  85.3047,
+                  27.7013
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W25",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W25",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 25,
+        "locality_name": "Asan / Keltole",
+        "locality_name_ne": "वडा नं. 25 - असन / केलटोल",
+        "mean_elevation_m": 1306.0,
+        "centroid_lat": 27.7074,
+        "centroid_lng": 85.3112,
+        "dhis2_org_unit_uid": "NPKMC30608W25"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3067,
+                  27.7029
+                ],
+                [
+                  85.3157,
+                  27.7029
+                ],
+                [
+                  85.3157,
+                  27.7119
+                ],
+                [
+                  85.3067,
+                  27.7119
+                ],
+                [
+                  85.3067,
+                  27.7029
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W26",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W26",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 26,
+        "locality_name": "Lainchaur / Thamel",
+        "locality_name_ne": "वडा नं. 26 - लैनचौर / ठमेल",
+        "mean_elevation_m": 1316.0,
+        "centroid_lat": 27.7165,
+        "centroid_lng": 85.3125,
+        "dhis2_org_unit_uid": "NPKMC30608W26"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.308,
+                  27.712
+                ],
+                [
+                  85.317,
+                  27.712
+                ],
+                [
+                  85.317,
+                  27.721
+                ],
+                [
+                  85.308,
+                  27.721
+                ],
+                [
+                  85.308,
+                  27.712
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W27",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W27",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 27,
+        "locality_name": "Mahaboudha / Bhotahiti",
+        "locality_name_ne": "वडा नं. 27 - महाबौद्ध / भोटाहिटी",
+        "mean_elevation_m": 1307.0,
+        "centroid_lat": 27.7055,
+        "centroid_lng": 85.3135,
+        "dhis2_org_unit_uid": "NPKMC30608W27"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.309,
+                  27.701
+                ],
+                [
+                  85.318,
+                  27.701
+                ],
+                [
+                  85.318,
+                  27.71
+                ],
+                [
+                  85.309,
+                  27.71
+                ],
+                [
+                  85.309,
+                  27.701
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W28",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W28",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 28,
+        "locality_name": "Bagbazar / Putalisadak",
+        "locality_name_ne": "वडा नं. 28 - बागबजार / पुतलीसडक",
+        "mean_elevation_m": 1309.0,
+        "centroid_lat": 27.7045,
+        "centroid_lng": 85.3202,
+        "dhis2_org_unit_uid": "NPKMC30608W28"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3157,
+                  27.7
+                ],
+                [
+                  85.3247,
+                  27.7
+                ],
+                [
+                  85.3247,
+                  27.709
+                ],
+                [
+                  85.3157,
+                  27.709
+                ],
+                [
+                  85.3157,
+                  27.7
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W29",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W29",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 29,
+        "locality_name": "Dillibazar / Ghattekulo",
+        "locality_name_ne": "वडा नं. 29 - डिल्लीबजार / घट्टेकुलो",
+        "mean_elevation_m": 1318.0,
+        "centroid_lat": 27.7048,
+        "centroid_lng": 85.3285,
+        "dhis2_org_unit_uid": "NPKMC30608W29"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.324,
+                  27.7003
+                ],
+                [
+                  85.333,
+                  27.7003
+                ],
+                [
+                  85.333,
+                  27.7093
+                ],
+                [
+                  85.324,
+                  27.7093
+                ],
+                [
+                  85.324,
+                  27.7003
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W30",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W30",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 30,
+        "locality_name": "Maitidevi / Gyaneshwor",
+        "locality_name_ne": "वडा नं. 30 - मैतीदेवी / ज्ञानेश्वर",
+        "mean_elevation_m": 1314.0,
+        "centroid_lat": 27.7095,
+        "centroid_lng": 85.3342,
+        "dhis2_org_unit_uid": "NPKMC30608W30"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3297,
+                  27.705
+                ],
+                [
+                  85.3387,
+                  27.705
+                ],
+                [
+                  85.3387,
+                  27.714
+                ],
+                [
+                  85.3297,
+                  27.714
+                ],
+                [
+                  85.3297,
+                  27.705
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W31",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W31",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 31,
+        "locality_name": "Minbhawan / Shantinagar",
+        "locality_name_ne": "वडा नं. 31 - मीनभवन / शान्तिनगर",
+        "mean_elevation_m": 1310.0,
+        "centroid_lat": 27.6869,
+        "centroid_lng": 85.3442,
+        "dhis2_org_unit_uid": "NPKMC30608W31"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3397,
+                  27.6824
+                ],
+                [
+                  85.3487,
+                  27.6824
+                ],
+                [
+                  85.3487,
+                  27.6914
+                ],
+                [
+                  85.3397,
+                  27.6914
+                ],
+                [
+                  85.3397,
+                  27.6824
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D27-30608-W32",
+      "properties": {
+        "composite_ward_id": "NP-P3-D27-30608-W32",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 27,
+        "district_name": "Kathmandu",
+        "palika_code": "30608",
+        "palika_name": "Kathmandu Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 32,
+        "locality_name": "Koteshwor / Tinkune",
+        "locality_name_ne": "वडा नं. 32 - कोटेश्वर / तीनकुने",
+        "mean_elevation_m": 1308.0,
+        "centroid_lat": 27.6782,
+        "centroid_lng": 85.3498,
+        "dhis2_org_unit_uid": "NPKMC30608W32"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3453,
+                  27.6737
+                ],
+                [
+                  85.3543,
+                  27.6737
+                ],
+                [
+                  85.3543,
+                  27.6827
+                ],
+                [
+                  85.3453,
+                  27.6827
+                ],
+                [
+                  85.3453,
+                  27.6737
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D28-30805-W03",
+      "properties": {
+        "composite_ward_id": "NP-P3-D28-30805-W03",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 28,
+        "district_name": "Lalitpur",
+        "palika_code": "30805",
+        "palika_name": "Lalitpur Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 3,
+        "locality_name": "Pulchowk",
+        "locality_name_ne": "वडा नं. ३ - पुल्चोक",
+        "mean_elevation_m": 1318.0,
+        "centroid_lat": 27.6784,
+        "centroid_lng": 85.3168,
+        "dhis2_org_unit_uid": "NPLMC30805W03"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.3123,
+                  27.6739
+                ],
+                [
+                  85.3213,
+                  27.6739
+                ],
+                [
+                  85.3213,
+                  27.6829
+                ],
+                [
+                  85.3123,
+                  27.6829
+                ],
+                [
+                  85.3123,
+                  27.6739
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D28-30805-W04",
+      "properties": {
+        "composite_ward_id": "NP-P3-D28-30805-W04",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 28,
+        "district_name": "Lalitpur",
+        "palika_code": "30805",
+        "palika_name": "Lalitpur Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 4,
+        "locality_name": "Jawalakhel",
+        "locality_name_ne": "वडा नं. ४ - जावलाखेल",
+        "mean_elevation_m": 1325.0,
+        "centroid_lat": 27.6712,
+        "centroid_lng": 85.3145,
+        "dhis2_org_unit_uid": "NPLMC30805W04"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  85.31,
+                  27.6667
+                ],
+                [
+                  85.319,
+                  27.6667
+                ],
+                [
+                  85.319,
+                  27.6757
+                ],
+                [
+                  85.31,
+                  27.6757
+                ],
+                [
+                  85.31,
+                  27.6667
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P3-D35-30502-W10",
+      "properties": {
+        "composite_ward_id": "NP-P3-D35-30502-W10",
+        "province_code": 3,
+        "province_name": "Bagmati Province",
+        "district_code": 35,
+        "district_name": "Chitwan",
+        "palika_code": "30502",
+        "palika_name": "Bharatpur Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 10,
+        "locality_name": "Bharatpur Hospital Road",
+        "locality_name_ne": "वडा नं. १० - भरतपुर अस्पताल रोड",
+        "mean_elevation_m": 208.0,
+        "centroid_lat": 27.6815,
+        "centroid_lng": 84.4342,
+        "dhis2_org_unit_uid": "NPBMC30502W10"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  84.4297,
+                  27.677
+                ],
+                [
+                  84.4387,
+                  27.677
+                ],
+                [
+                  84.4387,
+                  27.686
+                ],
+                [
+                  84.4297,
+                  27.686
+                ],
+                [
+                  84.4297,
+                  27.677
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "NP-P4-D40-40505-W06",
+      "properties": {
+        "composite_ward_id": "NP-P4-D40-40505-W06",
+        "province_code": 4,
+        "province_name": "Gandaki Province",
+        "district_code": 40,
+        "district_name": "Kaski",
+        "palika_code": "40505",
+        "palika_name": "Pokhara Metropolitan City",
+        "palika_type": "Mahanagarpalika",
+        "ward_number": 6,
+        "locality_name": "Lakeside Baidam",
+        "locality_name_ne": "वडा नं. ६ - लेकसाइड बैदाम",
+        "mean_elevation_m": 822.0,
+        "centroid_lat": 28.2096,
+        "centroid_lng": 83.9595,
+        "dhis2_org_unit_uid": "NPPMC40505W06"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                [
+                  83.955,
+                  28.2051
+                ],
+                [
+                  83.964,
+                  28.2051
+                ],
+                [
+                  83.964,
+                  28.2141
+                ],
+                [
+                  83.955,
+                  28.2141
+                ],
+                [
+                  83.955,
+                  28.2051
+                ]
+              ]
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

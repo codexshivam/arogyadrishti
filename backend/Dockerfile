@@ -1,38 +1,53 @@
 # syntax=docker/dockerfile:1
-# Multi-stage production Dockerfile for NidanIQ FastAPI Backend (Google Cloud Run asia-south1)
+# Sovereign Multi-Stage Build for Integrated Data Management Center (IDMC), Singha Durbar, Nepal
+FROM python:3.12-slim-bookworm AS builder
 
-FROM python:3.12-slim AS builder
-
-WORKDIR /build
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    libpq-dev \
+    libgeos-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY backend/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+WORKDIR /build
+COPY pyproject.toml ./
+COPY app ./app
+COPY seed_data ./seed_data
+COPY skills ./skills
+COPY alembic.ini ./
+COPY alembic ./alembic
 
-FROM python:3.12-slim AS runtime
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install .
 
-WORKDIR /app
+FROM python:3.12-slim-bookworm AS runtime
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=8080 \
-    GCP_REGION=asia-south1
+    TZ=Asia/Kathmandu \
+    PATH="/opt/venv/bin:$PATH"
 
-RUN groupadd -r nidaniq && useradd -r -g nidaniq -d /app -s /sbin/nologin nidaniq
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    libgeos-c1v5 \
+    tzdata \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -g 10001 nepaldpi \
+    && useradd -u 10001 -g nepaldpi -s /sbin/nologin -m nepaldpi
 
-COPY --from=builder /install /usr/local
-COPY backend /app/backend
-COPY skills /app/skills
-COPY docs /app/docs
-COPY LICENSE /app/LICENSE
+WORKDIR /app
+COPY --from=builder --chown=10001:10001 /opt/venv /opt/venv
+COPY --from=builder --chown=10001:10001 /build /app
 
-WORKDIR /app/backend
-USER nidaniq
-
+USER 10001:10001
 EXPOSE 8080
 
-CMD ["gunicorn", "app.main:app", "--bind", "0.0.0.0:8080", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--timeout", "120"]
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz')"]
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "4"]

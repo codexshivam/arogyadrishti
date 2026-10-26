@@ -6,11 +6,9 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - ./backend/.env
-    volumes:
-      - ~/.config/NidanIQ:/secrets:ro
+      - ./backend/.env.example
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/teamrocket_service.json
+      - TZ=Asia/Kathmandu
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
       interval: 15s

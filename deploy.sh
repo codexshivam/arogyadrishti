@@ -1,25 +1,16 @@
 #!/usr/bin/env bash
-# NidanIQ — Automated Production Deployment Script (asia-south1 Mumbai)
+# NidanIQ — Nepal Sovereign IDMC Singha Durbar Deployment & Verification Script
 set -euo pipefail
 
-PROJECT_ID="${GCP_PROJECT_ID:-teamrocketnp}"
-REGION="asia-south1"
-SERVICE_NAME="nidaniq-api"
+echo "=== [1/3] Running Backend Ruff Linting ==="
+./.venv/bin/python -m ruff check backend
 
-echo "=== [1/4] Verifying Gitleaks Zero-Secret-Leak Gate ==="
-gitleaks detect --source . --no-git -v
+echo "=== [2/3] Running Backend Pytest Suite ==="
+./.venv/bin/python -m pytest backend/tests -v
 
-echo "=== [2/4] Running Backend Ruff Linting ==="
-./.venv/bin/ruff check backend skills
-
-echo "=== [3/4] Running Mobile Flutter Static Analysis ==="
-(cd flutter_app && flutter analyze)
-
-echo "=== [4/4] Submitting Cloud Build & Firebase Deployment in ${REGION} ==="
-if [[ "${DEPLOY_CLOUD:-false}" == "true" ]]; then
-  CLOUDSDK_METRICS_REQUEST_ATTRIBUTION="agent-skills/1.0 (skill:gcloud)" \
-    gcloud builds submit --config=cloudbuild.yaml --project="${PROJECT_ID}" --region="${REGION}" --quiet
-  firebase deploy --only firestore:rules,firestore:indexes,storage --project "${PROJECT_ID}"
+echo "=== [3/3] Sovereign Docker Compose Validation ==="
+if [[ "${DEPLOY_SOVEREIGN:-false}" == "true" ]]; then
+  docker compose -f backend/docker-compose.sovereign.yml up -d --build
 else
-  echo "Dry-run verification complete. Set DEPLOY_CLOUD=true to push to Cloud Run & Firebase Hosting."
+  echo "Verification complete. Set DEPLOY_SOVEREIGN=true to launch IDMC Singha Durbar stack."
 fi

@@ -5,7 +5,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "lgd_code",
+          "fieldPath": "composite_ward_id",
           "order": "ASCENDING"
         },
         {
@@ -19,7 +19,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "ward_lgd_code",
+          "fieldPath": "composite_ward_id",
           "order": "ASCENDING"
         },
         {

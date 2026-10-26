@@ -59,3 +59,15 @@ memory.md
 *.memory.md
 .vscode/*
 !.vscode/extensions.json
+
+# ---- Node.js / Next.js ----
+node_modules/
+.next/
+out/
+
+# ---- Test Exports & Local Run Artifacts ----
+exports/
+backend/exports/
+*.db
+*.sqlite
+*.sqlite3

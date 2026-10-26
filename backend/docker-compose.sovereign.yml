@@ -1,0 +1,226 @@
+# ============================================================================
+# NidanIQ — Sovereign On-Premises Deployment Stack for Government of Nepal
+# Integrated Data Management Center (IDMC, Singha Durbar Primary & Hetauda DR)
+# Compliant with DCCS Directive 2081 (MoCIT / DOIT) & NCSC Policy 2080
+# - HashiCorp Vault 1.17 (60-Minute Ephemeral DB Leases; Zero .env in Prod)
+# - Mutual TLS (mTLS) + TLS 1.3 Only across FastAPI, PostGIS 16, and vLLM
+# - Wazuh 4.9 SIEM Agent for 24/7 IDMC Security Operations Center (SOC)
+# ============================================================================
+services:
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: nidaniq-nepal-vault
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - TZ=Asia/Kathmandu
+      - VAULT_LOCAL_CONFIG={"storage":{"raft":{"path":"/vault/data"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_min_version":"tls13","tls_cert_file":"/etc/idmc-mtls/certs/vault.crt","tls_key_file":"/etc/idmc-mtls/private/vault.key"}}],"default_lease_ttl":"1h","max_lease_ttl":"1h","ui":false}
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault_raft_data:/vault/data
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nidaniq-nepal-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV=production
+      - TZ=Asia/Kathmandu
+      - VAULT_ADDR=https://vault:8200
+      - VAULT_NAMESPACE=mohp-edcd-sovereign
+      - VAULT_DB_ROLE=nidaniq-mohp-role
+      - VAULT_DB_LEASE_TTL_SECONDS=3600
+      - MTLS_ENFORCED=true
+      - TLS_MIN_VERSION=TLSv1.3
+      - MTLS_CA_CERT=/etc/idmc-mtls/ca/idmc-root-ca.crt
+      - MTLS_CLIENT_CERT=/etc/idmc-mtls/certs/fastapi-client-server.crt
+      - MTLS_CLIENT_KEY=/etc/idmc-mtls/private/fastapi-client-server.key
+      - REDIS_URL=rediss://redis:6379/0?ssl_cert_reqs=required
+      - MINIO_ENDPOINT=https://minio-worm:9000
+      - VLLM_BASE_URL=https://vllm-gemma:8000/v1
+      - OSRM_BASE_URL=http://osrm-nepal:5000
+      - WAZUH_MANAGER_HOST=wazuh-manager.idmc.gov.np
+    volumes:
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+    depends_on:
+      vault:
+        condition: service_started
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-worm:
+        condition: service_started
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nidaniq-nepal-worker
+    restart: unless-stopped
+    command: ["python", "-m", "app.services.morning_fusion_pipeline", "--worker"]
+    environment:
+      - TZ=Asia/Kathmandu
+      - VAULT_ADDR=https://vault:8200
+      - VAULT_DB_ROLE=nidaniq-mohp-role
+      - VAULT_DB_LEASE_TTL_SECONDS=3600
+      - MTLS_ENFORCED=true
+      - REDIS_URL=rediss://redis:6379/0?ssl_cert_reqs=required
+    volumes:
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+    depends_on:
+      vault:
+        condition: service_started
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nidaniq-nepal-beat
+    restart: unless-stopped
+    command: ["python", "-m", "app.services.morning_fusion_pipeline", "--cron-beat"]
+    environment:
+      - TZ=Asia/Kathmandu
+      - FUSION_CRON_NPT=06:00
+      - VAULT_ADDR=https://vault:8200
+      - VAULT_DB_ROLE=nidaniq-mohp-role
+      - REDIS_URL=rediss://redis:6379/0?ssl_cert_reqs=required
+    volumes:
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+    depends_on:
+      vault:
+        condition: service_started
+      postgis:
+        condition: service_healthy
+
+  postgis:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: nidaniq-nepal-postgis
+    restart: unless-stopped
+    command:
+      - "postgres"
+      - "-c"
+      - "ssl=on"
+      - "-c"
+      - "ssl_min_protocol_version=TLSv1.3"
+      - "-c"
+      - "ssl_max_protocol_version=TLSv1.3"
+      - "-c"
+      - "ssl_cert_file=/etc/idmc-mtls/certs/postgis-server.crt"
+      - "-c"
+      - "ssl_key_file=/etc/idmc-mtls/private/postgis-server.key"
+      - "-c"
+      - "ssl_ca_file=/etc/idmc-mtls/ca/idmc-root-ca.crt"
+    environment:
+      - POSTGRES_USER=mohp_dpi_vault_root
+      - POSTGRES_DB=nidaniq_nepal
+      - TZ=Asia/Kathmandu
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mohp_dpi_vault_root -d nidaniq_nepal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: nidaniq-nepal-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--tls-protocols", "TLSv1.3"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  minio-worm:
+    image: minio/minio:latest
+    container_name: nidaniq-nepal-minio-worm
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_SITE_REGION=np-singha-durbar-1
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_worm_data:/data
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+
+  vllm-gemma:
+    image: vllm/vllm-openai:latest
+    container_name: nidaniq-nepal-vllm-gemma
+    restart: unless-stopped
+    command:
+      - "--model"
+      - "google/gemma-4-12b-it"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8000"
+      - "--max-model-len"
+      - "8192"
+      - "--ssl-keyfile"
+      - "/etc/idmc-mtls/private/vllm-server.key"
+      - "--ssl-certfile"
+      - "/etc/idmc-mtls/certs/vllm-server.crt"
+      - "--ssl-ca-certs"
+      - "/etc/idmc-mtls/ca/idmc-root-ca.crt"
+      - "--ssl-cert-reqs"
+      - "2"
+    ports:
+      - "8000:8000"
+    volumes:
+      - vllm_models:/root/.cache/huggingface
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+
+  wazuh-agent:
+    image: wazuh/wazuh-agent:4.9.0
+    container_name: nidaniq-nepal-wazuh-agent
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Kathmandu
+      - WAZUH_MANAGER=wazuh-manager.idmc.gov.np
+      - WAZUH_AGENT_GROUP=nepal-mohp-sovereign-dpi
+      - WAZUH_AGENT_NAME=nidaniq-idmc-singha-durbar-api-01
+    volumes:
+      - idmc_mtls_certs:/etc/idmc-mtls:ro
+
+  osrm-nepal:
+    image: ghcr.io/project-osrm/osrm-backend:latest
+    container_name: nidaniq-nepal-osrm
+    restart: unless-stopped
+    command: ["osrm-routed", "--algorithm", "mld", "/data/nepal-latest.osrm"]
+    ports:
+      - "5000:5000"
+    volumes:
+      - osrm_nepal_data:/data
+
+volumes:
+  vault_raft_data:
+  idmc_mtls_certs:
+  postgis_data:
+  redis_data:
+  minio_worm_data:
+  vllm_models:
+  osrm_nepal_data:

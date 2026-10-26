@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// NidanIQ — Cloud Storage Security Rules (asia-south1 Mumbai)
-// Enforces authenticated image-only uploads <= 10MB for breeding-site scans.
+// NidanIQ — Sovereign Storage Security Rules (Government of Nepal / IDMC Singha Durbar)
+// Enforces authenticated image-only uploads <= 10MB for breeding-site scans under Individual Privacy Act, 2075.
 service firebase.storage {
   match /b/{bucket}/o {
     function isAuthenticated() {
@@ -10,7 +10,7 @@ service firebase.storage {
 
     function isAuthorizedStaff() {
       return isAuthenticated() &&
-        request.auth.token.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'];
+        request.auth.token.role in ['fchv', 'ward_health_officer', 'palika_health_chief', 'edcd_nodal'];
     }
 
     function isValidBreedingScanImage() {
@@ -19,7 +19,7 @@ service firebase.storage {
         request.resource.contentType.matches('image/(jpeg|png|webp)');
     }
 
-    match /scans/{lgdCode}/{scanFile} {
+    match /scans/{compositeWardId}/{scanFile} {
       allow read: if isAuthenticated();
       allow create, update: if isAuthorizedStaff() && isValidBreedingScanImage();
       allow delete: if false;

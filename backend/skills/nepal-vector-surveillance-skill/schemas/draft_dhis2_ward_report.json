@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "draft_dhis2_ward_report",
+  "description": "Generate a MoHP IHMIS (hmis.gov.np) DHIS2 /api/dataValueSets JSON payload for a Nepal ward with HI, CI, BI, PPI, Composite Risk, and Houses Searched & Destroyed.",
+  "type": "object",
+  "properties": {
+    "composite_ward_id": {
+      "type": "string",
+      "description": "Canonical Nepal composite ward ID (e.g., 'NP-P3-D27-30608-W17')."
+    },
+    "period_iso": {
+      "type": "string",
+      "description": "DHIS2 reporting period (e.g., '2026W43' or '20261026')."
+    }
+  },
+  "required": ["composite_ward_id"],
+  "additionalProperties": false
+}

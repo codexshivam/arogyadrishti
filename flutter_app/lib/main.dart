@@ -1,315 +1,118 @@
-import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'core/services/firestore_sync.dart';
-import 'core/services/telemetry_service.dart';
+import 'core/network/dio_client.dart';
+import 'core/router/router.dart';
+import 'core/storage/secure_hive_storage.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/auth_screen.dart';
-import 'features/centers/centers_screen.dart';
-import 'features/chat/chat_screen.dart';
-import 'features/home/home_screen.dart';
-import 'features/map/map_screen.dart';
-import 'features/privacy/privacy_policy_screen.dart';
-import 'features/scan/scan_screen.dart';
-import 'features/settings/legal_viewer_screen.dart';
-import 'features/settings/settings_screen.dart';
-import 'features/stats/stats_screen.dart';
-import 'features/support/support_screen.dart';
-import 'features/vans/vans_screen.dart';
-import 'firebase_options.dart';
+import 'services/location_service.dart';
+import 'services/offline_sync_queue.dart';
+import 'viewmodels/auth_viewmodel.dart';
+import 'viewmodels/copilot_chat_viewmodel.dart';
+import 'viewmodels/map_viewmodel.dart';
+import 'viewmodels/rrt_fleet_viewmodel.dart';
+import 'viewmodels/surveillance_viewmodel.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(NidanIQTheme.whiteSystemUiOverlay);
-
-  bool firebaseReady = false;
-  try {
-    if (kIsWeb) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-      firebaseReady = true;
-    } else {
-      // On Android/iOS: attach to native google-services initialization,
-      // fallback to explicit options if native is not present.
-      try {
-        await Firebase.initializeApp();
-        firebaseReady = true;
-      } catch (nativeErr) {
-        debugPrint('Native Firebase init note ($nativeErr), trying with options...');
-        try {
-          await Firebase.initializeApp(
-            options: DefaultFirebaseOptions.currentPlatform,
-          );
-          firebaseReady = true;
-        } catch (optionsErr) {
-          debugPrint('Firebase init with options: $optionsErr');
-          if (Firebase.apps.isNotEmpty || optionsErr.toString().contains('duplicate')) {
-            firebaseReady = true;
-          }
-        }
-      }
-    }
-  } catch (e) {
-    debugPrint('Firebase initialization caught: $e');
-  }
-
-  if (firebaseReady || Firebase.apps.isNotEmpty) {
-    // App Check non-blocking
-    if (!kIsWeb) {
-      try {
-        await FirebaseAppCheck.instance.activate(
-          androidProvider: kDebugMode
-              ? AndroidProvider.debug
-              : AndroidProvider.playIntegrity,
-          appleProvider: kDebugMode
-              ? AppleProvider.debug
-              : AppleProvider.deviceCheck,
-        );
-      } catch (e) {
-        debugPrint('App Check activate bypassed: $e');
-      }
-    }
-
-    try {
-      await FirestoreSyncService.configureOfflinePersistence(
-        firebaseInitialized: true,
-      );
-    } catch (e) {
-      debugPrint('Firestore persistence init bypassed: $e');
-    }
-
-    try {
-      await NidanIQTelemetryService.initialize();
-    } catch (e) {
-      debugPrint('NidanIQTelemetryService init bypassed: $e');
-    }
-  }
-
-  runApp(const ProviderScope(child: NidanIQApp()));
+  final container = SovereignAppDependencies.create();
+  runApp(NidanIqNepalSovereignApp(dependencies: container));
 }
 
-/// Converts a Stream into a Listenable for GoRouter refresh notifications.
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen(
-      (dynamic _) => notifyListeners(),
+/// Dependency Container for NidanIQ Nepal Sovereign Government Field Application.
+class SovereignAppDependencies {
+  SovereignAppDependencies({
+    required this.storage,
+    required this.dioClient,
+    required this.offlineQueueService,
+    required this.locationNotifier,
+    required this.authViewModel,
+    required this.surveillanceViewModel,
+    required this.mapViewModel,
+    required this.rrtFleetViewModel,
+    required this.copilotChatViewModel,
+    required this.router,
+  });
+
+  factory SovereignAppDependencies.create({
+    bool useInMemoryStorageForTests = false,
+  }) {
+    final storage = SecureSovereignStorage(
+      useInMemoryForTests: useInMemoryStorageForTests,
+    );
+    final dioClient = SovereignDioClient(storage: storage);
+    final offlineQueueService = OfflineSyncQueueService(
+      storage: storage,
+      dioClient: dioClient,
+    );
+    final authViewModel = AuthViewModel(
+      storage: storage,
+      dioClient: dioClient,
+    );
+    final surveillanceViewModel = SurveillanceViewModel(
+      offlineQueueService: offlineQueueService,
+      dioClient: dioClient,
+    );
+    final mapViewModel = MapViewModel();
+    final locationNotifier = UserLocationStateNotifier(
+      storage: storage,
+      dioClient: dioClient,
+      onLocationChanged: mapViewModel.applyResolvedSpatialContext,
+    );
+    final rrtFleetViewModel = RrtFleetViewModel();
+    final copilotChatViewModel = CopilotChatViewModel();
+
+    final router = createNepalSovereignRouter(
+      authViewModel: authViewModel,
+      surveillanceViewModel: surveillanceViewModel,
+      mapViewModel: mapViewModel,
+      rrtFleetViewModel: rrtFleetViewModel,
+      copilotChatViewModel: copilotChatViewModel,
+      locationNotifier: locationNotifier,
+    );
+
+    return SovereignAppDependencies(
+      storage: storage,
+      dioClient: dioClient,
+      offlineQueueService: offlineQueueService,
+      locationNotifier: locationNotifier,
+      authViewModel: authViewModel,
+      surveillanceViewModel: surveillanceViewModel,
+      mapViewModel: mapViewModel,
+      rrtFleetViewModel: rrtFleetViewModel,
+      copilotChatViewModel: copilotChatViewModel,
+      router: router,
     );
   }
 
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
+  final SecureSovereignStorage storage;
+  final SovereignDioClient dioClient;
+  final OfflineSyncQueueService offlineQueueService;
+  final UserLocationStateNotifier locationNotifier;
+  final AuthViewModel authViewModel;
+  final SurveillanceViewModel surveillanceViewModel;
+  final MapViewModel mapViewModel;
+  final RrtFleetViewModel rrtFleetViewModel;
+  final CopilotChatViewModel copilotChatViewModel;
+  final GoRouter router;
 }
 
-Stream<User?> _safeAuthStream() {
-  try {
-    return FirebaseAuth.instance.authStateChanges();
-  } catch (_) {
-    return const Stream<User?>.empty();
-  }
-}
+/// Root Flutter Application Widget for NidanIQ Nepal Sovereign Vector Surveillance DPI.
+class NidanIqNepalSovereignApp extends StatelessWidget {
+  const NidanIqNepalSovereignApp({
+    required this.dependencies,
+    super.key,
+  });
 
-bool _isUserAuthenticated() {
-  try {
-    return FirebaseAuth.instance.currentUser != null;
-  } catch (_) {
-    return false;
-  }
-}
-
-final GoRouter nidaniqRouter = GoRouter(
-  initialLocation: '/auth',
-  refreshListenable: GoRouterRefreshStream(_safeAuthStream()),
-  redirect: (BuildContext context, GoRouterState state) {
-    final bool loggedIn = _isUserAuthenticated();
-    final String path = state.uri.path;
-    final bool isPublicRoute =
-        path == '/auth' ||
-        path == '/privacy' ||
-        path == '/privacy-policy' ||
-        path == '/terms' ||
-        path == '/terms-of-service' ||
-        path == '/support';
-
-    // Strict Zero-Trust Security Gate:
-    // If not authenticated, unprivileged users are never allowed on protected screens.
-    if (!loggedIn && !isPublicRoute) {
-      return '/auth';
-    }
-
-    // If already verified/authenticated and navigating to /auth, redirect to /home.
-    if (loggedIn && path == '/auth') {
-      return '/home';
-    }
-
-    return null;
-  },
-  observers: <NavigatorObserver>[
-    NidanIQTelemetryService.createNavigationObserver(),
-  ],
-  routes: [
-    GoRoute(
-      path: '/privacy',
-      builder: (context, state) => const PrivacyPolicyScreen(),
-    ),
-    GoRoute(
-      path: '/privacy-policy',
-      builder: (context, state) => const LegalViewerScreen(
-        title: 'Privacy Policy',
-        documentType: 'privacy',
-      ),
-    ),
-    GoRoute(
-      path: '/terms',
-      builder: (context, state) => const LegalViewerScreen(
-        title: 'Terms of Service',
-        documentType: 'terms',
-      ),
-    ),
-    GoRoute(
-      path: '/terms-of-service',
-      builder: (context, state) => const LegalViewerScreen(
-        title: 'Terms of Service',
-        documentType: 'terms',
-      ),
-    ),
-    GoRoute(path: '/auth', builder: (context, state) => const AuthScreen()),
-    GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-    GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
-    GoRoute(path: '/stats', builder: (context, state) => const StatsScreen()),
-    GoRoute(path: '/map', builder: (context, state) => const MapScreen()),
-    GoRoute(
-      path: '/settings',
-      builder: (context, state) => const SettingsScreen(),
-    ),
-    GoRoute(
-      path: '/support',
-      builder: (context, state) => const SupportScreen(),
-    ),
-    GoRoute(
-      path: '/centers',
-      builder: (context, state) => const CentersScreen(),
-    ),
-    GoRoute(path: '/vans', builder: (context, state) => const VansScreen()),
-    GoRoute(path: '/scan', builder: (context, state) => const ScanScreen()),
-  ],
-);
-
-class NidanIQApp extends ConsumerStatefulWidget {
-  const NidanIQApp({super.key});
-
-  @override
-  ConsumerState<NidanIQApp> createState() => _NidanIQAppState();
-}
-
-class _NidanIQAppState extends ConsumerState<NidanIQApp> {
-  StreamSubscription<User?>? _authSub;
-
-  @override
-  void initState() {
-    super.initState();
-    _listenAuthAndHydrate();
-  }
-
-  void _listenAuthAndHydrate() {
-    try {
-      _authSub = FirebaseAuth.instance.authStateChanges().listen((user) async {
-        if (user != null) {
-          final current = ref.read(activeWardProvider);
-          if (!current.isAuthenticated || current.officerUid != user.uid) {
-            Map<String, dynamic> profile = {};
-            try {
-              final snap = await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(user.uid)
-                  .get();
-              if (snap.exists && snap.data() != null) {
-                profile = snap.data()!;
-              } else {
-                final phone = user.phoneNumber ?? '';
-                final rawPhone = phone.replaceAll(RegExp(r'\D'), '');
-                final last10 = rawPhone.length >= 10
-                    ? rawPhone.substring(rawPhone.length - 10)
-                    : rawPhone;
-                final candidateKeys = ['officer_$last10', '+91$last10', last10];
-                for (final k in candidateKeys) {
-                  final altSnap = await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(k)
-                      .get();
-                  if (altSnap.exists && altSnap.data() != null) {
-                    profile = altSnap.data()!;
-                    // Auto-sync profile to user.uid
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)
-                        .set(profile, SetOptions(merge: true));
-                    break;
-                  }
-                }
-              }
-            } catch (_) {}
-
-            ref
-                .read(activeWardProvider.notifier)
-                .setOfficerSession(
-                  uid: user.uid,
-                  name: (profile['name'] ?? user.displayName ?? 'Field Officer')
-                      .toString(),
-                  phone: (profile['phone'] ?? user.phoneNumber ?? '')
-                      .toString(),
-                  email: (profile['email'] ?? user.email ?? '').toString(),
-                  lgdCode: (profile['assigned_lgd_code'] ?? '0404400017')
-                      .toString(),
-                  wardName: profile['ward_village'] != null
-                      ? '${profile['ward_village']}, ${profile['district'] ?? ''}'
-                      : 'Sector 22-B, Chandigarh',
-                );
-          }
-        } else {
-          ref.read(activeWardProvider.notifier).signOut();
-        }
-      });
-    } catch (_) {}
-  }
-
-  @override
-  void dispose() {
-    _authSub?.cancel();
-    super.dispose();
-  }
+  final SovereignAppDependencies dependencies;
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: NidanIQTheme.whiteSystemUiOverlay,
-      child: MaterialApp.router(
-        title: 'NidanIQ',
-        debugShowCheckedModeBanner: false,
-        theme: NidanIQTheme.lightTheme(),
-        routerConfig: nidaniqRouter,
-        builder: (context, child) {
-          return AnnotatedRegion<SystemUiOverlayStyle>(
-            value: NidanIQTheme.whiteSystemUiOverlay,
-            child: child ?? const SizedBox.shrink(),
-          );
-        },
-      ),
+    return MaterialApp.router(
+      title: 'NidanIQ — स्वास्थ्य तथा जनसंख्या मन्त्रालय (MoHP / EDCD Nepal)',
+      debugShowCheckedModeBanner: false,
+      theme: NepalGovTheme.buildTheme(),
+      routerConfig: dependencies.router,
     );
   }
 }

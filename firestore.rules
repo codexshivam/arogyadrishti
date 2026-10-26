@@ -1,28 +1,40 @@
 rules_version = '2';
 
 // ===============================================================
-// Assumed Data Model — NidanIQ (NCVBDC / IHIP / DPDP 2023)
+// Assumed Data Model — NidanIQ (MoHP / EDCD Teku / 753 Palikas)
 // ===============================================================
 //
 // This security rules file enforces role-based access control (RBAC),
-// Local Government Directory (LGD) ward jurisdiction scoping, strict
-// schema/type/bounds validation, and DPDP Act 2023 data minimization.
+// Government of Nepal 4-tier federal administrative jurisdiction scoping
+// (7 Provinces -> 77 Districts -> 753 Palikas -> 6,743 Wards), strict
+// schema/type/bounds validation, and statutory citizen data minimization
+// under the Nepal Individual Privacy Act, 2075 (2018) and Constitution
+// of Nepal (2072) Article 28 (Right to Privacy).
 //
 // Custom JWT Claims (request.auth.token):
-//   - role: string in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN']
-//   - lgd_code / assigned_lgd_code: string (1..32 chars) - Officer's assigned ward LGD code
+//   - role: string in ['fchv', 'ward_health_officer', 'palika_health_chief', 'edcd_nodal']
+//   - province_code: string (1..32 chars, e.g. 'P3')
+//   - district_code: string (1..32 chars, e.g. 'D27')
+//   - palika_code / assigned_palika_code: string (1..32 chars, e.g. '30608')
+//   - composite_ward_id / assigned_composite_ward_id: string (1..64 chars, e.g. 'NP-P3-D27-30608-W17')
 //
-// Collection: wards/{lgdCode}
-// Document ID: {lgdCode} (official LGD ward code, e.g. '04055001')
+// Collection: wards/{compositeWardId}
+// Document ID: {compositeWardId} (official Nepal composite ward ID, e.g. 'NP-P3-D27-30608-W17')
 // Fields:
-//   - lgd_code: string (required, immutable, 1..32 chars, must equal lgdCode)
+//   - composite_ward_id: string (required, immutable, 1..64 chars, must equal compositeWardId)
+//   - palika_code: string (required, immutable, 1..32 chars, e.g. '30608')
 //   - ward_name: string (required, 1..120 chars)
 //   - house_index_pct: number (required, 0..100)
 //   - container_index_pct: number (required, 0..100)
 //   - breteau_index: number (required, 0..500)
+//   - province_code: string (optional, immutable, 1..32 chars, e.g. 'P3')
+//   - district_code: string (optional, immutable, 1..32 chars, e.g. 'D27')
+//   - palika_name: string (optional, 1..120 chars)
+//   - ward_no: int (optional, 1..50)
 //   - district: string (optional, 1..100 chars)
-//   - state: string (optional, 1..100 chars)
-//   - composite_risk_score: number (optional, 0..1)
+//   - province: string (optional, 1..100 chars)
+//   - ecological_belt: string (optional, in ['TERAI', 'HILL', 'MOUNTAIN', 'Terai', 'Hill', 'Mountain'])
+//   - composite_risk_score: number (optional, 0..100)
 //   - risk_tier: string (optional, in ['LOW', 'MODERATE', 'HIGH', 'CRITICAL', 'SAFE', 'HIGH RISK'])
 //   - lst_celsius: number (optional, -50..70)
 //   - ndwi: number (optional, -1..1)
@@ -34,12 +46,15 @@ rules_version = '2';
 //   - updated_at: timestamp (optional)
 //   - updated_by: string (optional, 1..128 chars)
 //
-// Subcollection: wards/{lgdCode}/weekly_series/{weekId}
-// Document ID: {weekId} (ISO week identifier, e.g. '2026-W42' or 'W1')
+// Subcollection: wards/{compositeWardId}/weekly_series/{weekId}
+// Document ID: {weekId} (EWARS epidemiological week identifier, e.g. '2026-W42' or 'W1')
 // Fields:
-//   - week_id: string (optional, immutable, 1..32 chars)
+//   - week_id: string (optional, immutable, 1..32 chars, must equal weekId if present)
 //   - week_label: string (required, 1..32 chars)
-//   - lgd_code: string (required, immutable, must equal lgdCode)
+//   - composite_ward_id: string (required, immutable, 1..64 chars, must equal compositeWardId)
+//   - palika_code: string (optional, immutable, 1..32 chars)
+//   - province_code: string (optional, immutable, 1..32 chars)
+//   - district_code: string (optional, immutable, 1..32 chars)
 //   - hi: number (required, 0..100)
 //   - ci: number (required, 0..100)
 //   - bi: number (required, 0..500)
@@ -58,8 +73,12 @@ rules_version = '2';
 //   - log_id: string (optional, immutable, 1..64 chars)
 //   - officer_uid: string (optional, immutable, 1..128 chars)
 //   - officer_name: string (optional, 1..120 chars)
-//   - lgd_code: string (required, immutable, 1..32 chars)
+//   - composite_ward_id: string (required, immutable, 1..64 chars)
+//   - palika_code: string (required, immutable, 1..32 chars)
+//   - province_code: string (optional, immutable, 1..32 chars)
+//   - district_code: string (optional, immutable, 1..32 chars)
 //   - ward_village: string (optional, 1..120 chars)
+//   - palika_name: string (optional, 1..120 chars)
 //   - larvicidal_treatment: string (optional, 1..100 chars)
 //   - houses_inspected: int (optional, 1..100000)
 //   - houses_positive: int (optional, 0..100000)
@@ -76,37 +95,46 @@ rules_version = '2';
 //   - geohash: string (optional, 1..16 chars)
 //   - timestamp: timestamp (optional, immutable)
 //   - notes: string (optional, 0..500 chars)
-//   - FORBIDDEN PII FIELDS (DPDP Act 2023): ['aadhaar', 'pan_number', 'patient_name', 'phone_number']
+//   - FORBIDDEN PII FIELDS (Nepal Individual Privacy Act, 2075 & Constitution Art. 28):
+//     ['nagarikta_no', 'nid_number', 'citizen_name', 'household_phone']
 //
 // Collection: support_tickets/{ticketId}
 // Document ID: {ticketId}
 // Fields:
 //   - ticket_id: string (required, immutable, 1..64 chars)
-//   - ward_lgd_code: string (required, immutable, 1..32 chars)
+//   - composite_ward_id: string (required, immutable, 1..64 chars)
+//   - palika_code: string (required, immutable, 1..32 chars)
+//   - province_code: string (optional, immutable, 1..32 chars)
+//   - district_code: string (optional, immutable, 1..32 chars)
 //   - category: string (required, immutable, 1..120 chars)
 //   - severity: string (required, immutable, in ['LOW', 'MODERATE', 'HIGH', 'CRITICAL', 'Critical (2h SLA)', 'High (6h SLA)', 'Standard (24h SLA)'])
 //   - status: string (required, in ['OPEN', 'DISPATCH SENT', 'IN_PROGRESS', 'RESOLVED', 'ESCALATED', 'CLOSED'])
 //   - officer_uid: string (optional, immutable, 1..128 chars)
 //   - ward_village: string (optional, immutable, 1..120 chars)
-//   - lgd_code: string (optional, immutable, 1..32 chars)
+//   - palika_name: string (optional, immutable, 1..120 chars)
 //   - severity_sla: string (optional, immutable, 1..64 chars)
 //   - observation_notes: string (optional, immutable, 1..1000 chars)
-//   - assigned_nodal_officer: string (optional, 1..120 chars)
+//   - assigned_edcd_nodal: string (optional, 1..120 chars)
 //   - created_at: timestamp (optional, immutable)
 //   - created_at_utc: string (optional, immutable, 1..64 chars)
 //   - updated_at: timestamp (optional)
+//
 // Collection: users/{userId}
 // Document ID: {userId} (Firebase Auth UID)
 // Fields:
 //   - uid: string (optional on partial update, immutable, must equal userId if present)
 //   - name: string (optional on partial update, 1..120 chars)
-//   - role: string (optional, immutable for non-admin, in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'])
-//   - assigned_lgd_code / lgd_code: string (optional, 1..32 chars)
+//   - role: string (optional, immutable for non-nodal, in ['fchv', 'ward_health_officer', 'palika_health_chief', 'edcd_nodal'])
+//   - province_code: string (optional, 1..32 chars)
+//   - district_code: string (optional, 1..32 chars)
+//   - palika_code / assigned_palika_code: string (optional, 1..32 chars)
+//   - composite_ward_id / assigned_composite_ward_id: string (optional, 1..64 chars)
 //   - assigned_ward / ward_village / ward_id: string (optional, 1..120 chars)
+//   - palika_name: string (optional, 1..120 chars)
 //   - district: string (optional, 1..100 chars)
-//   - state: string (optional, 1..100 chars)
-//   - email: string (optional, 3..254 chars) - PII protected (owner/admin read only)
-//   - phone: string (optional, 3..32 chars) - PII protected (owner/admin read only)
+//   - province: string (optional, 1..100 chars)
+//   - email: string (optional, 3..254 chars) - PII protected (owner / edcd_nodal read only)
+//   - phone: string (optional, 3..32 chars) - PII protected (owner / edcd_nodal read only)
 //   - avatar_initials: string (optional, 1..8 chars)
 //   - updated_at: timestamp or ISO string (optional)
 //   - district_rep_name: string (optional, 1..120 chars)
@@ -120,7 +148,7 @@ rules_version = '2';
 //
 // Subcollection: users/{userId}/preferences/{prefId}
 // Document ID: 'settings' or string (1..64 chars)
-// Fields: push_notifications_enabled, email_notifications_enabled, etc.
+// Fields: push_notifications_enabled, email_notifications_enabled, sms_alerts_enabled, theme_mode, language_code, updated_at
 //
 // Collection: chat_sessions/{userId} and subcollection messages/{messageId}
 // Document ID: {userId} for session doc, {messageId} for messages
@@ -130,14 +158,18 @@ rules_version = '2';
 //   - sender: string (optional, 1..120 chars)
 //   - session_id: string (optional, 1..128 chars)
 //   - ward_village: string (optional, 1..120 chars)
-//   - lgd_code: string (optional, 1..32 chars)
+//   - composite_ward_id: string (optional, 1..64 chars)
+//   - palika_code: string (optional, 1..32 chars)
+//   - province_code: string (optional, 1..32 chars)
+//   - district_code: string (optional, 1..32 chars)
 //   - model_used: string (optional, 1..120 chars)
 //   - tool_cards: list (optional, max 20 items)
 //   - timestamp: timestamp (optional)
-//   - FORBIDDEN PII FIELDS (DPDP Act 2023): ['aadhaar', 'pan_number', 'patient_name', 'phone_number']
+//   - FORBIDDEN PII FIELDS (Nepal Individual Privacy Act, 2075 & Constitution Art. 28):
+//     ['nagarikta_no', 'nid_number', 'citizen_name', 'household_phone']
 //
 // Collection: app_config/{configId}
-// Document ID: {configId} (read-only for authenticated staff)
+// Document ID: {configId} (read-only for authenticated staff; write restricted to edcd_nodal)
 //
 // ===============================================================
 
@@ -236,71 +268,108 @@ service cloud.firestore {
     // RBAC & Jurisdiction Helpers (Custom Claims Only — Never Client Data)
     // ===============================================================
 
-    // Check if the authenticated user holds one of the recognized NCVBDC staff roles
+    // Check if the authenticated user holds one of the recognized MoHP / EDCD Teku roles
     function isAuthorizedRole() {
       return isAuthenticated() &&
              'role' in request.auth.token &&
-             request.auth.token.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'];
+             request.auth.token.role in [
+               'fchv',
+               'ward_health_officer',
+               'palika_health_chief',
+               'edcd_nodal'
+             ];
     }
 
-    // Supervisory medical/district/admin roles (Medical Officer, Nodal Officer, Admin)
+    // Supervisory clinical/municipal/national roles (Ward Health Officer, Palika Health Chief, EDCD Nodal)
     function isSupervisorRole() {
       return isAuthenticated() &&
              'role' in request.auth.token &&
-             request.auth.token.role in ['MO', 'NODAL_OFFICER', 'ADMIN'];
+             request.auth.token.role in [
+               'ward_health_officer',
+               'palika_health_chief',
+               'edcd_nodal'
+             ];
     }
 
-    // High-privilege audit governance roles (Nodal Officer or Admin)
-    function isNodalOrAdmin() {
+    // High-privilege municipal/national governance roles (Palika Health Chief or EDCD Nodal)
+    function isPalikaOrEdcdAuthority() {
       return isAuthenticated() &&
              'role' in request.auth.token &&
-             request.auth.token.role in ['NODAL_OFFICER', 'ADMIN'];
+             request.auth.token.role in [
+               'palika_health_chief',
+               'edcd_nodal'
+             ];
     }
 
-    // System Administrator role
-    function isAdmin() {
+    // National Epidemiology and Disease Control Division (EDCD Teku) Nodal authority
+    function isEdcdNodal() {
       return isAuthenticated() &&
              'role' in request.auth.token &&
-             request.auth.token.role == 'ADMIN';
+             request.auth.token.role == 'edcd_nodal';
     }
 
-    // Check if user's custom JWT claim matches the target ward LGD code
-    function isAssignedToLgd(lgdCode) {
+    // Check if user's custom JWT claim matches the target Nepal composite ward ID
+    // (e.g. 'NP-P3-D27-30608-W17')
+    function isAssignedToCompositeWard(compositeWardId) {
       return isAuthenticated() &&
-             lgdCode is string &&
-             lgdCode.size() >= 1 &&
-             lgdCode.size() <= 32 && (
-               ('lgd_code' in request.auth.token && request.auth.token.lgd_code == lgdCode) ||
-               ('assigned_lgd_code' in request.auth.token && request.auth.token.assigned_lgd_code == lgdCode)
+             compositeWardId is string &&
+             compositeWardId.size() >= 1 &&
+             compositeWardId.size() <= 64 && (
+               ('composite_ward_id' in request.auth.token && request.auth.token.composite_ward_id == compositeWardId) ||
+               ('assigned_composite_ward_id' in request.auth.token && request.auth.token.assigned_composite_ward_id == compositeWardId)
              );
     }
 
-    // DPDP Act 2023 Data Minimization: strictly forbid raw citizen PII keys
+    // Check if user's custom JWT claim matches the target Nepal Palika code (e.g. '30608')
+    function isAssignedToPalika(palikaCode) {
+      return isAuthenticated() &&
+             palikaCode is string &&
+             palikaCode.size() >= 1 &&
+             palikaCode.size() <= 32 && (
+               ('palika_code' in request.auth.token && request.auth.token.palika_code == palikaCode) ||
+               ('assigned_palika_code' in request.auth.token && request.auth.token.assigned_palika_code == palikaCode)
+             );
+    }
+
+    // Nepal Individual Privacy Act, 2075 (2018) & Constitution of Nepal (2072) Article 28:
+    // strictly forbid citizen PII keys in any Firestore document
     function hasNoForbiddenPiiFields(data) {
-      return !data.keys().hasAny(['aadhaar', 'pan_number', 'patient_name', 'phone_number']);
+      return !data.keys().hasAny([
+        'nagarikta_no',
+        'nid_number',
+        'citizen_name',
+        'household_phone'
+      ]);
     }
 
     // ===============================================================
     // Domain Validators (Called in BOTH create and update rules)
     // ===============================================================
 
-    // Validate wards/{lgdCode} aggregate document
-    function isValidWard(data, lgdCode) {
+    // Validate wards/{compositeWardId} aggregate document
+    function isValidWard(data, compositeWardId) {
       let requiredFields = [
-        'lgd_code',
+        'composite_ward_id',
+        'palika_code',
         'ward_name',
         'house_index_pct',
         'container_index_pct',
         'breteau_index'
       ];
       let allowedFields = [
-        'lgd_code',
+        'composite_ward_id',
+        'palika_code',
+        'province_code',
+        'district_code',
+        'palika_name',
+        'ward_no',
         'ward_name',
         'house_index_pct',
         'container_index_pct',
         'breteau_index',
         'district',
-        'state',
+        'province',
+        'ecological_belt',
         'composite_risk_score',
         'risk_tier',
         'lst_celsius',
@@ -316,10 +385,13 @@ service cloud.firestore {
       return hasRequiredFields(requiredFields) &&
              hasOnlyAllowedFields(allowedFields) &&
              hasNoForbiddenPiiFields(data) &&
-             data.lgd_code is string &&
-             data.lgd_code == lgdCode &&
-             data.lgd_code.size() >= 1 &&
-             data.lgd_code.size() <= 32 &&
+             data.composite_ward_id is string &&
+             data.composite_ward_id == compositeWardId &&
+             data.composite_ward_id.size() >= 1 &&
+             data.composite_ward_id.size() <= 64 &&
+             data.palika_code is string &&
+             data.palika_code.size() >= 1 &&
+             data.palika_code.size() <= 32 &&
              data.ward_name is string &&
              data.ward_name.size() >= 1 &&
              data.ward_name.size() <= 120 &&
@@ -332,10 +404,18 @@ service cloud.firestore {
              data.breteau_index is number &&
              data.breteau_index >= 0 &&
              data.breteau_index <= 500 &&
+             isValidOptionalString('province_code', 1, 32) &&
+             isValidOptionalString('district_code', 1, 32) &&
+             isValidOptionalString('palika_name', 1, 120) &&
+             isValidOptionalInt('ward_no', 1, 50) &&
              isValidOptionalString('district', 1, 100) &&
-             isValidOptionalString('state', 1, 100) &&
-             isValidOptionalNumber('composite_risk_score', 0, 1) &&
-             (!( 'risk_tier' in data ) || (
+             isValidOptionalString('province', 1, 100) &&
+             (!('ecological_belt' in data) || (
+               data.ecological_belt is string &&
+               data.ecological_belt in ['TERAI', 'HILL', 'MOUNTAIN', 'Terai', 'Hill', 'Mountain']
+             )) &&
+             isValidOptionalNumber('composite_risk_score', 0, 100) &&
+             (!('risk_tier' in data) || (
                data.risk_tier is string &&
                data.risk_tier in ['LOW', 'MODERATE', 'HIGH', 'CRITICAL', 'SAFE', 'HIGH RISK']
              )) &&
@@ -350,13 +430,16 @@ service cloud.firestore {
              isValidOptionalString('updated_by', 1, 128);
     }
 
-    // Validate wards/{lgdCode}/weekly_series/{weekId} entomological series record
-    function isValidWeeklySeries(data, lgdCode, weekId) {
-      let requiredFields = ['lgd_code', 'week_label', 'hi', 'ci', 'bi'];
+    // Validate wards/{compositeWardId}/weekly_series/{weekId} entomological series record
+    function isValidWeeklySeries(data, compositeWardId, weekId) {
+      let requiredFields = ['composite_ward_id', 'week_label', 'hi', 'ci', 'bi'];
       let allowedFields = [
         'week_id',
         'week_label',
-        'lgd_code',
+        'composite_ward_id',
+        'palika_code',
+        'province_code',
+        'district_code',
         'hi',
         'ci',
         'bi',
@@ -372,14 +455,17 @@ service cloud.firestore {
       return hasRequiredFields(requiredFields) &&
              hasOnlyAllowedFields(allowedFields) &&
              hasNoForbiddenPiiFields(data) &&
-             data.lgd_code is string &&
-             data.lgd_code == lgdCode &&
-             data.lgd_code.size() >= 1 &&
-             data.lgd_code.size() <= 32 &&
+             data.composite_ward_id is string &&
+             data.composite_ward_id == compositeWardId &&
+             data.composite_ward_id.size() >= 1 &&
+             data.composite_ward_id.size() <= 64 &&
              data.week_label is string &&
              data.week_label.size() >= 1 &&
              data.week_label.size() <= 32 &&
              (!('week_id' in data) || (data.week_id is string && data.week_id == weekId && data.week_id.size() >= 1 && data.week_id.size() <= 32)) &&
+             isValidOptionalString('palika_code', 1, 32) &&
+             isValidOptionalString('province_code', 1, 32) &&
+             isValidOptionalString('district_code', 1, 32) &&
              data.hi is number && data.hi >= 0 && data.hi <= 100 &&
              data.ci is number && data.ci >= 0 && data.ci <= 100 &&
              data.bi is number && data.bi >= 0 && data.bi <= 500 &&
@@ -399,8 +485,12 @@ service cloud.firestore {
         'log_id',
         'officer_uid',
         'officer_name',
-        'lgd_code',
+        'composite_ward_id',
+        'palika_code',
+        'province_code',
+        'district_code',
         'ward_village',
+        'palika_name',
         'larvicidal_treatment',
         'houses_inspected',
         'houses_positive',
@@ -425,17 +515,23 @@ service cloud.firestore {
       (!('breteau_index' in data) || (data.breteau_index is number && data.breteau_index >= 0 && data.breteau_index <= 500)) &&
       (!('computed_bi' in data) || (data.computed_bi is number && data.computed_bi >= 0 && data.computed_bi <= 500));
 
-      return hasRequiredFields(['lgd_code']) &&
+      return hasRequiredFields(['composite_ward_id', 'palika_code']) &&
              hasOnlyAllowedFields(allowedFields) &&
-             !data.keys().hasAny(['aadhaar', 'pan_number', 'patient_name', 'phone_number']) &&
-             data.lgd_code is string &&
-             data.lgd_code.size() >= 1 &&
-             data.lgd_code.size() <= 32 &&
+             hasNoForbiddenPiiFields(data) &&
+             data.composite_ward_id is string &&
+             data.composite_ward_id.size() >= 1 &&
+             data.composite_ward_id.size() <= 64 &&
+             data.palika_code is string &&
+             data.palika_code.size() >= 1 &&
+             data.palika_code.size() <= 32 &&
              hasValidBi &&
+             isValidOptionalString('province_code', 1, 32) &&
+             isValidOptionalString('district_code', 1, 32) &&
              isValidOptionalString('log_id', 1, 64) &&
              isValidOptionalString('officer_uid', 1, 128) &&
              isValidOptionalString('officer_name', 1, 120) &&
              isValidOptionalString('ward_village', 1, 120) &&
+             isValidOptionalString('palika_name', 1, 120) &&
              isValidOptionalString('larvicidal_treatment', 1, 100) &&
              isValidOptionalInt('houses_inspected', 1, 100000) &&
              isValidOptionalInt('houses_positive', 0, 100000) &&
@@ -456,23 +552,27 @@ service cloud.firestore {
     function isValidSupportTicket(data) {
       let requiredFields = [
         'ticket_id',
-        'ward_lgd_code',
+        'composite_ward_id',
+        'palika_code',
         'category',
         'severity',
         'status'
       ];
       let allowedFields = [
         'ticket_id',
-        'ward_lgd_code',
+        'composite_ward_id',
+        'palika_code',
+        'province_code',
+        'district_code',
         'category',
         'severity',
         'status',
         'officer_uid',
         'ward_village',
-        'lgd_code',
+        'palika_name',
         'severity_sla',
         'observation_notes',
-        'assigned_nodal_officer',
+        'assigned_edcd_nodal',
         'created_at',
         'created_at_utc',
         'updated_at'
@@ -500,9 +600,12 @@ service cloud.firestore {
              data.ticket_id is string &&
              data.ticket_id.size() >= 1 &&
              data.ticket_id.size() <= 64 &&
-             data.ward_lgd_code is string &&
-             data.ward_lgd_code.size() >= 1 &&
-             data.ward_lgd_code.size() <= 32 &&
+             data.composite_ward_id is string &&
+             data.composite_ward_id.size() >= 1 &&
+             data.composite_ward_id.size() <= 64 &&
+             data.palika_code is string &&
+             data.palika_code.size() >= 1 &&
+             data.palika_code.size() <= 32 &&
              data.category is string &&
              data.category.size() >= 1 &&
              data.category.size() <= 120 &&
@@ -510,18 +613,20 @@ service cloud.firestore {
              data.severity in validSeverities &&
              data.status is string &&
              data.status in validStatuses &&
+             isValidOptionalString('province_code', 1, 32) &&
+             isValidOptionalString('district_code', 1, 32) &&
              isValidOptionalString('officer_uid', 1, 128) &&
              isValidOptionalString('ward_village', 1, 120) &&
-             isValidOptionalString('lgd_code', 1, 32) &&
+             isValidOptionalString('palika_name', 1, 120) &&
              isValidOptionalString('severity_sla', 1, 64) &&
              isValidOptionalString('observation_notes', 1, 1000) &&
-             isValidOptionalString('assigned_nodal_officer', 1, 120) &&
+             isValidOptionalString('assigned_edcd_nodal', 1, 120) &&
              isValidOptionalTimestamp('created_at') &&
              isValidOptionalString('created_at_utc', 1, 64) &&
              isValidOptionalTimestamp('updated_at');
     }
 
-    // Validate users/{userId} staff profile document (PII-isolated to owner & Nodal/Admin)
+    // Validate users/{userId} staff profile document (PII-isolated to owner & Palika/EDCD Nodal)
     function isValidUserProfile(data, userId) {
       let allowedFields = [
         'uid',
@@ -530,10 +635,15 @@ service cloud.firestore {
         'phone',
         'ward_village',
         'assigned_ward',
+        'palika_name',
         'district',
-        'state',
-        'assigned_lgd_code',
-        'lgd_code',
+        'province',
+        'province_code',
+        'district_code',
+        'palika_code',
+        'assigned_palika_code',
+        'composite_ward_id',
+        'assigned_composite_ward_id',
         'avatar_initials',
         'updated_at',
         'district_rep_name',
@@ -551,20 +661,28 @@ service cloud.firestore {
              hasNoForbiddenPiiFields(data) &&
              (!('uid' in data) || (data.uid is string && data.uid == userId && data.uid.size() >= 1 && data.uid.size() <= 128)) &&
              (!('name' in data) || (data.name is string && data.name.size() >= 1 && data.name.size() <= 120)) &&
-             (!('role' in data) || (data.role is string && data.role in ['ASHA', 'MO', 'NODAL_OFFICER', 'ADMIN'])) &&
-             (!('assigned_lgd_code' in data) || (data.assigned_lgd_code is string && data.assigned_lgd_code.size() >= 1 && data.assigned_lgd_code.size() <= 32)) &&
-             (!('lgd_code' in data) || (data.lgd_code is string && data.lgd_code.size() >= 1 && data.lgd_code.size() <= 32)) &&
-             (!('assigned_ward' in data) || (data.assigned_ward is string && data.assigned_ward.size() >= 1 && data.assigned_ward.size() <= 120)) &&
-             (!('ward_id' in data) || (data.ward_id is string && data.ward_id.size() >= 1 && data.ward_id.size() <= 120)) &&
-             (!('doc_key' in data) || (data.doc_key is string && data.doc_key.size() >= 1 && data.doc_key.size() <= 128)) &&
+             (!('role' in data) || (
+               data.role is string &&
+               data.role in ['fchv', 'ward_health_officer', 'palika_health_chief', 'edcd_nodal']
+             )) &&
+             isValidOptionalString('province_code', 1, 32) &&
+             isValidOptionalString('district_code', 1, 32) &&
+             isValidOptionalString('palika_code', 1, 32) &&
+             isValidOptionalString('assigned_palika_code', 1, 32) &&
+             isValidOptionalString('composite_ward_id', 1, 64) &&
+             isValidOptionalString('assigned_composite_ward_id', 1, 64) &&
+             isValidOptionalString('assigned_ward', 1, 120) &&
+             isValidOptionalString('ward_id', 1, 120) &&
+             isValidOptionalString('doc_key', 1, 128) &&
              (!('authorized_staff' in data) || data.authorized_staff is bool) &&
              isValidOptionalNumber('latitude', -90, 90) &&
              isValidOptionalNumber('longitude', -180, 180) &&
              isValidOptionalString('email', 3, 254) &&
              isValidOptionalString('phone', 3, 32) &&
              isValidOptionalString('ward_village', 1, 120) &&
+             isValidOptionalString('palika_name', 1, 120) &&
              isValidOptionalString('district', 1, 100) &&
-             isValidOptionalString('state', 1, 100) &&
+             isValidOptionalString('province', 1, 100) &&
              isValidOptionalString('avatar_initials', 1, 8) &&
              (!('updated_at' in data) || data.updated_at is timestamp || (data.updated_at is string && data.updated_at.size() <= 64)) &&
              isValidOptionalString('district_rep_name', 1, 120) &&
@@ -593,6 +711,30 @@ service cloud.firestore {
              isValidOptionalTimestamp('updated_at');
     }
 
+    // Validate chat_sessions/{userId} session metadata document
+    function isValidChatSession(data, userId) {
+      let allowedFields = [
+        'uid',
+        'session_id',
+        'composite_ward_id',
+        'palika_code',
+        'province_code',
+        'district_code',
+        'updated_at',
+        'created_at'
+      ];
+      return hasOnlyAllowedFields(allowedFields) &&
+             hasNoForbiddenPiiFields(data) &&
+             (!('uid' in data) || (data.uid is string && data.uid == userId && data.uid.size() >= 1 && data.uid.size() <= 128)) &&
+             isValidOptionalString('session_id', 1, 128) &&
+             isValidOptionalString('composite_ward_id', 1, 64) &&
+             isValidOptionalString('palika_code', 1, 32) &&
+             isValidOptionalString('province_code', 1, 32) &&
+             isValidOptionalString('district_code', 1, 32) &&
+             isValidOptionalTimestamp('updated_at') &&
+             isValidOptionalTimestamp('created_at');
+    }
+
     // Validate chat_sessions/{userId}/messages/{messageId} copilot chat messages
     function isValidChatMessage(data) {
       let allowedFields = [
@@ -601,7 +743,10 @@ service cloud.firestore {
         'sender',
         'session_id',
         'ward_village',
-        'lgd_code',
+        'composite_ward_id',
+        'palika_code',
+        'province_code',
+        'district_code',
         'model_used',
         'tool_cards',
         'timestamp'
@@ -616,7 +761,10 @@ service cloud.firestore {
              isValidOptionalString('sender', 1, 120) &&
              isValidOptionalString('session_id', 1, 128) &&
              isValidOptionalString('ward_village', 1, 120) &&
-             isValidOptionalString('lgd_code', 1, 32) &&
+             isValidOptionalString('composite_ward_id', 1, 64) &&
+             isValidOptionalString('palika_code', 1, 32) &&
+             isValidOptionalString('province_code', 1, 32) &&
+             isValidOptionalString('district_code', 1, 32) &&
              isValidOptionalString('model_used', 1, 120) &&
              (!('tool_cards' in data) || (data.tool_cards is list && data.tool_cards.size() <= 20)) &&
              isValidOptionalTimestamp('timestamp');
@@ -626,63 +774,104 @@ service cloud.firestore {
     // Collection Rules
     // ===============================================================
 
-    // 1. Ward Telemetry & Aggregates: wards/{lgdCode}
-    match /wards/{lgdCode} {
+    // 1. Ward Telemetry & Aggregates: wards/{compositeWardId}
+    match /wards/{compositeWardId} {
       // Authenticated users can read aggregate ward entomological telemetry (contains no PII)
       allow read: if isAuthenticated();
 
-      // Only MO, NODAL_OFFICER, ADMIN, or an authorized staff member assigned to {lgdCode}
-      // can create or update ward aggregates with valid schema fields
+      // Only ward_health_officer, palika_health_chief, edcd_nodal, or an fchv assigned to
+      // {compositeWardId} / {palika_code} can create or update ward aggregates with valid schema fields
       allow create: if isAuthenticated() &&
-                    (isSupervisorRole() || (isAuthorizedRole() && isAssignedToLgd(lgdCode))) &&
-                    isValidWard(request.resource.data, lgdCode);
+                    (isSupervisorRole() || (
+                      isAuthorizedRole() && (
+                        isAssignedToCompositeWard(compositeWardId) ||
+                        isAssignedToPalika(request.resource.data.palika_code)
+                      )
+                    )) &&
+                    isValidWard(request.resource.data, compositeWardId);
 
       allow update: if isAuthenticated() &&
-                    (isSupervisorRole() || (isAuthorizedRole() && isAssignedToLgd(lgdCode))) &&
-                    isValidWard(request.resource.data, lgdCode) &&
-                    areImmutableFieldsUnchanged(['lgd_code']);
+                    (isSupervisorRole() || (
+                      isAuthorizedRole() && (
+                        isAssignedToCompositeWard(compositeWardId) ||
+                        isAssignedToPalika(resource.data.palika_code)
+                      )
+                    )) &&
+                    isValidWard(request.resource.data, compositeWardId) &&
+                    areImmutableFieldsUnchanged([
+                      'composite_ward_id',
+                      'palika_code',
+                      'province_code',
+                      'district_code'
+                    ]);
 
       allow delete: if false;
 
-      // 2. Weekly Entomological Series: wards/{lgdCode}/weekly_series/{weekId}
+      // 2. Weekly Entomological Series: wards/{compositeWardId}/weekly_series/{weekId}
       match /weekly_series/{weekId} {
         // Authenticated users can read weekly series trends
         allow read: if isAuthenticated();
 
-        // Only ASHA (for their assigned lgdCode), MO, NODAL_OFFICER, or ADMIN can create/update
+        // Only fchv (for their assigned compositeWardId), ward_health_officer, palika_health_chief, or edcd_nodal can create/update
         allow create: if isAuthenticated() &&
-                      (isSupervisorRole() || (isAuthorizedRole() && request.auth.token.role == 'ASHA' && isAssignedToLgd(lgdCode))) &&
-                      isValidWeeklySeries(request.resource.data, lgdCode, weekId);
+                      (isSupervisorRole() || (
+                        isAuthorizedRole() &&
+                        request.auth.token.role == 'fchv' &&
+                        isAssignedToCompositeWard(compositeWardId)
+                      )) &&
+                      isValidWeeklySeries(request.resource.data, compositeWardId, weekId);
 
         allow update: if isAuthenticated() &&
-                      (isSupervisorRole() || (isAuthorizedRole() && request.auth.token.role == 'ASHA' && isAssignedToLgd(lgdCode))) &&
-                      isValidWeeklySeries(request.resource.data, lgdCode, weekId) &&
-                      areImmutableFieldsUnchanged(['lgd_code', 'week_id', 'recorded_by_uid']);
+                      (isSupervisorRole() || (
+                        isAuthorizedRole() &&
+                        request.auth.token.role == 'fchv' &&
+                        isAssignedToCompositeWard(compositeWardId)
+                      )) &&
+                      isValidWeeklySeries(request.resource.data, compositeWardId, weekId) &&
+                      areImmutableFieldsUnchanged([
+                        'composite_ward_id',
+                        'palika_code',
+                        'province_code',
+                        'district_code',
+                        'week_id',
+                        'recorded_by_uid'
+                      ]);
 
         allow delete: if false;
       }
     }
 
-    // 3. Field Inspection Logs (DPDP Act 2023 Minimization + Immutable Audit Trail): field_logs/{logId}
+    // 3. Field Inspection Logs (Individual Privacy Act, 2075 Minimization + Immutable Audit Trail): field_logs/{logId}
     match /field_logs/{logId} {
-      // Authenticated users can read field logs in their jurisdiction or if role in ['MO', 'NODAL_OFFICER', 'ADMIN']
+      // Authenticated users can read field logs in their ward/Palika jurisdiction or if supervisor role
       allow read: if isAuthenticated() && (
         isSupervisorRole() ||
-        isAssignedToLgd(resource.data.lgd_code)
+        isAssignedToCompositeWard(resource.data.composite_ward_id) ||
+        isAssignedToPalika(resource.data.palika_code)
       );
 
-      // Authenticated ASHA, MO, NODAL_OFFICER, or ADMIN can create field_logs with valid schema,
-      // Breteau Index in [0, 500], jurisdiction match for ASHA, and zero raw citizen PII fields
+      // Authenticated fchv, ward_health_officer, palika_health_chief, or edcd_nodal can create field_logs
+      // with valid schema, Breteau Index in [0, 500], jurisdiction match for fchv, and zero citizen PII fields
       allow create: if isAuthorizedRole() &&
-                    (isSupervisorRole() || isAssignedToLgd(request.resource.data.lgd_code)) &&
+                    (isSupervisorRole() ||
+                     isAssignedToCompositeWard(request.resource.data.composite_ward_id) ||
+                     isAssignedToPalika(request.resource.data.palika_code)) &&
                     uidUnchanged() &&
                     isValidFieldLog(request.resource.data);
 
-      // Field logs are immutable audit records: restrict update to NODAL_OFFICER or ADMIN
-      // while still enforcing full schema validation and immutable identity/timestamp fields
-      allow update: if isNodalOrAdmin() &&
+      // Field logs are immutable epidemiological audit records: restrict update to palika_health_chief or edcd_nodal
+      // while still enforcing full schema validation and immutable identity/jurisdiction/timestamp fields
+      allow update: if isPalikaOrEdcdAuthority() &&
                     isValidFieldLog(request.resource.data) &&
-                    areImmutableFieldsUnchanged(['log_id', 'officer_uid', 'lgd_code', 'timestamp']);
+                    areImmutableFieldsUnchanged([
+                      'log_id',
+                      'officer_uid',
+                      'composite_ward_id',
+                      'palika_code',
+                      'province_code',
+                      'district_code',
+                      'timestamp'
+                    ]);
 
       // Disallow deletion of epidemiological audit records
       allow delete: if false;
@@ -693,24 +882,27 @@ service cloud.firestore {
       // Authenticated users can read escalation tickets (contains no citizen PII)
       allow read: if isAuthenticated();
 
-      // Authenticated users can create tickets with required schema validation
-      allow create: if isAuthenticated() &&
+      // Authenticated staff can create tickets with required schema validation
+      allow create: if isAuthorizedRole() &&
                     uidUnchanged() &&
                     isValidSupportTicket(request.resource.data);
 
-      // Only MO, NODAL_OFFICER, or ADMIN can update ticket status (and optional assigned_nodal_officer / updated_at);
-      // all core ticket metadata fields are locked against modification
+      // Only ward_health_officer, palika_health_chief, or edcd_nodal can update ticket status
+      // (and optional assigned_edcd_nodal / updated_at); all core ticket metadata fields are locked
       allow update: if isSupervisorRole() &&
                     isValidSupportTicket(request.resource.data) &&
                     uidNotModified() &&
                     areImmutableFieldsUnchanged([
                       'ticket_id',
-                      'ward_lgd_code',
+                      'composite_ward_id',
+                      'palika_code',
+                      'province_code',
+                      'district_code',
                       'category',
                       'severity',
                       'officer_uid',
                       'ward_village',
-                      'lgd_code',
+                      'palika_name',
                       'severity_sla',
                       'observation_notes',
                       'created_at',
@@ -721,37 +913,43 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // 5. Officer Profiles (Contains Officer Phone/Email PII — Strict Owner or Nodal/Admin Access Only)
+    // 5. Officer Profiles (Contains Officer Phone/Email PII — Strict Owner or Palika/EDCD Nodal Access Only)
     match /users/{userId} {
-      allow read: if isOwner(userId) || isNodalOrAdmin();
+      allow read: if isOwner(userId) || isPalikaOrEdcdAuthority();
 
-      // Allow profile creation by owner or ADMIN. Non-admins cannot self-assign role or assigned_lgd_code
-      // unless verified via custom JWT claims.
+      // Allow profile creation by owner or edcd_nodal. Non-nodal users cannot self-assign role or
+      // Palika/ward jurisdiction unless verified via custom JWT claims.
       allow create: if isAuthenticated() &&
                     isValidUserProfile(request.resource.data, userId) && (
-                      isAdmin() ||
+                      isEdcdNodal() ||
                       (isOwner(userId) &&
                        (!('role' in request.resource.data) || ('role' in request.auth.token && request.resource.data.role == request.auth.token.role)) &&
-                       (!('assigned_lgd_code' in request.resource.data) || isAssignedToLgd(request.resource.data.assigned_lgd_code)))
+                       (!('palika_code' in request.resource.data) || isAssignedToPalika(request.resource.data.palika_code)) &&
+                       (!('assigned_palika_code' in request.resource.data) || isAssignedToPalika(request.resource.data.assigned_palika_code)) &&
+                       (!('composite_ward_id' in request.resource.data) || isAssignedToCompositeWard(request.resource.data.composite_ward_id)) &&
+                       (!('assigned_composite_ward_id' in request.resource.data) || isAssignedToCompositeWard(request.resource.data.assigned_composite_ward_id)))
                     );
 
-      // Allow profile updates by owner or ADMIN.
-      // For owners: UID cannot change, role cannot change unless verified by admin/token,
-      // and existing assigned_lgd_code cannot be escalated.
+      // Allow profile updates by owner or edcd_nodal.
+      // For owners: UID cannot change, role cannot change unless verified by token,
+      // and existing Palika/ward jurisdiction cannot be escalated.
       allow update: if isAuthenticated() &&
                     isValidUserProfile(request.resource.data, userId) && (
-                      isAdmin() ||
+                      isEdcdNodal() ||
                       (isOwner(userId) &&
                        (!('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid) &&
                        (!('role' in request.resource.data) || request.resource.data.role == resource.data.role || ('role' in request.auth.token && request.resource.data.role == request.auth.token.role)) &&
-                       (!('assigned_lgd_code' in request.resource.data) || request.resource.data.assigned_lgd_code == resource.data.assigned_lgd_code || isAssignedToLgd(request.resource.data.assigned_lgd_code)))
+                       (!('palika_code' in request.resource.data) || request.resource.data.palika_code == resource.data.palika_code || isAssignedToPalika(request.resource.data.palika_code)) &&
+                       (!('assigned_palika_code' in request.resource.data) || request.resource.data.assigned_palika_code == resource.data.assigned_palika_code || isAssignedToPalika(request.resource.data.assigned_palika_code)) &&
+                       (!('composite_ward_id' in request.resource.data) || request.resource.data.composite_ward_id == resource.data.composite_ward_id || isAssignedToCompositeWard(request.resource.data.composite_ward_id)) &&
+                       (!('assigned_composite_ward_id' in request.resource.data) || request.resource.data.assigned_composite_ward_id == resource.data.assigned_composite_ward_id || isAssignedToCompositeWard(request.resource.data.assigned_composite_ward_id)))
                     );
 
       allow delete: if false;
 
       // Subcollection: users/{userId}/preferences/{prefId}
       match /preferences/{prefId} {
-        allow read: if isOwner(userId) || isAdmin();
+        allow read: if isOwner(userId) || isEdcdNodal();
         allow create, update: if isOwner(userId) && isValidUserPreference(request.resource.data);
         allow delete: if false;
       }
@@ -759,10 +957,12 @@ service cloud.firestore {
 
     // 6. Copilot AI Chat Sessions & Messages: chat_sessions/{userId}/messages/{messageId}
     match /chat_sessions/{userId} {
-      allow read, write: if isOwner(userId) || isAdmin();
+      allow read: if isOwner(userId) || isEdcdNodal();
+      allow create, update: if (isOwner(userId) || isEdcdNodal()) && isValidChatSession(request.resource.data, userId);
+      allow delete: if false;
 
       match /messages/{messageId} {
-        allow read: if isOwner(userId) || isAdmin();
+        allow read: if isOwner(userId) || isEdcdNodal();
         allow create: if isOwner(userId) && isValidChatMessage(request.resource.data);
         allow update: if isOwner(userId) && isValidChatMessage(request.resource.data);
         allow delete: if false;
@@ -773,8 +973,8 @@ service cloud.firestore {
     match /app_config/{configId} {
       // Authenticated staff can read app metadata and version configuration
       allow read: if isAuthenticated();
-      // Only system administrators can update application config
-      allow write: if isAdmin();
+      // Only national EDCD Teku nodal administrators can update application config
+      allow write: if isEdcdNodal();
     }
 
     // 8. Default Deny for all other paths

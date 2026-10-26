@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "query_ward_risk",
+  "description": "Fetch the 06:00 AM NPT 5-pillar fused epidemiological risk, WHO/EDCD indices (HI, CI, BI, PPI), NASADEM elevation viability (V_elev), and Bikram Sambat date for a Nepal ward.",
+  "type": "object",
+  "properties": {
+    "composite_ward_id": {
+      "type": "string",
+      "pattern": "^NP-P[1-7]-D\\d{1,2}-\\d{5}-W\\d{1,2}$",
+      "description": "Canonical Nepal 4-tier composite ward ID (e.g., 'NP-P3-D27-30608-W17' for Kathmandu Metro Ward 17 Chhetrapati)."
+    }
+  },
+  "required": ["composite_ward_id"],
+  "additionalProperties": false
+}

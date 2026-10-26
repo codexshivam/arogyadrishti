@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "find_nearest_rrt_and_route",
+  "description": "Locate the nearest available Rapid Response Team (RRT 'Khoj Ra Nashta Gar' unit) in the Palika and calculate road distance and ETA via sovereign OSRM Nepal routing.",
+  "type": "object",
+  "properties": {
+    "composite_ward_id": {
+      "type": "string",
+      "description": "Target Nepal composite ward ID (e.g., 'NP-P3-D27-30608-W12')."
+    },
+    "target_lat": {
+      "type": "number",
+      "minimum": 26.0,
+      "maximum": 30.5,
+      "description": "Target latitude within Nepal WGS84 bounds."
+    },
+    "target_lng": {
+      "type": "number",
+      "minimum": 80.0,
+      "maximum": 88.5,
+      "description": "Target longitude within Nepal WGS84 bounds."
+    }
+  },
+  "required": ["composite_ward_id", "target_lat", "target_lng"],
+  "additionalProperties": false
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "compute_edcd_larvicide_dose",
+  "description": "Compute exact EDCD Nepal 'Khoj Ra Nashta Gar' source-reduction, Bti (0.5-1.0 g/m2), or Temephos 50% EC (1 ppm) dosage in bilingual Nepali Devanagari and English.",
+  "type": "object",
+  "properties": {
+    "container_type": {
+      "type": "string",
+      "enum": [
+        "uncovered_plastic_drum",
+        "discarded_vehicle_tire",
+        "rooftop_tank",
+        "flower_pot",
+        "construction_pit",
+        "solid_waste"
+      ],
+      "description": "Classified breeding container habitat."
+    },
+    "water_matrix": {
+      "type": "string",
+      "enum": ["clean_non_potable", "stagnant_pool_or_tire", "potable_drinking_water"],
+      "description": "Water quality matrix dictating Bti vs Temephos vs physical scrubbing."
+    },
+    "water_volume_liters": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000,
+      "description": "Estimated water volume in liters (for Temephos 50% EC @ 1 ppm calculation)."
+    },
+    "surface_area_sqm": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 50000,
+      "description": "Estimated water surface area in square meters (for Bti @ 0.5-1.0 g/m2 calculation)."
+    }
+  },
+  "required": ["container_type", "water_matrix"],
+  "additionalProperties": false
+}

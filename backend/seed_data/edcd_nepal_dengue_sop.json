@@ -1,0 +1,62 @@
+{
+  "guideline_title_en": "National Guidelines on Prevention, Management and Control of Dengue in Nepal",
+  "guideline_title_ne": "नेपालमा डेंगु रोगको रोकथाम, नियन्त्रण तथा व्यवस्थापन सम्बन्धी राष्ट्रिय निर्देशिका",
+  "issuing_authority": "Ministry of Health and Population (MoHP), Department of Health Services (DoHS), Epidemiology and Disease Control Division (EDCD), Teku, Kathmandu",
+  "emergency_hotline": {
+    "hello_swasthya": "1115",
+    "edcd_teku_control_room": "+977-1-4255796"
+  },
+  "core_campaign": {
+    "code": "KHOJ_RA_NASHTA_GAR",
+    "name_ne": "लामखुट्टेको लार्भा खोज र नष्ट गर अभियान",
+    "name_en": "Search and Destroy Mosquito Larvae Campaign (Khoj Ra Nashta Gar)",
+    "frequency": "Weekly mandatory community & FCHV courtyard (bahal), rooftop, and tire inspection",
+    "priority_order": [
+      "1. Physical source reduction (emptying, scrubbing inner container walls to destroy desiccated Aedes eggs, covering water drums)",
+      "2. Biological larviciding with Bacillus thuringiensis israelensis (Bti) in non-drainable stagnant water and tires",
+      "3. Chemical larviciding with Temephos 50% EC @ 1 ppm in non-potable bulk water storage",
+      "4. Restricted focal Ultra-Low Volume (ULV) space-spraying ONLY upon confirmed EWARS cluster transmission + BI >= 30 + Palika Health Chief cryptographic sign-off"
+    ]
+  },
+  "larvicide_protocols": {
+    "physical_search_and_destroy": {
+      "water_matrix": "potable_drinking_water",
+      "dosage_en": "Zero chemical larvicide. Physically decant water, scrub inner container walls with a stiff brush to remove attached Aedes eggs, dry in sunlight, and fit tight lid.",
+      "dosage_ne": "पिउने पानीमा कुनै रसायन नराख्ने। भाँडोको पानी खन्याउने, भित्री भित्तामा टाँसिएका लामखुट्टेका अण्डा नष्ट गर्न ब्रसले राम्ररी माझ्ने, घाममा सुकाउने र बिर्को लगाउने (खोज र नष्ट गर)।"
+    },
+    "temephos_50_ec": {
+      "water_matrix": "clean_non_potable",
+      "active_ingredient": "Temephos 50% EC",
+      "target_concentration_ppm": 1.0,
+      "active_mg_per_liter": 1.0,
+      "formulation_ml_per_1000_liters": 2.0,
+      "dosage_en": "Apply Temephos 50% EC @ 1 ppm (1 mg a.i./L = 2.0 mL of 50% EC formulation per 1,000 liters of clean non-potable water) after physical source reduction where emptying is impossible.",
+      "dosage_ne": "खोज र नष्ट गर अभियान अन्तर्गत खन्याउन नमिल्ने सफा तर नपिउने पानीमा टेमेफोस ५०% ई.सी. (Temephos 50% EC) १ पिपिएम (प्रति १,००० लिटर पानीमा २ मि.लि. झोल) प्रयोग गर्ने।"
+    },
+    "bti_wp_granules": {
+      "water_matrix": "stagnant_pool_or_tire",
+      "active_ingredient": "Bacillus thuringiensis israelensis (Bti) Serotype H-14 WP / Granules",
+      "dosage_g_per_sqm_min": 0.5,
+      "dosage_g_per_sqm_max": 1.0,
+      "dosage_en": "Apply Bacillus thuringiensis israelensis (Bti) WP/granules @ 0.5–1.0 g/m² water surface area across stagnant pools, construction pits, or waterlogged discarded vehicle tires.",
+      "dosage_ne": "बगाउन नमिल्ने जमेको पानी, निर्माण खाल्डो वा पुराना टायरहरूमा जैविक लार्भिसाइड बिएटिआई (Bti - Bacillus thuringiensis israelensis) ०.५ देखि १.० ग्राम प्रति वर्गमिटर पानीको सतहमा छर्ने।"
+    }
+  },
+  "ulv_space_spraying_gate": {
+    "routine_fogging_permitted": false,
+    "statutory_rule_en": "Routine diesel thermal fogging is strictly prohibited under EDCD Nepal guidelines due to vector knockdown resistance, environmental toxicity, and zero larval efficacy. Focal ULV cold aerosol spraying requires: (1) role == 'palika_health_chief', (2) confirmed EWARS clinical cases > 0, and (3) Breteau Index (BI) >= 30.",
+    "statutory_rule_ne": "नियमित डिजेल फगिङ स्वास्थ्य तथा वातावरणका लागि हानिकारक र लार्भा नियन्त्रणमा प्रभावहीन भएकाले पूर्णतः निषेधित छ। फोकल ULV स्प्रे गर्न (१) पालिका स्वास्थ्य प्रमुखको स्वीकृति, (२) EWARS बाट प्रमाणित डेंगु केस र (३) ब्रेटो सूचकांक (BI) >= ३० अनिवार्य छ।"
+  },
+  "clinical_referral_triage": {
+    "group_a_mild": {
+      "criteria_en": "Fever without warning signs, tolerating oral fluids, normal urine output.",
+      "action_en": "Manage at KMC Urban Health Promotion Center (UHPC) / Ward BHSC with ORS, Paracetamol only (strictly avoid NSAIDs: Ibuprofen, Aspirin, Diclofenac).",
+      "action_ne": "चर्को लक्षण नभएको सामान्य डेंगु ज्वरो: सहरी स्वास्थ्य प्रवर्द्धन केन्द्र (UHPC) को निगरानीमा जीवनजल, प्रशस्त झोलिलो पदार्थ र पारासिटामोल मात्र प्रयोग गर्ने (ब्रुफेन, एस्पिरिन जस्ता औषधि पूर्णतः निषेध)।"
+    },
+    "group_b_warning_signs": {
+      "criteria_en": "Severe abdominal pain, persistent vomiting, mucosal bleeding, lethargy, hepatomegaly, hematocrit rise with rapid platelet drop.",
+      "action_en": "Immediate referral to NHFR Secondary/Tertiary Hospital (Sukraraj Tropical Hospital Teku, Bir Hospital, Patan Hospital, Civil Hospital, TU Teaching Hospital) for inpatient IV fluid management.",
+      "action_ne": "खतराका चिन्हहरू (पेट दुख्ने, लगातार बान्ता हुने, गिजा वा नाकबाट रगत बग्ने, अत्यधिक कमजोरी): तुरुन्तै शुक्रराज ट्रपिकल तथा सरुवा रोग अस्पताल (टेकु), वीर अस्पताल, पाटन अस्पताल वा सिभिल अस्पतालमा भर्नाका लागि रेफर गर्ने।"
+    }
+  }
+}

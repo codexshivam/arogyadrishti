@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "lookup_nhfr_health_centers",
+  "description": "Query nearest accredited NHFR Government Hospitals (Teku, Bir, Patan, TU Teaching, Civil Hospital) and Urban Health Promotion Centers (UHPCs) with 24x7 fever clinics and 1115 Hello Swasthya hotline.",
+  "type": "object",
+  "properties": {
+    "latitude": {
+      "type": "number",
+      "minimum": 26.0,
+      "maximum": 30.5
+    },
+    "longitude": {
+      "type": "number",
+      "minimum": 80.0,
+      "maximum": 88.5
+    },
+    "radius_km": {
+      "type": "number",
+      "minimum": 0.5,
+      "maximum": 50.0,
+      "default": 5.0
+    }
+  },
+  "required": ["latitude", "longitude"],
+  "additionalProperties": false
+}
