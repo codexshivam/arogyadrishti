@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import re
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -80,6 +81,12 @@ async def export_municipal_ledger_endpoint(
     Export the Sovereign 7-Tab Municipal Command Workbook (`1_Ward_Master_32` through `7_Escalation_SLA_Tickets`)
     from PostgreSQL as a cryptographically SHA-256 signed `.xlsx` file or JSON metadata summary.
     """
+    if not re.match(r"^[A-Za-z0-9_-]+$", palika_code):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid palika_code: only alphanumeric characters, underscores, and hyphens are permitted.",
+        )
+
     if not principal.can_access_palika(palika_code):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

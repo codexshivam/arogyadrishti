@@ -364,26 +364,32 @@ class MunicipalLedgerSyncService:
         xlsx_bytes = buf.getvalue()
         sha256_sig = hashlib.sha256(xlsx_bytes).hexdigest()
 
-        # Sanitize palika_code and enforce safe path containment against traversal
-        clean_palika = re.sub(r"[^A-Za-z0-9_-]", "", os.path.basename(str(palika_code).strip()))
-        if not clean_palika:
-            clean_palika = "default"
+        # 1. Sanitize user input using os.path.basename and strict alphanumeric filtering
+        clean_palika = re.sub(r"[^A-Za-z0-9_-]", "", os.path.basename(str(palika_code).strip())) or "default"
 
+        # 2. Canonical CodeQL-compliant normalization and root directory prefix validation
         settings = get_settings()
-        export_dir = Path(settings.ledger_export_dir).resolve()
-        export_dir.mkdir(parents=True, exist_ok=True)
-        safe_filename = f"nepal_municipal_ledger_{clean_palika}.xlsx"
-        out_path = (export_dir / safe_filename).resolve()
-        if not out_path.is_relative_to(export_dir):
-            raise ValueError(f"Path traversal detected: {out_path} is outside {export_dir}")
-        out_path.write_bytes(xlsx_bytes)
+        safe_root_dir = os.path.abspath(settings.ledger_export_dir)
+        os.makedirs(safe_root_dir, exist_ok=True)
+        root_prefix = safe_root_dir if safe_root_dir.endswith(os.sep) else safe_root_dir + os.sep
+
+        filename = f"nepal_municipal_ledger_{clean_palika}.xlsx"
+        unsafe_path = os.path.join(safe_root_dir, filename)
+        normalized_path = os.path.normpath(unsafe_path)
+        resolved_path = os.path.abspath(normalized_path)
+
+        if not resolved_path.startswith(root_prefix):
+            raise ValueError(f"Access denied: path traversal detected in '{palika_code}'")
+
+        with open(resolved_path, "wb") as f:
+            f.write(xlsx_bytes)
 
         meta = {
             "palika_code": palika_code,
             "sheet_tabs": list(REQUIRED_SEVEN_TABS),
             "sha256_signature": sha256_sig,
             "file_size_bytes": len(xlsx_bytes),
-            "local_export_path": str(out_path),
+            "local_export_path": resolved_path,
             "exported_at_utc": stamp.timestamp_utc,
             "exported_at_bs": stamp.bs_combined_label,
         }

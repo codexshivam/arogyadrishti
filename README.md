@@ -1,5 +1,3 @@
-Readme
-
 <div align="center">
 
 <!-- NidanIQ Header Banner -->
