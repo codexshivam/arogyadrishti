@@ -489,7 +489,7 @@ NidanIQ targets massive cost reductions compared to commercial software contract
 
 ### Projected Monthly Infrastructure Breakdown (Nationwide Core / 753 Palikas)
 
-*Estimated baseline cloud operating cost on DigitalOcean or co-located IDMC Singha Durbar infrastructure is projected at **under NPR 2,80,000 / month (~$2,090 USD)**:*
+*Estimated baseline cloud operating cost on DigitalOcean or co-located IDMC Singha Durbar infrastructure is projected at **under NPR 2,80,000 / month ($2,090 USD)**:*
 
 | Infrastructure Component | Resource Allocation / Tier | Estimated Monthly Cost (NPR) | Cost Justification |
 | :--- | :--- | :--- | :--- |
@@ -500,7 +500,7 @@ NidanIQ targets massive cost reductions compared to commercial software contract
 | **OSRM Nepal Routing** | Container running offline Nepal OSM graph | NPR 15,000 | Real-time vehicle navigation without external Google Maps API charges. |
 | **AI Inference Droplet** | DigitalOcean GPU Droplet (NVIDIA L40S/A10) running vLLM | NPR 1,20,000 | High-throughput local inference for Gemma 4 and PaliGemma 3B. |
 | **SMS Gateway (Hybrid)** | Sparrow / Aakash SMS (Login OTPs Only) | NPR 35,000 | Zero SMS cost for alerts (routed via verified SMTP email + push). |
-| **Total Estimated Operating Cost** | **Sovereign Bare-Metal / DO Stack** | **~NPR 2,80,000 / month (~$2,090 USD)** | **Over 94% savings compared to commercial cloud models.** |
+| **Total Estimated Operating Cost** | **Sovereign Bare-Metal / DO Stack** | **NPR 2,80,000 / month ($2,090 USD)** | **Over 94% savings compared to commercial cloud models.** |
 
 ---
 
