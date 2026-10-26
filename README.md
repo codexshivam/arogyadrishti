@@ -7,7 +7,7 @@
 
 ## Executive Overview & Architectural Mission
 
-**NidanIQ** is an open-source **Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration for the **Government of Nepal**. Designed in strict alignment with the statutory mandates of the **Epidemiology and Disease Control Division (EDCD Teku)**, the **Ministry of Health and Population (MoHP)**, the **Early Warning, Alert and Response System (EWARS / DHIS2)**, and the **Constitution of Nepal (2072) Schedule 8 (Local Level Exclusive Health Jurisdiction)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated biological larviciding.
+**NidanIQ** is a sovereign **Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration for the **Government of Nepal**. Designed in strict alignment with the statutory mandates of the **Epidemiology and Disease Control Division (EDCD Teku)**, the **Ministry of Health and Population (MoHP)**, the **Early Warning, Alert and Response System (EWARS / DHIS2)**, and the **Constitution of Nepal (2072) Schedule 8 (Local Level Exclusive Health Jurisdiction)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated biological larviciding.
 
 Traditional public health surveillance in Nepal operates reactively: municipal authorities learn of an outbreak only after clinical blood tests (NS1 antigen / IgM ELISA) appear in hospital diagnostic registries (e.g., Sukraraj Tropical & Infectious Disease Hospital, Teku; Patan Hospital, Lagankhel; Bharatpur Hospital, Chitwan). By this stage, *Aedes aegypti* and *Aedes albopictus* (dengue and chikungunya vectors) have already completed their 8–10 day aquatic life cycle and multiple blood-feeding cycles, resulting in exponential community transmission across dense urban courtyards (*bahals*) and river basins (*bensi*).
 
@@ -158,7 +158,7 @@ $$Z = \frac{\text{BI}_{\text{current}} - \mu_{\text{historical, week}}}{\sigma_{
 
 ### 1.6 Haversine Pre-Filter & Tactical OSRM Fleet Allocation
 
-When an outbreak is flagged, municipal Rapid Response Team (**RRT Vans**, BA-2-JHA vehicles) are selected via Haversine spatial candidate filtering followed by sovereign OSRM (Open Source Routing Machine) traffic-aware shortest-path minimization:
+When an outbreak is flagged, municipal Rapid Response Team (**RRT Vans**, BA-2-JHA vehicles) are selected via Haversine spatial candidate filtering followed by sovereign OSRM tactical traffic-aware shortest-path minimization:
 
 $$d = 2R \cdot \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)$$
 
@@ -477,14 +477,14 @@ External municipal dashboards, province health directorates, and citizen apps qu
 
 ## 9. Operational Economics & Cost Estimation
 
-NidanIQ targets massive cost reductions compared to commercial software contracts by deploying bare-metal open-source infrastructure (on DigitalOcean or IDMC Singha Durbar bare-metal servers):
+NidanIQ targets massive cost reductions compared to commercial software contracts by deploying bare-metal sovereign infrastructure (on DigitalOcean or IDMC Singha Durbar bare-metal servers):
 
 | Cost Driver | Commercial Cloud / Hyperscaler | NidanIQ Sovereign Bare-Metal Model | Optimization & Savings Basis |
 | :--- | :--- | :--- | :--- |
 | **Vector AI Inference** | Commercial LLM APIs ($0.03–$0.05 / scan) | Open-Weight Gemma 4 / PaliGemma on vLLM | Scales to local GPU/CPU bare metal; negligible marginal inference cost (< NPR 0.05/scan). |
 | **Satellite Imagery** | Commercial High-Res Imagery ($100s/km²) | Open Copernicus Sentinel-1 SAR & GEE | Free, open-access public radar & thermal feeds (Sentinel-1 SAR, Sentinel-2, MODIS LST, CHIRPS). |
 | **Chemical Larvicide** | Indiscriminate City-Wide Thermal Fogging | Targeted Precision Dispatch ($BI \ge 35$ / critical) | **Estimated 60–75% reduction in chemical wastage** by shifting from blanket fogging to verified biological Bti hotspot containment. |
-| **Database Licensing** | Proprietary Enterprise DB ($10,000s/year) | PostgreSQL 16 + PostGIS 3.4 (Open Source) | High-performance spatial indexing (`GIST`) with zero licensing overhead. |
+| **Database Licensing** | Commercial Enterprise DB ($10,000s/year) | PostgreSQL 16 + PostGIS 3.4 | High-performance spatial indexing (`GIST`) with zero licensing overhead. |
 | **Field Devices** | Dedicated Ruggedized Terminals ($500/unit)| Standard Frontline Smartphones (BYOD) | Runs on frontline FCHV Android phones with full offline SQLite/Hive storage and 3GB–4GB RAM optimization. |
 
 ### Projected Monthly Infrastructure Breakdown (Nationwide Core / 753 Palikas)
@@ -743,7 +743,7 @@ async def verify_100m_inspection_geofence(
 
 ## 12. Tools Used & Technology Stack
 
-NidanIQ leverages an end-to-end, sovereign, open-source stack designed for zero data egress, sub-second latency, and Tier-3 offline resilience in resource-constrained environments:
+NidanIQ leverages an end-to-end sovereign stack designed for zero data egress, sub-second latency, and Tier-3 offline resilience in resource-constrained environments:
 
 ### 12.1 Core Engineering & Architecture Matrix
 
@@ -760,7 +760,7 @@ NidanIQ leverages an end-to-end, sovereign, open-source stack designed for zero 
 | **Database & GIS** | **PostgreSQL 16 + PostGIS 3.4** | Enterprise Spatial Engine | Core spatial database storing 6,743 Nepal ward boundaries (`MULTIPOLYGON`, `SRID 4326`), `ST_Contains`, `ST_DWithin`, and RLS isolation. |
 | **Caching & Rate Limits**| **Redis 7.2 (Alpine)** | In-Memory Key-Value | 15-minute public ward stats cache (`ward_stats:{id}`), session blacklisting, and OTP rate-limiting counters. |
 | **WORM Object Storage**| **MinIO (Object Lock)** | COMPLIANCE Mode | 365-day immutable audit logs and 1-Tap Singha Durbar GIOMS Outbreak Brief PDFs without retroactive tampering. |
-| **Tactical Routing** | **OSRM (Nepal Engine)** | Open Source Routing Machine | Offline vehicle routing engine using Nepal's OpenStreetMap graph for rapid response van dispatch. |
+| **Tactical Routing** | **OSRM (Nepal Engine)** | Tactical Routing Engine | Offline vehicle routing engine using Nepal's OpenStreetMap graph for rapid response van dispatch. |
 | **Secrets Management** | **HashiCorp Vault 1.17** | AppRole Engine | 60-minute ephemeral database credential leases (`TTL = 3600s`), eliminating hardcoded database passwords. |
 | **SIEM & SOC Security** | **Wazuh 4.9 Agent** | Host-Based IDS & SIEM | 24/7 SOC monitoring for brute force and impossible travel, triggering automatic IP blacklisting and JWT revocation. |
 | **Edge Vision** | **Google PaliGemma 3B** | Open-Weight Multimodal VLM | Edge/server smartphone camera detection of mosquito breeding containers, water stagnation surfaces, and larval classification. |
@@ -794,7 +794,7 @@ NidanIQ leverages an end-to-end, sovereign, open-source stack designed for zero 
     <tr>
       <td><strong>🎯 Autonomous Agent Skill Standard</strong></td>
       <td>Technical specification for open-weight Google Gemma 4 &amp; PaliGemma autonomous vector surveillance, field multi-tool orchestration, and automated municipal emergency triage.</td>
-      <td><code>Agent Skill Standard</code><br/>Apache 2.0</td>
+      <td><code>Agent Skill Standard</code><br/>Sovereign Protocol</td>
       <td><a href="skills/nepal-vector-surveillance-skill/SKILL.md"><strong>SKILL.md</strong></a></td>
     </tr>
     <tr>
@@ -824,7 +824,7 @@ NidanIQ leverages an end-to-end, sovereign, open-source stack designed for zero 
     <tr>
       <td><strong>📂 Sovereign Source Repository</strong></td>
       <td>Complete production codebase containing the Flutter mobile client (Android &amp; iOS), FastAPI backend, Citizen Transparency Portal (Next.js 15), Earth Engine satellite pipelines, and verified test suites.</td>
-      <td><code>Open Source System</code><br/>Apache 2.0 License</td>
+      <td><code>Sovereign Platform</code><br/>Government Deployment</td>
       <td><a href="https://github.com/codexshivam/nidaniq"><strong>GitHub Repository</strong></a></td>
     </tr>
   </tbody>
@@ -832,23 +832,10 @@ NidanIQ leverages an end-to-end, sovereign, open-source stack designed for zero 
 
 ---
 
-## 14. License & Sovereign Open-Source Adoption
+## 14. Proprietary Rights & Deployment Governance
 
-NidanIQ is licensed under the **Apache License, Version 2.0**.
-See the [LICENSE](LICENSE) file for complete terms.
+**Copyright © 2026 NidanIQ. All Rights Reserved.**
 
-```text
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+NidanIQ is proprietary sovereign digital public infrastructure engineered for the **Government of Nepal** (**Ministry of Health and Population — MoHP**, **Epidemiology and Disease Control Division — EDCD Teku**, and **753 Local Levels / Palikas**).
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
-
-The platform is designed and documented for open adoption by municipal corporations (*Mahanagarpalika*), district health offices, the **Epidemiology and Disease Control Division (EDCD)**, the **Ministry of Health and Population (MoHP)**, and international public health partners seeking sovereign, cost-efficient, and predictive vector surveillance infrastructure.
+Unauthorized copying, distribution, modification, public disclosure, or commercial exploitation of this repository, in whole or in part, without explicit prior written authorization from the project authority is strictly prohibited.

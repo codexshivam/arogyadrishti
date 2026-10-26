@@ -8,7 +8,7 @@ version = "2.0.0"
 description = "Sovereign Vector Surveillance & Early Warning DPI Backend for the Government of Nepal (MoHP / EDCD Teku / 753 Palikas)"
 readme = "README.md"
 requires-python = ">=3.12"
-license = "Apache-2.0"
+license = { text = "Proprietary" }
 authors = [
     { name = "Government of Nepal — MoHP / EDCD Vector Surveillance Architecture Team" }
 ]
