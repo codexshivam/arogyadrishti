@@ -4,18 +4,13 @@
 # You may wish to alter this file to override the set of languages analyzed,
 # or to provide custom queries or build logic.
 #
-# ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
-#
 name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   schedule:
     - cron: '33 7 * * 6'
   workflow_dispatch:
@@ -23,12 +18,7 @@ on:
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
-    # Runner size impacts CodeQL analysis time. To learn more, please see:
-    #   - https://gh.io/recommended-hardware-resources-for-running-codeql
-    #   - https://gh.io/supported-runners-and-hardware-resources
-    #   - https://gh.io/using-larger-runners (GitHub.com only)
-    # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       # required for all workflows
       security-events: write
@@ -44,34 +34,31 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        # Analyzes Python backend and agent skill harnesses with zero build requirement
-        - language: python
-          build-mode: none
-        # Note on excluded languages:
-        # - java-kotlin & swift: Generated Flutter wrappers in subdirectories; autobuild fails at root without full Flutter SDK.
-        # - ruby: Only an iOS Podfile exists with no application Ruby code.
-        # - actions: GitHub Actions workflow linting (optional; omitted to keep scan focused).
+          # Python: FastAPI backend, vLLM/PaliGemma harness, and sovereign agent skills
+          - language: python
+            build-mode: none
+
+          # JavaScript / TypeScript: Next.js 15 Citizen Portal & Remotion Video Showcase
+          - language: javascript-typescript
+            build-mode: none
+
+          # Actions: GitHub Actions workflow security linting
+          - language: actions
+            build-mode: none
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
+      # Initializes the CodeQL tools for scanning with v4 and security-extended suite.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: +security-extended
 
-    # Manual build step (executed only if build-mode is set to manual)
-    - name: Run manual build steps
-      if: matrix.build-mode == 'manual'
-      shell: bash
-      run: |
-        echo 'No manual build required for current matrix languages.'
-        exit 0
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{matrix.language}}"
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
