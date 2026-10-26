@@ -12,7 +12,7 @@
 ## 1. Authorized Public Health Personnel
 
 Access to NidanIQ operational endpoints is restricted to accredited public health personnel registered in the Municipal & EDCD Staff Whitelist (`+977` Nepal Telecom / Ncell via Sparrow SMS & Aakash SMS):
-- **Female Community Health Volunteers (`fchv` / महिला सामुदायिक स्वास्थ्य स्वयंसेविका)**
+- **Female Community Health Volunteers (`fchv` / Female Community Health Volunteers)**
 - **Ward Health Officers (`ward_health_officer` / Health Assistants, AHWs, Sanitary Inspectors at Ward BHSCs & UHPCs)**
 - **Palika Health Chiefs (`palika_health_chief` / Chief of Municipal Public Health Division — Jan Swasthya Bibhag)**
 - **EDCD Nodal Officers (`edcd_nodal` / MoHP EDCD Teku & Provincial Health Directorate Epidemiologists)**
@@ -20,7 +20,7 @@ Access to NidanIQ operational endpoints is restricted to accredited public healt
 ## 2. EDCD National Dengue Control Protocol Compliance
 
 All field interventions dispatched through NidanIQ adhere to the **EDCD Nepal National Guidelines on Prevention, Management and Control of Dengue**:
-- Primary vector control prioritizes **"Search & Destroy" (*खोज र नष्ट गर अभियान* / Khoj Ra Nashta Gar)** Rapid Response Teams (RRT) and biological larviciding (*Bacillus thuringiensis israelensis* `Bti` WP/granules and `Temephos 50% EC`).
+- Primary vector control prioritizes **"Search & Destroy" (Khoj Ra Nashta Gar)** Rapid Response Teams (RRT) and biological larviciding (*Bacillus thuringiensis israelensis* `Bti` WP/granules and `Temephos 50% EC`).
 - Focal Ultra-Low Volume (ULV) space-spraying is strictly gated behind confirmed EWARS clinical virus transmission, Breteau Index (`BI >= 30`), and cryptographic authorization by a `palika_health_chief`.
 
 ## 3. Audit Trail & Electronic Transactions Act, 2063

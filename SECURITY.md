@@ -1,13 +1,13 @@
 # Security & Privacy
 ## Security & Compliance Policy
 
-**NidanIQ** (deployed as **SwasthyaDrishti / स्वास्थ्यदृष्टि**) is engineered as a secure sovereign **Digital Public Infrastructure (DPI)** for predictive vector-borne disease surveillance in the **Government of Nepal** (**Ministry of Health and Population — MoHP**, **Epidemiology and Disease Control Division — EDCD Teku**, and **753 Local Levels / Palikas**), adhering to statutory cybersecurity directives and data protection principles established under:
+**NidanIQ** is engineered as a secure sovereign **Digital Public Infrastructure (DPI)** for predictive vector-borne disease surveillance in the **Government of Nepal** (**Ministry of Health and Population — MoHP**, **Epidemiology and Disease Control Division — EDCD Teku**, and **753 Local Levels / Palikas**), adhering to statutory cybersecurity directives and data protection principles established under:
 
 * **Constitution of Nepal (2072):** Article 28 (Right to Privacy), Article 35 (Right to Health), & Schedule 8 (Local Level Exclusive Health & Sanitation Jurisdiction)
-* **National Cyber Security Policy, 2080 (2023 — National Cyber Security Centre / NCSC / राष्ट्रिय साइबर सुरक्षा नीति, २०८०)**
+* **National Cyber Security Policy, 2080 (2023 — National Cyber Security Centre / NCSC)**
 * **Data Center and Cloud Service (Operation and Management) Directive, 2081 (DCCS Directive 2081 — MoCIT / DOIT)**
-* **Individual Privacy Act, 2075 (2018) & Individual Privacy Regulation, 2077 (2020 — वैयक्तिक गोपनीयता सम्बन्धी ऐन, २०७५)**
-* **Electronic Transactions Act, 2063 (2008 — विद्युतीय कारोबार ऐन, २०६३)**
+* **Individual Privacy Act, 2075 (2018) & Individual Privacy Regulation, 2077 (2020)**
+* **Electronic Transactions Act, 2063 (2008)**
 * **OWASP Mobile Application Security Verification Standard (MASVS L1) & OWASP Top 10 API Security** guidelines.
 
 ---
@@ -18,8 +18,8 @@ Security updates, vulnerability patches, and cryptographic dependency remediatio
 
 | Component / Distribution | Version | Supported | Security Maintenance Status |
 | :--- | :---: | :---: | :--- |
-| **Mobile Client (Android & iOS)** | `1.0.x` | ✅ Yes | Active Security Maintenance (Flutter 3.24+, 256-bit AES-GCM Hive/SecureStorage) |
-| **Backend API Gateway (FastAPI)** | `2.0.x` | ✅ Yes | Active Security Maintenance (Python 3.12+, PostgreSQL 16 / PostGIS 3.4 / vLLM) |
+| **Mobile Client** | `1.0.x` | ✅ Yes | Active Security Maintenance (Flutter 3.24+, 256-bit AES-GCM Hive/SecureStorage) |
+| **Backend & API** | `2.0.x` | ✅ Yes | Active Security Maintenance (Python 3.12+, PostgreSQL 16 / PostGIS 3.4 / vLLM) |
 | **Citizen Transparency Portal** | `2.0.x` | ✅ Yes | Active Security Maintenance (Next.js 15 App Router, 15m ISR, MapLibre GL) |
 | **Autonomous Agent Skill** | `1.0.0` | ✅ Yes | Apache 2.0 Sovereign Nepal Vector Surveillance Agent Skill Standard |
 
@@ -29,7 +29,7 @@ Security updates, vulnerability patches, and cryptographic dependency remediatio
 
 * **Strict Nepal Sovereign Data Residency (IDMC Singha Durbar & Hetauda DR):** In accordance with **DCCS Directive 2081**, all bare-metal compute nodes, container runtimes, spatial databases, WORM object storage buckets, and AI inference engines execute within sovereign data center facilities at the **Government Integrated Data Management Center (IDMC, Singha Durbar, Kathmandu)** and the **Government Data Center (GDC, Hetauda DR site, Makwanpur)** (with local DigitalOcean staging bridging).
 * **Zero Cross-Border Data Transfers:** In strict accordance with the **Individual Privacy Act, 2075** and DCCS Directive 2081, zero field surveillance records, telemetry streams, satellite overlays, or officer credentials are transferred outside the sovereign territorial boundaries of the Federal Democratic Republic of Nepal.
-* **OAG 365-Day WORM Audit Trail (Mahalekha Parikshak Mandate):** As required for constitutional audits by the **Office of the Auditor General (OAG / महालेखा परीक्षक)** and NCSC Policy 2080, all administrative actions, AI vision scans, RRT vehicle dispatches, and chemical larvicide consumptions are committed to MinIO Object Lock in **`COMPLIANCE` mode** and PostgreSQL SHA-256 hash-chained tables (`prev_hash || canonical_payload || timestamp_utc`) protected by immutable database triggers blocking `UPDATE` and `DELETE` for a statutory 365-day retention lock.
+* **OAG 365-Day WORM Audit Trail (Mahalekha Parikshak Mandate):** As required for constitutional audits by the **Office of the Auditor General (OAG)** and NCSC Policy 2080, all administrative actions, AI vision scans, RRT vehicle dispatches, and chemical larvicide consumptions are committed to MinIO Object Lock in **`COMPLIANCE` mode** and PostgreSQL SHA-256 hash-chained tables (`prev_hash || canonical_payload || timestamp_utc`) protected by immutable database triggers blocking `UPDATE` and `DELETE` for a statutory 365-day retention lock.
 
 ---
 
@@ -69,20 +69,13 @@ If you believe you have identified a potential security vulnerability within Nid
 
 ---
 
-## 6. Official Institutional Coordinates & Data Protection Officer
+## 6. Official Institutional Coordinates & Security Contact
 
 Under Section 13(2) of the **Individual Privacy Act, 2075** and **National Cyber Security Policy, 2080**:
 
 | Attribute | Official Specification |
 | :--- | :--- |
-| **Entity Name** | **NidanIQ (SwasthyaDrishti / स्वास्थ्यदृष्टि DPI Project)** |
-| **Institutional Authority** | **Epidemiology and Disease Control Division (EDCD), Ministry of Health and Population (MoHP)** |
-| **Headquarters** | **Teku, Kathmandu, Nepal** |
-| **Primary Sovereign Data Center** | **Government Integrated Data Management Center (IDMC), Singha Durbar, Kathmandu** |
-| **Disaster Recovery (DR) Site** | **Government Data Center (GDC), Hetauda, Makwanpur District, Nepal** |
-| **Official Institutional Email** | `security@edcd.gov.np` / `security@nidaniq.gov.np` |
-| **Official Grievance Desk** | `privacy.dpo@edcd.gov.np` |
-| **Data Protection Officer (DPO)** | **Chief Information Security Officer (CISO)** |
-| **Institutional Department** | **MoHP / EDCD Digital Public Infrastructure Secretariat** |
-| **Public Health Emergency Hotline** | **1115** (Hello Swasthya / *हेलो स्वास्थ्य*) \| Phone: `+977-1-4255796` |
-| **Physical Office Address** | **Epidemiology and Disease Control Division (EDCD), Teku Road, Kathmandu 44600, Nepal** |
+| **Entity Name** | **NidanIQ** |
+| **Authority** | **Shivam Yadav** |
+| **Headquarters** | **Bhaisepati, Lalitpur (Nepal)** |
+| **Email** | `hello@shivm.com` |

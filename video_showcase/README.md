@@ -3,8 +3,8 @@
 Programmatic motion graphics showcase built with **Remotion 4**, **React 18**, and **TypeScript**, reproducing the NidanIQ mobile surveillance application in 100% custom layered vector UI components with spring physics and synchronized procedural Foley audio.
 
 ## Video Specifications
-- **4K Output**: `out/arogya_drishti_showcase_4k.mp4` (3840×2160 @ 60 FPS, CRF 18, YUV420p)
-- **1080p Output**: `out/arogya_drishti_showcase.mp4` (1920×1080 @ 60 FPS)
+- **4K Output**: `out/nidaniq_showcase_4k.mp4` (3840×2160 @ 60 FPS, CRF 18, YUV420p)
+- **1080p Output**: `out/nidaniq_showcase.mp4` (1920×1080 @ 60 FPS)
 - **Duration**: `00:01:00.00` (3,600 frames @ 60 FPS, 1 minute)
 - **Video Codec**: H.264 High Profile, progressive (`yuv420p`)
 - **Audio Codec**: AAC stereo (48,000 Hz, 320 kbps)
@@ -12,7 +12,7 @@ Programmatic motion graphics showcase built with **Remotion 4**, **React 18**, a
 - **Typography**: Poppins with generous line spacing
   - **Main Titles**: `#A12C18`
   - **Subtitles**: `#BF5341`
-- **Closing Card**: Full red `#EE211E` background with centered white "AROGYA" logo text matching the native Android app launch splash screen.
+- **Closing Card**: Full red `#EE211E` background with centered white "NidanIQ" logo text matching the native Android app launch splash screen.
 
 ## Scene Progression & Motion Transitions
 1. **Scene 1 (Frames 0–480 | 0s–8s)**: **Secure Municipal Onboarding**

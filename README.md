@@ -2,14 +2,14 @@ Readme
 
 <div align="center">
 
-<!-- NidanIQ / SwasthyaDrishti Header Banner -->
+<!-- NidanIQ Header Banner -->
 <img src="./assets/readme/nidaniq_banner.svg" width="100%" alt="NidanIQ Sovereign Vector Surveillance DPI" />
 
 </div>
 
 ## Executive Overview & Architectural Mission
 
-**NidanIQ** (deployed as **SwasthyaDrishti / स्वास्थ्यदृष्टि**) is an open-source **Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration for the **Government of Nepal**. Designed in strict alignment with the statutory mandates of the **Epidemiology and Disease Control Division (EDCD Teku)**, the **Ministry of Health and Population (MoHP)**, the **Early Warning, Alert and Response System (EWARS / DHIS2)**, and the **Constitution of Nepal (2072) Schedule 8 (Local Level Exclusive Health Jurisdiction)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated biological larviciding.
+**NidanIQ** is an open-source **Digital Public Infrastructure (DPI)** engineered for autonomous vector-borne disease forecasting, micro-climate predictive modeling, and municipal intervention orchestration for the **Government of Nepal**. Designed in strict alignment with the statutory mandates of the **Epidemiology and Disease Control Division (EDCD Teku)**, the **Ministry of Health and Population (MoHP)**, the **Early Warning, Alert and Response System (EWARS / DHIS2)**, and the **Constitution of Nepal (2072) Schedule 8 (Local Level Exclusive Health Jurisdiction)**, the system eliminates paper-based municipal reporting by closing the loop between orbital earth observation, frontline field inspection, and automated biological larviciding.
 
 Traditional public health surveillance in Nepal operates reactively: municipal authorities learn of an outbreak only after clinical blood tests (NS1 antigen / IgM ELISA) appear in hospital diagnostic registries (e.g., Sukraraj Tropical & Infectious Disease Hospital, Teku; Patan Hospital, Lagankhel; Bharatpur Hospital, Chitwan). By this stage, *Aedes aegypti* and *Aedes albopictus* (dengue and chikungunya vectors) have already completed their 8–10 day aquatic life cycle and multiple blood-feeding cycles, resulting in exponential community transmission across dense urban courtyards (*bahals*) and river basins (*bensi*).
 
@@ -168,7 +168,7 @@ $$\text{OptimalVan} = \arg\min_{v \in \text{Vans}_{\text{available}}} \Big( \tex
 
 ---
 
-## 2. Step-by-Step Verified Worked Example: Kathmandu Metropolitan City, Ward 17
+## 2. Worked Example: Kathmandu Metropolitan City Ward 17
 
 To demonstrate mathematical transparency, below is the real-world calculation executed for **Kathmandu Metropolitan City (KMC), Ward 17 (Chhetrapati / Dhalko / Nyokha — MoFAGA Code: `NP-P3-D27-30608-W17`)** during post-monsoon surveillance:
 
@@ -274,7 +274,7 @@ Since $Z = +3.27 \ge +2.0$ and $\text{CompositeRisk} = 89.1 \ge 80.0$, KMC Ward 
 
 #### Step 6: Statutory Classification & Action Mandate
 
-* **Statutory Classification:** **CRITICAL OUTBREAK (CRITICAL_TIER_1 / आपतकालीन)** ($\text{Score} \ge 80.0 \text{ or } \text{BI} \ge 35.0$).
+* **Statutory Classification:** **CRITICAL OUTBREAK (CRITICAL_TIER_1 / Emergency Containment)** ($\text{Score} \ge 80.0 \text{ or } \text{BI} \ge 35.0$).
 * **Automated Actions Dispatched:** Immediate vehicle routing (`RRT Van BA-2-JHA-4101`), *Bacillus thuringiensis israelensis* (Bti) biological larvicide application order generated, Singha Durbar GIOMS 1-Tap Outbreak Brief compiled, and KMC Health Chief alerted via zero-cost email & push notification.
 
 ---
@@ -400,13 +400,13 @@ To ensure immediate adoption across Municipal Corporations (*Mahanagarpalika*), 
 
 | Tab Index | Worksheet Name | Data Structure & Key Fields | Administrative Purpose |
 | :--- | :--- | :--- | :--- |
-| **Tab 1** | `1_Vans_Fleet` | `van_id`, `vehicle_no` (बा २ झ), `team_lead_name`, `driver_phone`, `status`, `lat`, `lng`, `bti_stock_kg`, `temephos_liters` | Real-time vehicle telematics, biological larvicide inventory, and dispatch state. |
+| **Tab 1** | `1_Vans_Fleet` | `van_id`, `vehicle_no` (BA-2-JHA), `team_lead_name`, `driver_phone`, `status`, `lat`, `lng`, `bti_stock_kg`, `temephos_liters` | Real-time vehicle telematics, biological larvicide inventory, and dispatch state. |
 | **Tab 2** | `2_Health_Facilities`| `facility_id`, `name_en`, `name_ne`, `nhfr_code`, `ward_id`, `fever_clinic_24x7`, `ns1_elisa_available`, `rdt_kits_stock` | Bed availability and rapid diagnostic test kit inventory across NHFR accredited hospitals. |
 | **Tab 3** | `3_Staff_Directory`| `staff_id`, `name`, `role`, `assigned_ward`, `palika_code`, `email`, `phone_encrypted` | Roster of Ward Health Officers, Sanitary Inspectors, FCHVs, and Palika Chiefs. |
 | **Tab 4** | `4_Van_Requests` | `dispatch_id`, `timestamp_bs`, `ward_id`, `vehicle_id`, `dispatched_by`, `eta_minutes`, `status` | Real-time immutable audit log of automated and manual larviciding dispatches. |
 | **Tab 5** | `5_Alert_Logs` | `alert_id`, `timestamp_npt`, `ward_id`, `bi_index`, `composite_score`, `recipient_email`, `status` | Palika Health Chief emergency escalation notices with delivery timestamps. |
 | **Tab 6** | `6_Weekly_Surveillance_Stats` | `week_iso`, `ward_id`, `hi_pct`, `ci_pct`, `bi_index`, `lst_celsius`, `ndwi`, `risk_tier` | Multi-year epidemiological data warehouse for longitudinal predictive modeling. |
-| **Tab 7** | `7_WORM_Audit_Trail`| `seq_id`, `timestamp_npt`, `sha256_hash`, `prev_hash`, `actor_role`, `canonical_payload` | Immutable, hash-chained audit trail for the Auditor General (OAG / *महालेखा परीक्षक*). |
+| **Tab 7** | `7_WORM_Audit_Trail`| `seq_id`, `timestamp_npt`, `sha256_hash`, `prev_hash`, `actor_role`, `canonical_payload` | Immutable, hash-chained audit trail for the Auditor General (OAG / Office of the Auditor General). |
 
 ---
 
@@ -579,7 +579,7 @@ class GemmaSovereignHarness:
         tool_outputs = self._plan_and_execute_tools(query, context)
         system_instruction = (
             "You are NidanIQ's Sovereign Epidemiological Copilot (EDCD/MoHP aligned). "
-            "Recommend strictly biological larvicide (Bti) or Search & Destroy (खोज र नष्ट गर). "
+            "Recommend strictly biological larvicide (Bti) or Search & Destroy (Khoj Ra Nashta Gar). "
             "Thermal fogging is prohibited unless BI >= 30 and confirmed EWARS cases are present. "
             "Cite live indices and Bikram Sambat dates."
         )
