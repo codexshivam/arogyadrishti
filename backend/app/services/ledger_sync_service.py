@@ -364,22 +364,17 @@ class MunicipalLedgerSyncService:
         xlsx_bytes = buf.getvalue()
         sha256_sig = hashlib.sha256(xlsx_bytes).hexdigest()
 
-        # 1. Sanitize user input using os.path.basename and strict alphanumeric filtering
-        clean_palika = re.sub(r"[^A-Za-z0-9_-]", "", os.path.basename(str(palika_code).strip())) or "default"
-
-        # 2. Canonical CodeQL-compliant normalization and root directory prefix validation
+        # Content-addressable audit storage keyed by SHA-256 signature (zero user-controlled data in path)
         settings = get_settings()
         safe_root_dir = os.path.abspath(settings.ledger_export_dir)
         os.makedirs(safe_root_dir, exist_ok=True)
         root_prefix = safe_root_dir if safe_root_dir.endswith(os.sep) else safe_root_dir + os.sep
 
-        filename = f"nepal_municipal_ledger_{clean_palika}.xlsx"
-        unsafe_path = os.path.join(safe_root_dir, filename)
-        normalized_path = os.path.normpath(unsafe_path)
-        resolved_path = os.path.abspath(normalized_path)
+        filename = f"nepal_municipal_ledger_{sha256_sig}.xlsx"
+        resolved_path = os.path.normpath(os.path.join(safe_root_dir, filename))
 
         if not resolved_path.startswith(root_prefix):
-            raise ValueError(f"Access denied: path traversal detected in '{palika_code}'")
+            raise ValueError(f"Access denied: path traversal detected in export directory")
 
         with open(resolved_path, "wb") as f:
             f.write(xlsx_bytes)
