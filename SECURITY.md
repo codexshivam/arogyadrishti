@@ -1,5 +1,4 @@
-# Security & Privacy
-## Security & Compliance Policy
+# Security & Compliance Policy
 
 **NidanIQ** is engineered as a secure sovereign **Digital Public Infrastructure (DPI)** for predictive vector-borne disease surveillance in the **Government of Nepal** (**Ministry of Health and Population — MoHP**, **Epidemiology and Disease Control Division — EDCD Teku**, and **753 Local Levels / Palikas**), adhering to statutory cybersecurity directives and data protection principles established under:
 
