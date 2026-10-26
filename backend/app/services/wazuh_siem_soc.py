@@ -303,7 +303,8 @@ class WazuhSiemSocService:
             created_at_bs=stamp.bs_ad_official_label,
         )
         self._alerts.append(event)
-        logger.warning("WAZUH_SOC_ACTIVE_RESPONSE: %s", msg_en)
+        clean_msg = msg_en.replace("\r", "").replace("\n", " ")
+        logger.warning("WAZUH_SOC_ACTIVE_RESPONSE: %s", clean_msg)
 
         return {
             "anomaly_detected": True,

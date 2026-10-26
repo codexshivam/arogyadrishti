@@ -318,11 +318,14 @@ class NotificationService:
         _DEV_DISPATCHED_EMAILS.append(record)
 
         if settings.env in {"development", "test"} or not settings.smtp_pass:
+            clean_email = to_email.replace("\r", "").replace("\n", "")
+            clean_event = event_type.replace("\r", "").replace("\n", "")
+            clean_subject = subject.replace("\r", "").replace("\n", "")
             logger.info(
                 "[ZERO-COST SMTP MOCK -> %s | %s] %s",
-                to_email,
-                event_type,
-                subject,
+                clean_email,
+                clean_event,
+                clean_subject,
             )
             return f"smtp_mock ({settings.smtp_host}:{settings.smtp_port})"
 

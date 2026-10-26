@@ -305,7 +305,9 @@ class NepalAuthService:
         if settings.env in {"development", "test"} or not (
             settings.sparrow_sms_token or settings.aakash_sms_token
         ):
-            logger.info("[DEV SMS MOCK -> %s] %s", phone, msg_text)
+            clean_phone = phone.replace("\r", "").replace("\n", "")
+            clean_msg = msg_text.replace("\r", "").replace("\n", " ")
+            logger.info("[DEV SMS MOCK -> %s] %s", clean_phone, clean_msg)
             return f"{settings.sms_provider}_dev_mock"
 
         if settings.sms_provider.lower() == "aakash" and settings.aakash_sms_token:
