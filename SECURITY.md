@@ -20,7 +20,7 @@ Security updates, vulnerability patches, and cryptographic dependency remediatio
 | **Mobile Client** | `1.0.x` | ✅ Yes | Active Security Maintenance (Flutter 3.24+, 256-bit AES-GCM Hive/SecureStorage) |
 | **Backend & API** | `2.0.x` | ✅ Yes | Active Security Maintenance (Python 3.12+, PostgreSQL 16 / PostGIS 3.4 / vLLM) |
 | **Citizen Portal** | `2.0.x` | ✅ Yes | Active Security Maintenance (Next.js 15 App Router, 15m ISR, MapLibre GL) |
-| **Agent Skill** | `1.0.0` | ✅ Yes | Sovereign Nepal Vector Surveillance Agent Skill Standard |
+| **Agent Skill** | `1.0.0` | ✅ Yes | Apache 2.0 Sovereign Nepal Vector Surveillance Agent Skill Standard |
 
 ---
 

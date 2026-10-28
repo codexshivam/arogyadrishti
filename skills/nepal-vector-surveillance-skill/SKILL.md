@@ -8,7 +8,7 @@ description: |
   Bti / Temephos larviciding calculation, Himalayan NASADEM terrain-corrected dengue risk queries,
   NHFR hospital/UHPC lookup, and IHMIS/DHIS2 ward reporting in Nepali, Romanized Nepali,
   and English.
-license: Proprietary
+license: Apache-2.0
 metadata:
   version: "2.0.0"
   authority: "Government of Nepal — MoHP / EDCD Teku"
