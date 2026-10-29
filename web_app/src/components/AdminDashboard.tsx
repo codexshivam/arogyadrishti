@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import {
   createFacility,
   createRrtUnit,
@@ -41,7 +40,7 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const { lang } = useAuth();
+  // Auth context
 
   const [activeTab, setActiveTab] = useState<'users' | 'facilities' | 'rrt' | 'tickets'>('users');
   const [hierarchy, setHierarchy] = useState<AdministrativeHierarchy | null>(null);
@@ -187,7 +186,7 @@ export const AdminDashboard: React.FC = () => {
         pin: newUserPin,
       });
 
-      setSuccessMsg(lang === 'ne' ? 'कर्मचारी सफलतापूर्वक थपियो!' : 'Staff user successfully created!');
+      setSuccessMsg('Staff user successfully created!');
       setShowAddUserModal(false);
       // Reset form
       setNewUserName('');
@@ -200,12 +199,12 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm(lang === 'ne' ? 'के तपाईं यो प्रयोगकर्ता मेटाउन निश्चित हुनुहुन्छ?' : 'Are you sure you want to delete this staff user?')) {
+    if (!confirm('Are you sure you want to delete this staff user?')) {
       return;
     }
     try {
       await deleteStaffUser(userId);
-      setSuccessMsg(lang === 'ne' ? 'प्रयोगकर्ता हटाइयो!' : 'Staff user removed!');
+      setSuccessMsg('Staff user removed!');
       loadData();
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
@@ -331,20 +330,18 @@ export const AdminDashboard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Top Banner / Summary */}
-      <div className="bg-linear-to-r from-[#1B4D9B] to-[#123770] rounded-xl text-white p-6 shadow-md mb-6">
+      <div className="bg-linear-to-r from-[#2563EB] to-[#1E3A8A] rounded-xl text-white p-6 shadow-md mb-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2">
               <Shield className="w-3.5 h-3.5" />
-              <span>{lang === 'ne' ? 'राष्ट्रिय प्रशासक कमाण्ड सेन्टर' : 'National Sovereign Admin Console'}</span>
+              <span>{'National Sovereign Admin Console'}</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold">
-              {lang === 'ne' ? 'सार्वभौम स्वास्थ्य तथा भेक्टर नियन्त्रण कमाण्ड' : 'Sovereign Vector Control & Public Health Console'}
+              {'Sovereign Vector Control & Public Health Console'}
             </h2>
             <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-2xl">
-              {lang === 'ne'
-                ? 'देशभरका सबै पालिका, महानगरपालिका, स्वास्थ्य संस्था, आर.आर.टी. टोली तथा सुरक्षा टिकटहरूको केन्द्रीय व्यवस्थापन।'
-                : 'National command authority to manage municipal admins, field visitors, health centers, vans, and emergency tickets.'}
+              {'National command authority to manage municipal admins, field visitors, health centers, vans, and emergency tickets.'}
             </p>
           </div>
 
@@ -355,7 +352,7 @@ export const AdminDashboard: React.FC = () => {
               className="bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>{lang === 'ne' ? 'ताजा गर्नुहोस्' : 'Refresh Data'}</span>
+              <span>{'Refresh Data'}</span>
             </button>
           </div>
         </div>
@@ -363,19 +360,19 @@ export const AdminDashboard: React.FC = () => {
         {/* Quick Metrics Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10">
           <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'स्थानिय तह (Palikas)' : 'Covered Palikas'}</div>
+            <div className="text-xs text-slate-300 font-medium">{'Covered Palikas'}</div>
             <div className="text-xl font-bold mt-0.5">{hierarchy?.palikas.length || 11}</div>
           </div>
           <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'स्वास्थ्यकर्मी (Staff)' : 'Active Staff'}</div>
+            <div className="text-xs text-slate-300 font-medium">{'Active Staff'}</div>
             <div className="text-xl font-bold mt-0.5">{usersList.length || 7}</div>
           </div>
           <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'स्वास्थ्य संस्था (Centers)' : 'Health Facilities'}</div>
+            <div className="text-xs text-slate-300 font-medium">{'Health Facilities'}</div>
             <div className="text-xl font-bold mt-0.5">{facilitiesList.length || 10}</div>
           </div>
           <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'आर.आर.टी. गाडी (RRT Fleet)' : 'RRT Vans Fleet'}</div>
+            <div className="text-xs text-slate-300 font-medium">{'RRT Vans Fleet'}</div>
             <div className="text-xl font-bold mt-0.5">{rrtList.length || 6}</div>
           </div>
         </div>
@@ -407,56 +404,56 @@ export const AdminDashboard: React.FC = () => {
           onClick={() => setActiveTab('users')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'users'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'कर्मचारी तथा भूमिका व्यवस्थापन' : 'Staff & RBAC Directory'}</span>
+          <span>{'Staff & RBAC Directory'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('facilities')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'facilities'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <Building2 className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'स्वास्थ्य संस्था (NHFR Centers)' : 'Health Facilities (Centers)'}</span>
+          <span>{'Health Facilities (Centers)'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('rrt')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'rrt'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <Truck className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'आर.आर.टी. द्रुत प्रतिकार्य गाडी' : 'Rapid Response Fleet (Vans)'}</span>
+          <span>{'Rapid Response Fleet (Vans)'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('tickets')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'tickets'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <AlertTriangle className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'सहयोग टिकट तथा उजुरीहरू' : 'Support Tickets & Escalations'}</span>
+          <span>{'Support Tickets & Escalations'}</span>
         </button>
       </div>
 
       {/* Global Filter Bar */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs mb-6 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-          <Filter className="w-4 h-4 text-[#1B4D9B]" />
-          <span>{lang === 'ne' ? 'फिल्टर गर्नुहोस्:' : 'Filter Scope:'}</span>
+          <Filter className="w-4 h-4 text-[#2563EB]" />
+          <span>{'Filter Scope:'}</span>
         </div>
 
         {/* Palika Filter */}
@@ -466,9 +463,9 @@ export const AdminDashboard: React.FC = () => {
             setFilterPalika(e.target.value);
             setFilterWard('');
           }}
-          className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium focus:ring-1 focus:ring-[#1B4D9B]"
+          className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium focus:ring-1 focus:ring-[#2563EB]"
         >
-          <option value="">{lang === 'ne' ? 'सबै पालिका (All Palikas)' : 'All Palikas (Nationwide)'}</option>
+          <option value="">{'All Palikas (Nationwide)'}</option>
           {hierarchy?.palikas.map((p) => (
             <option key={p.palika_code} value={p.palika_code}>
               {p.palika_name} ({p.palika_type})
@@ -481,9 +478,9 @@ export const AdminDashboard: React.FC = () => {
           <select
             value={filterWard}
             onChange={(e) => setFilterWard(e.target.value)}
-            className="text-xs border border-blue-300 rounded-lg px-2.5 py-1.5 bg-blue-50/50 font-medium focus:ring-1 focus:ring-[#1B4D9B]"
+            className="text-xs border border-blue-300 rounded-lg px-2.5 py-1.5 bg-blue-50/50 font-medium focus:ring-1 focus:ring-[#2563EB]"
           >
-            <option value="">{lang === 'ne' ? 'सबै वडाहरू (All Wards)' : 'All Wards (Metro Wide)'}</option>
+            <option value="">{'All Wards (Metro Wide)'}</option>
             {selectedPalikaObj.wards.map((w) => (
               <option key={w.composite_ward_id} value={w.composite_ward_id}>
                 Ward {w.ward_no} - {w.locality_name}
@@ -511,10 +508,10 @@ export const AdminDashboard: React.FC = () => {
           {activeTab === 'users' && (
             <button
               onClick={() => setShowAddUserModal(true)}
-              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{lang === 'ne' ? 'नयाँ कर्मचारी थप्नुहोस्' : 'Add Staff Member'}</span>
+              <span>{'Add Staff Member'}</span>
             </button>
           )}
 
@@ -527,10 +524,10 @@ export const AdminDashboard: React.FC = () => {
                 setFacFacilityId(`FAC-${Date.now().toString().slice(-6)}`);
                 setShowFacilityModal(true);
               }}
-              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{lang === 'ne' ? 'नयाँ स्वास्थ्य संस्था थप्नुहोस्' : 'Add Health Center'}</span>
+              <span>{'Add Health Center'}</span>
             </button>
           )}
 
@@ -543,10 +540,10 @@ export const AdminDashboard: React.FC = () => {
                 setRrtTeamLead('');
                 setShowRrtModal(true);
               }}
-              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{lang === 'ne' ? 'नयाँ आर.आर.टी. गाडी थप्नुहोस्' : 'Add RRT Van'}</span>
+              <span>{'Add RRT Van'}</span>
             </button>
           )}
         </div>
@@ -558,12 +555,10 @@ export const AdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'दर्ता भएका स्वास्थ्यकर्मी तथा प्रशासकहरू' : 'Authorized Health Personnel & Administrators'}
+                {'Authorized Health Personnel & Administrators'}
               </h3>
               <p className="text-xs text-slate-500">
-                {lang === 'ne'
-                  ? 'प्रशासकले नयाँ प्रशासक, पालिका प्रशासक र फिल्ड भिजिटरहरू थप्न सक्नुहुन्छ।'
-                  : 'Federal admins can authorize Admins, Municipality Admins, and Field Visitors.'}
+                {'Federal admins can authorize Admins, Municipality Admins, and Field Visitors.'}
               </p>
             </div>
             <span className="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-full">
@@ -653,7 +648,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'राष्ट्रिय स्वास्थ्य संस्था निर्देशिका (NHFR Facilities)' : 'National Health Facility Registry (NHFR)'}
+                {'National Health Facility Registry (NHFR)'}
               </h3>
               <p className="text-xs text-slate-500">
                 Manage dengue wards, inpatient beds, and NS1 RDT rapid test kit stocks.
@@ -695,7 +690,7 @@ export const AdminDashboard: React.FC = () => {
                     <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-slate-800">
                       {fac.total_beds}
                     </td>
-                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-[#C8102E]">
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-[#DC2626]">
                       {fac.dengue_ward_beds}
                     </td>
                     <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-emerald-700">
@@ -746,7 +741,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'द्रुत प्रतिकार्य टोली (RRT Vans & Chemical Stock)' : 'Rapid Response Team Fleet & Chemical Stock'}
+                {'Rapid Response Team Fleet & Chemical Stock'}
               </h3>
               <p className="text-xs text-slate-500">
                 Sovereign government vans with Bti larvicide, Temephos, and ULV fogging equipment.
@@ -864,7 +859,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'सार्वजनिक स्वास्थ्य सहयोग टिकट तथा उजुरीहरू' : 'Community Outbreak Alerts & SLA Support Tickets'}
+                {'Community Outbreak Alerts & SLA Support Tickets'}
               </h3>
               <p className="text-xs text-slate-500">
                 Filtered across municipalities and specific wards. Update ticket status in real-time.
@@ -891,7 +886,7 @@ export const AdminDashboard: React.FC = () => {
               <tbody className="divide-y divide-slate-200 bg-white">
                 {ticketsList.map((t) => (
                   <tr key={t.ticket_code} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#1B4D9B]">
+                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#2563EB]">
                       {t.ticket_code}
                     </td>
                     <td className="px-6 py-3.5 whitespace-nowrap text-slate-600">
@@ -963,8 +958,8 @@ export const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Users className="w-5 h-5 text-[#1B4D9B]" />
-                <span>{lang === 'ne' ? 'नयाँ कर्मचारी / प्रशासक थप्नुहोस्' : 'Authorize New Staff User'}</span>
+                <Users className="w-5 h-5 text-[#2563EB]" />
+                <span>{'Authorize New Staff User'}</span>
               </h3>
               <button
                 onClick={() => setShowAddUserModal(false)}
@@ -978,7 +973,7 @@ export const AdminDashboard: React.FC = () => {
               {/* Role Selector */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  {lang === 'ne' ? 'भूमिका (Role / Authority Level)' : 'Role / Authority Level'}
+                  {'Role / Authority Level'}
                 </label>
                 <select
                   value={newUserRole}
@@ -994,7 +989,7 @@ export const AdminDashboard: React.FC = () => {
               {/* Palika Selector (Hierarchy) */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  {lang === 'ne' ? 'स्थानिय तह / पालिका (Municipality / Rural Municipality)' : 'Assigned Local Level (Palika)'}
+                  {'Assigned Local Level (Palika)'}
                 </label>
                 <select
                   value={newUserPalika}
@@ -1019,7 +1014,7 @@ export const AdminDashboard: React.FC = () => {
               {/* Metropolitan or Sub-Metropolitan Ward Allocation Strategy */}
               {newUserPalikaObj && newUserPalikaObj.is_metro_or_submetro && newUserRole !== 'admin' && (
                 <div className="bg-blue-50/60 border border-blue-200 rounded-lg p-3">
-                  <div className="text-xs font-bold text-[#1B4D9B] mb-1.5 flex items-center gap-1.5">
+                  <div className="text-xs font-bold text-[#2563EB] mb-1.5 flex items-center gap-1.5">
                     <Layers className="w-3.5 h-3.5" />
                     <span>Metropolitan / Sub-Metropolitan Jurisdiction Strategy</span>
                   </div>
@@ -1153,7 +1148,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
                 >
                   Create Staff User
                 </button>
@@ -1169,7 +1164,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#1B4D9B]" />
+                <Building2 className="w-5 h-5 text-[#2563EB]" />
                 <span>{editingFacility ? 'Edit Health Center' : 'Add Health Center'}</span>
               </h3>
               <button onClick={() => setShowFacilityModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -1299,7 +1294,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
                 >
                   Save Health Center
                 </button>
@@ -1315,7 +1310,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Truck className="w-5 h-5 text-[#1B4D9B]" />
+                <Truck className="w-5 h-5 text-[#2563EB]" />
                 <span>{editingRrt ? 'Edit RRT Van' : 'Add Rapid Response Van'}</span>
               </h3>
               <button onClick={() => setShowRrtModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -1465,7 +1460,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
                 >
                   Save RRT Van
                 </button>

@@ -42,20 +42,21 @@ export async function verifyOtp(phoneNumber: string, otpCode: string, pin?: stri
     throw new Error(err.detail || 'Verification failed');
   }
   const data = await res.json();
+  const sp = data.staff_profile || {};
   const profile: UserProfile = {
-    id: data.staff_id,
+    id: sp.id || data.staff_id || '',
     phone: phoneNumber,
-    full_name: data.full_name,
-    full_name_ne: data.full_name_ne,
-    designation: data.designation,
-    role: data.role,
-    province_code: data.province_code,
-    district_code: data.district_code,
-    palika_code: data.palika_code,
-    assigned_wards: data.assigned_wards || [],
-    bs_date: data.bs_date,
-    bs_ad_official_label: data.bs_ad_official_label,
-    token: data.access_token,
+    full_name: sp.full_name || data.full_name || 'Staff User',
+    full_name_ne: sp.full_name_ne || data.full_name_ne || '',
+    designation: sp.designation || data.designation || '',
+    role: (sp.role || data.role || 'field_visitor') as UserProfile['role'],
+    province_code: sp.province_code ?? data.province_code ?? 3,
+    district_code: sp.district_code ?? data.district_code ?? 27,
+    palika_code: sp.palika_code ?? data.palika_code ?? '30608',
+    assigned_wards: sp.assigned_wards || data.assigned_wards || [],
+    bs_date: data.bs_date || '',
+    bs_ad_official_label: data.bs_ad_official_label || '',
+    token: data.access_token || '',
   };
   return profile;
 }

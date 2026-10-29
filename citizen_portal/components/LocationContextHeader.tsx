@@ -221,7 +221,7 @@ export default function LocationContextHeader({
     for (const w of NEPAL_WARD_HIERARCHY) {
       map.set(w.province_code, {
         code: w.province_code,
-        label: `${w.province_name_np} (${w.province_name})`,
+        label: w.province_name,
       });
     }
     return Array.from(map.values());
@@ -233,7 +233,7 @@ export default function LocationContextHeader({
       if (w.province_code === provinceCode) {
         map.set(w.district_code, {
           code: w.district_code,
-          label: `${w.district_name_np} (${w.district_name})`,
+          label: w.district_name,
         });
       }
     }
@@ -249,7 +249,7 @@ export default function LocationContextHeader({
       ) {
         map.set(w.palika_code, {
           code: w.palika_code,
-          label: `${w.palika_name_np} (${w.palika_name})`,
+          label: w.palika_name,
         });
       }
     }
@@ -270,8 +270,8 @@ export default function LocationContextHeader({
   const buttonLabel = currentCompositeWardId
     ? `📍 ${palikaName ?? activeEntry.palika_name}, Ward ${
         wardNo ?? activeEntry.ward_no
-      } (${palikaNameNp ?? activeEntry.palika_name_np})`
-    : "📍 Select Your Palika • आफ्नो पालिका छान्नुहोस्";
+      }`
+    : "📍 Select Your Palika & Ward";
 
   return (
     <>
@@ -289,11 +289,10 @@ export default function LocationContextHeader({
       >
         <div>
           <strong style={{ fontSize: "1.05rem" }}>
-            नेपाल सरकार • नागरिक पारदर्शिता पोर्टल | Citizen Transparency Portal
+            NidanIQ • Citizen Transparency Portal
           </strong>
           <div style={{ fontSize: "0.82rem", opacity: 0.9 }}>
-            citizen.nidaniq.com.np • Individual Privacy Act 2075 (Zero Citizen
-            PII)
+            Predictive Vector Surveillance & Outbreak Intelligence
           </div>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
@@ -327,7 +326,7 @@ export default function LocationContextHeader({
               cursor: "pointer",
             }}
           >
-            Use GPS (मेरो स्थान)
+            Use GPS Location
           </button>
         </div>
       </header>
@@ -360,11 +359,10 @@ export default function LocationContextHeader({
             }}
           >
             <h2 id="select-palika-title" style={{ marginTop: 0 }}>
-              Select Your Palika • आफ्नो प्रदेश, जिल्ला, पालिका र वडा छान्नुहोस्
+              Select Your Municipality &amp; Ward
             </h2>
             <p style={{ fontSize: "0.88rem", color: "#475569" }}>
-              Zero Defaulting Policy: Choose your administrative boundary in
-              English or Nepali (Devanagari) or use Browser Geolocation.
+              Choose your administrative boundary or use Browser Geolocation.
             </p>
             {gpsStatus && (
               <div
@@ -383,7 +381,7 @@ export default function LocationContextHeader({
 
             <label style={{ display: "block", marginBottom: "10px" }}>
               <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>
-                1. Province / प्रदेश
+                1. Province
               </span>
               <select
                 value={provinceCode}
@@ -411,7 +409,7 @@ export default function LocationContextHeader({
 
             <label style={{ display: "block", marginBottom: "10px" }}>
               <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>
-                2. District / जिल्ला
+                2. District
               </span>
               <select
                 value={districtCode}
@@ -440,7 +438,7 @@ export default function LocationContextHeader({
 
             <label style={{ display: "block", marginBottom: "10px" }}>
               <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>
-                3. Palika (Local Level) / पालिका
+                3. Palika (Municipality)
               </span>
               <select
                 value={palikaCode}
@@ -466,7 +464,7 @@ export default function LocationContextHeader({
 
             <label style={{ display: "block", marginBottom: "16px" }}>
               <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>
-                4. Ward / वडा नं.
+                4. Ward Number
               </span>
               <select
                 value={selectedWardId}
@@ -475,8 +473,7 @@ export default function LocationContextHeader({
               >
                 {wards.map((w) => (
                   <option key={w.composite_ward_id} value={w.composite_ward_id}>
-                    वडा {w.ward_no} - {w.locality_name_np} (Ward {w.ward_no}{" "}
-                    {w.locality_name})
+                    Ward {w.ward_no} — {w.locality_name}
                   </option>
                 ))}
               </select>
@@ -500,7 +497,7 @@ export default function LocationContextHeader({
                   cursor: "pointer",
                 }}
               >
-                Open Ward Dashboard • वडा ड्यासबोर्ड हेर्नुहोस्
+                Open Ward Dashboard
               </button>
               {currentCompositeWardId && (
                 <button

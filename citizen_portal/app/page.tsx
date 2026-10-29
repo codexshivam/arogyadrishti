@@ -22,16 +22,14 @@ export default function CitizenPortalLandingPage() {
           }}
         >
           <h1 style={{ marginTop: 0 }}>
-            Select Your Palika • आफ्नो प्रदेश, जिल्ला, पालिका र वडा छान्नुहोस्
+            Select Your Municipal Ward
           </h1>
           <p style={{ color: "#475569", lineHeight: 1.6 }}>
-            Welcome to the Government of Nepal Sovereign Vector Surveillance
-            Citizen Transparency Portal (<code>citizen.nidaniq.com.np</code>).
-            To ensure accurate local epidemiological intelligence, this portal
-            enforces a strict <strong>Zero Defaulting Policy</strong>: allow
-            Browser Geolocation or choose your exact{" "}
+            Welcome to the NidanIQ Vector Surveillance Citizen Transparency Portal
+            (<code>citizen.nidaniq.com.np</code>).
+            To view localized epidemiological intelligence, select your exact{" "}
             <strong>Province -&gt; District -&gt; Palika -&gt; Ward</strong>{" "}
-            using the Location Context selector above.
+            using the Location Context selector above or enable Browser Geolocation.
           </p>
         </div>
       </section>

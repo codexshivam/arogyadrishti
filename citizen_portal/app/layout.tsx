@@ -2,9 +2,9 @@ import React from "react";
 
 export const metadata = {
   title:
-    "नागरिक पारदर्शिता पोर्टल | Citizen Transparency Portal — Government of Nepal (citizen.nidaniq.com.np)",
+    "Citizen Transparency Portal — NidanIQ Vector Surveillance DPI",
   description:
-    "Read-only, Zero-Citizen-PII public dengue surveillance dashboard for Nepal Palikas & Wards (Individual Privacy Act 2075 compliant).",
+    "Read-only public vector surveillance dashboard for municipal wards.",
 };
 
 export default function RootLayout({
@@ -13,11 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ne">
+    <html lang="en">
       <body
         style={{
           margin: 0,
-          fontFamily: "'Noto Sans Devanagari', 'Inter', system-ui, sans-serif",
+          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
           background: "#F8FAFC",
           color: "#0F172A",
         }}

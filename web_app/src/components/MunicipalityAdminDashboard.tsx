@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 
 export const MunicipalityAdminDashboard: React.FC = () => {
-  const { currentUser, lang } = useAuth();
+  const { currentUser } = useAuth();
   const palikaCode = currentUser?.palika_code || '30608';
 
   const [activeTab, setActiveTab] = useState<'users' | 'facilities' | 'rrt' | 'tickets'>('users');
@@ -168,7 +168,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
         pin: visitorPin,
       });
 
-      setSuccessMsg(lang === 'ne' ? 'फिल्ड भिजिटर सफलतापूर्वक थपियो!' : 'Field visitor successfully created!');
+      setSuccessMsg('Field visitor successfully created!');
       setShowAddVisitorModal(false);
       setVisitorName('');
       setVisitorNameNe('');
@@ -297,7 +297,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Municipality Header Card */}
-      <div className="bg-linear-to-r from-[#1B4D9B] via-[#1657A2] to-[#123770] rounded-xl text-white p-6 shadow-md mb-6">
+      <div className="bg-linear-to-r from-[#2563EB] via-[#1657A2] to-[#1E3A8A] rounded-xl text-white p-6 shadow-md mb-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2">
@@ -313,9 +313,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
               )}
             </h2>
             <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-2xl">
-              {lang === 'ne'
-                ? 'यस नगरपालिका क्षेत्रभित्रका फिल्ड भिजिटर, स्वास्थ्य संस्था, आर.आर.टी. गाडी र स्थानीय उजुरीहरूको प्रत्यक्ष नियन्त्रण।'
-                : 'Dedicated municipal operations: field visitor recruitment, local health centers, van fleet, and ward tickets.'}
+              {'Dedicated municipal operations: field visitor recruitment, local health centers, van fleet, and ward tickets.'}
             </p>
           </div>
 
@@ -326,7 +324,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
               className="bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>{lang === 'ne' ? 'ताजा गर्नुहोस्' : 'Refresh'}</span>
+              <span>{'Refresh'}</span>
             </button>
           </div>
         </div>
@@ -378,48 +376,48 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           onClick={() => setActiveTab('users')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'users'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'फिल्ड भिजिटर व्यवस्थापन' : 'Field Visitors Management'}</span>
+          <span>{'Field Visitors Management'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('facilities')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'facilities'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <Building2 className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'नगरपालिका स्वास्थ्य केन्द्रहरू' : 'Local Health Centers'}</span>
+          <span>{'Local Health Centers'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('rrt')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'rrt'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <Truck className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'आर.आर.टी. द्रुत प्रतिकार्य गाडी' : 'Municipal RRT Fleet'}</span>
+          <span>{'Municipal RRT Fleet'}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('tickets')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'tickets'
-              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              ? 'border-[#2563EB] text-[#2563EB]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
           <AlertTriangle className="w-4 h-4" />
-          <span>{lang === 'ne' ? 'यस क्षेत्रका उजुरी तथा अनुरोधहरू' : 'Area Requests & Tickets'}</span>
+          <span>{'Area Requests & Tickets'}</span>
         </button>
       </div>
 
@@ -427,7 +425,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
-            <Filter className="w-4 h-4 text-[#1B4D9B]" />
+            <Filter className="w-4 h-4 text-[#2563EB]" />
             <span>Scope: {currentPalikaObj?.palika_name}</span>
           </div>
 
@@ -465,10 +463,10 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           {activeTab === 'users' && (
             <button
               onClick={() => setShowAddVisitorModal(true)}
-              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{lang === 'ne' ? 'फिल्ड भिजिटर थप्नुहोस्' : 'Add Field Visitor'}</span>
+              <span>{'Add Field Visitor'}</span>
             </button>
           )}
 
@@ -481,10 +479,10 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 setFacFacilityId(`FAC-${palikaCode}-${Date.now().toString().slice(-4)}`);
                 setShowFacilityModal(true);
               }}
-              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{lang === 'ne' ? 'स्वास्थ्य केन्द्र थप्नुहोस्' : 'Add Health Center'}</span>
+              <span>{'Add Health Center'}</span>
             </button>
           )}
 
@@ -497,10 +495,10 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 setRrtTeamLead('');
                 setShowRrtModal(true);
               }}
-              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>{lang === 'ne' ? 'आर.आर.टी. गाडी थप्नुहोस्' : 'Add RRT Van'}</span>
+              <span>{'Add RRT Van'}</span>
             </button>
           )}
         </div>
@@ -512,12 +510,10 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'नगरपालिका फिल्ड टोली' : 'Municipal Field Inspection Staff'}
+                {'Municipal Field Inspection Staff'}
               </h3>
               <p className="text-xs text-slate-500">
-                {lang === 'ne'
-                  ? 'तपाईंले आफ्नो नगरपालिका क्षेत्रका लागि मात्र नयाँ फिल्ड भिजिटरहरू थप्न सक्नुहुन्छ।'
-                  : 'Municipality admins are authorized to recruit and assign field visitors for this area.'}
+                {'Municipality admins are authorized to recruit and assign field visitors for this area.'}
               </p>
             </div>
             <span className="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-full">
@@ -591,7 +587,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'नगरपालिका स्वास्थ्य संस्थाहरू' : 'Health Facilities in Your Municipality'}
+                {'Health Facilities in Your Municipality'}
               </h3>
               <p className="text-xs text-slate-500">
                 Manage beds, dengue units, and NS1 test kits across your municipal area.
@@ -632,7 +628,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                     <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-slate-800">
                       {fac.total_beds}
                     </td>
-                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-[#C8102E]">
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-[#DC2626]">
                       {fac.dengue_ward_beds}
                     </td>
                     <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-emerald-700">
@@ -682,7 +678,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'नगरपालिका आर.आर.टी. गाडी' : 'Municipal Rapid Response Fleet'}
+                {'Municipal Rapid Response Fleet'}
               </h3>
               <p className="text-xs text-slate-500">
                 Chemical stocks and rapid deployment units assigned to your municipality.
@@ -788,7 +784,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 className="text-sm font-bold text-slate-800">
-                {lang === 'ne' ? 'नगरपालिका भित्रका उजुरी तथा अनुरोधहरू' : 'Outbreak Tickets in Your Municipal Jurisdiction'}
+                {'Outbreak Tickets in Your Municipal Jurisdiction'}
               </h3>
               <p className="text-xs text-slate-500">
                 You have exclusive jurisdiction over tickets filed inside this municipality.
@@ -815,7 +811,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
               <tbody className="divide-y divide-slate-200 bg-white">
                 {ticketsList.map((t) => (
                   <tr key={t.ticket_code} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#1B4D9B]">
+                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#2563EB]">
                       {t.ticket_code}
                     </td>
                     <td className="px-6 py-3.5 whitespace-nowrap font-mono text-slate-600">
@@ -874,8 +870,8 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Users className="w-5 h-5 text-[#1B4D9B]" />
-                <span>{lang === 'ne' ? 'नयाँ फिल्ड भिजिटर दर्ता गर्नुहोस्' : 'Add New Field Visitor'}</span>
+                <Users className="w-5 h-5 text-[#2563EB]" />
+                <span>{'Add New Field Visitor'}</span>
               </h3>
               <button onClick={() => setShowAddVisitorModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
@@ -975,7 +971,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
                 >
                   Create Field Visitor
                 </button>
@@ -991,7 +987,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#1B4D9B]" />
+                <Building2 className="w-5 h-5 text-[#2563EB]" />
                 <span>{editingFacility ? 'Edit Health Center' : 'Add Health Center'}</span>
               </h3>
               <button onClick={() => setShowFacilityModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -1080,7 +1076,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
                 >
                   Save Health Center
                 </button>
@@ -1096,7 +1092,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Truck className="w-5 h-5 text-[#1B4D9B]" />
+                <Truck className="w-5 h-5 text-[#2563EB]" />
                 <span>{editingRrt ? 'Edit RRT Van' : 'Add Rapid Response Van'}</span>
               </h3>
               <button onClick={() => setShowRrtModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -1193,7 +1189,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
                 >
                   Save RRT Van
                 </button>

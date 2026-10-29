@@ -70,11 +70,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: NepalGovTheme.outbreakCrimson,
+                                    color: NepalGovTheme.royalNepalBlue,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: const Text(
-                                    'नेपाल सरकार | GoN',
+                                    'NidanIQ Vector DPI',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 11,
@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Text(
-                                    '२०८३ कार्तिक ९ BS',
+                                    'Operational Console',
                                     overflow: TextOverflow.ellipsis,
                                     style: NepalGovTheme.monoTelemetry(
                                       fontSize: 12,
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 8),
                             const Text(
-                              'स्वास्थ्य तथा जनसंख्या मन्त्रालय\nइपिडिमियोलोजी तथा रोग नियन्त्रण महाशाखा (EDCD Teku)',
+                              'Predictive Vector Surveillance & Outbreak Intelligence',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 4),
                             const Text(
-                              'NidanIQ Sovereign Vector Surveillance & Early Warning DPI',
+                              'Frontline Field Inspection & Larvae Identification Station',
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 12,
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
                               const Text(
-                                'कर्मचारी प्रमाणीकरण (Staff Authentication)',
+                                'Staff Authentication',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: 4),
                               const Text(
-                                'आफ्नो दर्ता भएको मोबाइल नम्बर (+977 / +91) प्रविष्ट गर्नुहोस्।',
+                                'Enter your authorized staff mobile number (+91 or +977).',
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   color: NepalGovTheme.mutedInk,
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 keyboardType: TextInputType.phone,
                                 style: NepalGovTheme.monoTelemetry(fontSize: 15),
                                 decoration: const InputDecoration(
-                                  labelText: 'मोबाइल नम्बर (+977 / +91 Mobile Number)',
+                                  labelText: 'Mobile Number (+91 / +977)',
                                   hintText: '+919876543210 or +9779841000001',
                                   prefixIcon: Icon(Icons.phone_android_rounded),
                                 ),
@@ -181,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ? null
                                     : _handleRequestOtp,
                                 icon: const Icon(Icons.sms_outlined, size: 18),
-                                label: const Text('OTP पठाउनुहोस् / Request 6-Digit OTP'),
+                                label: const Text('Request 6-Digit OTP'),
                               ),
                             ],
                           ),

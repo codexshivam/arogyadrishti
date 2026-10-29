@@ -188,7 +188,7 @@ class _LocationPickerState extends State<LocationPicker> {
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
-                    'Select Your Palika • आफ्नो पालिका र वडा छान्नुहोस्',
+                    'Select Your Municipal Ward',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
@@ -214,7 +214,7 @@ class _LocationPickerState extends State<LocationPicker> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Zero Defaulting Policy: Province -> District -> Palika -> Ward (प्रदेश -> जिल्ला -> पालिका -> वडा)',
+              'Hierarchical Administrative Scope: Province -> District -> Palika -> Ward',
               style: NepalGovTheme.monoTelemetry(
                 fontSize: 11.5,
                 color: NepalGovTheme.mutedInk,
@@ -227,7 +227,7 @@ class _LocationPickerState extends State<LocationPicker> {
               isExpanded: true,
               initialValue: _selectedProvinceCode,
               decoration: const InputDecoration(
-                labelText: '1. Province / प्रदेश',
+                labelText: '1. Province',
                 isDense: true,
               ),
               items: provinces
@@ -250,7 +250,7 @@ class _LocationPickerState extends State<LocationPicker> {
               isExpanded: true,
               initialValue: _selectedDistrictCode,
               decoration: const InputDecoration(
-                labelText: '2. District / जिल्ला',
+                labelText: '2. District',
                 isDense: true,
               ),
               items: districts
@@ -273,7 +273,7 @@ class _LocationPickerState extends State<LocationPicker> {
               isExpanded: true,
               initialValue: _selectedPalikaCode,
               decoration: const InputDecoration(
-                labelText: '3. Palika (Local Level) / पालिका',
+                labelText: '3. Palika (Municipality)',
                 isDense: true,
               ),
               items: palikas
@@ -297,7 +297,7 @@ class _LocationPickerState extends State<LocationPicker> {
               isExpanded: true,
               initialValue: _selectedCompositeWardId,
               decoration: const InputDecoration(
-                labelText: '4. Ward / वडा नं.',
+                labelText: '4. Ward Number',
                 isDense: true,
               ),
               items: wards
@@ -305,7 +305,7 @@ class _LocationPickerState extends State<LocationPicker> {
                     (ResolvedWardLocation w) => DropdownMenuItem<String>(
                       value: w.compositeWardId,
                       child: Text(
-                        'वडा ${w.wardNo} - ${w.localityNameNp} (Ward ${w.wardNo} ${w.localityName})',
+                        'Ward ${w.wardNo} — ${w.localityName}',
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

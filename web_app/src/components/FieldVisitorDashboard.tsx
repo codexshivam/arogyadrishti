@@ -1,111 +1,189 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { MapPin, Phone, Shield, CheckCircle, FileText, Smartphone } from 'lucide-react';
+import { MapPin, Phone, Shield, CheckCircle2, Smartphone, Droplets, Compass } from 'lucide-react';
 
 export const FieldVisitorDashboard: React.FC = () => {
-  const { currentUser, lang } = useAuth();
+  const { currentUser } = useAuth();
   const wardId = currentUser?.assigned_wards[0] || 'NP-P3-D27-30608-W17';
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Welcome Card */}
-      <div className="bg-linear-to-r from-[#1B4D9B] to-[#123770] rounded-xl text-white p-6 shadow-md mb-6">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2">
-          <Shield className="w-3.5 h-3.5" />
-          <span>{lang === 'ne' ? 'फिल्ड भिजिटर ड्यासबोर्ड' : 'Field Surveillance Dashboard'}</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* Welcome Banner */}
+      <div className="bg-linear-to-r from-blue-700 via-indigo-700 to-slate-800 rounded-2xl text-white p-6 sm:p-8 shadow-sm">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold tracking-wide mb-3">
+          <Shield className="w-3.5 h-3.5 text-blue-300" />
+          <span>Field Surveillance & Inspection Console</span>
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold">
-          {lang === 'ne' ? 'नमस्ते' : 'Welcome'}, {currentUser?.full_name || 'Field Officer'}
+        <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          Welcome, {currentUser?.full_name || 'Field Officer'}
         </h2>
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-200 mt-2">
-          <span className="flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-red-300" />
+        <p className="text-blue-100 text-xs sm:text-sm mt-1 max-w-2xl">
+          Frontline vector surveillance station for household breeding habitat inspections, larval identification, and focal bio-larviciding.
+        </p>
+        <div className="flex flex-wrap items-center gap-4 text-xs text-blue-200 mt-4 pt-4 border-t border-white/10">
+          <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg">
+            <MapPin className="w-3.5 h-3.5 text-rose-300" />
             Assigned Ward: <strong className="text-white font-mono">{wardId}</strong>
           </span>
-          <span>•</span>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg">
             <Phone className="w-3.5 h-3.5 text-emerald-300" />
-            Phone: <strong className="text-white font-mono">{currentUser?.phone}</strong>
+            Contact Phone: <strong className="text-white font-mono">{currentUser?.phone}</strong>
           </span>
-          <span>•</span>
-          <span>Palika: <strong className="text-white">{currentUser?.palika_code}</strong></span>
+          <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg">
+            <Compass className="w-3.5 h-3.5 text-amber-300" />
+            Palika Code: <strong className="text-white font-mono">{currentUser?.palika_code}</strong>
+          </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Field Task Advisory */}
-        <div className="md:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs">
-            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 mb-3">
-              <FileText className="w-5 h-5 text-[#1B4D9B]" />
-              <span>{lang === 'ne' ? 'आजको दैनिक कार्यनिर्देशन (Today’s Protocol)' : 'Daily Inspection Protocol'}</span>
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              {lang === 'ne'
-                ? 'तपाईंलाई तोकिएको वडामा "खोज र नष्ट गर" अभियान अन्तर्गत कम्तिमा २५ घरधुरी तथा पानी जमेका भाँडाहरूको अनुगमन गर्नुहोस्।'
-                : 'Inspect at least 25 designated households, plastic drums, and water containers in your assigned ward.'}
-            </p>
+      {/* Metrics Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Today's Inspection Target</div>
+          <div className="text-2xl font-bold text-slate-900 mt-2">25 <span className="text-xs font-normal text-slate-400">households</span></div>
+          <div className="text-xs text-emerald-600 font-medium mt-1">18 inspected • 7 remaining</div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Breteau Index (BI)</div>
+          <div className="text-2xl font-bold text-amber-600 mt-2">28.4 <span className="text-xs font-normal text-slate-400">/ 100</span></div>
+          <div className="text-xs text-amber-700 font-medium mt-1">Moderate-to-High risk tier</div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sites Neutralized</div>
+          <div className="text-2xl font-bold text-blue-600 mt-2">12 <span className="text-xs font-normal text-slate-400">habitats</span></div>
+          <div className="text-xs text-slate-500 font-medium mt-1">Bti & Temephos treated</div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mobile Field Sync</div>
+          <div className="text-2xl font-bold text-emerald-600 mt-2 flex items-center gap-1.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            <span>Online</span>
+          </div>
+          <div className="text-xs text-slate-500 font-medium mt-1">Encrypted local queue synced</div>
+        </div>
+      </div>
 
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Field Protocols & Dosing Guide */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Chemical Dosing Standards */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs">
+            <div className="flex items-center space-x-2.5 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Droplets className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Standard Chemical Dosing & Application Guide</h3>
+                <p className="text-xs text-slate-500">Official technical guidelines for frontline vector control operations</p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th className="py-2.5 px-3">Larvicide Compound</th>
+                    <th className="py-2.5 px-3">Target Container / Water Type</th>
+                    <th className="py-2.5 px-3">Standard Dosing Rate</th>
+                    <th className="py-2.5 px-3">Action Interval</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-600">
+                  <tr>
+                    <td className="py-3 px-3 font-semibold text-slate-900">
+                      Bti (Bacillus thuringiensis israelensis)
+                    </td>
+                    <td className="py-3 px-3">Open water tanks, shallow pools, unsealed drums</td>
+                    <td className="py-3 px-3 font-mono text-blue-700 font-bold">0.5 g / m² surface</td>
+                    <td className="py-3 px-3">Every 7 to 10 days</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-3 font-semibold text-slate-900">
+                      Temephos 50% EC
+                    </td>
+                    <td className="py-3 px-3">Domestic water reservoirs, non-potable storage cisterns</td>
+                    <td className="py-3 px-3 font-mono text-blue-700 font-bold">1 ppm (2 ml per 1,000 L)</td>
+                    <td className="py-3 px-3">Every 14 to 21 days</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-3 font-semibold text-slate-900">
+                      Source Reduction ("Search & Destroy")
+                    </td>
+                    <td className="py-3 px-3">Discarded tires, plastic trays, flowerpot saucers</td>
+                    <td className="py-3 px-3 font-mono text-emerald-700 font-bold">Physical emptying & scrub</td>
+                    <td className="py-3 px-3">Twice weekly</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Routine Field Protocol */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs">
+            <h3 className="text-base font-bold text-slate-900 mb-3">Field Inspection Workflow</h3>
             <div className="space-y-3">
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-start gap-3 text-xs">
-                <CheckCircle className="w-4 h-4 text-[#107C41] shrink-0 mt-0.5" />
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">1</span>
                 <div>
-                  <div className="font-bold text-slate-800">१. खुला पानीका ड्रम तथा कन्टेनर जाँच (Drum Inspection)</div>
-                  <div className="text-slate-500">KUKL खानेपानी ड्रम, पुरानो टायर तथा गमलाका प्लेटहरूमा लामखुट्टेको लार्भा खोजी गर्नुहोस्।</div>
+                  <h4 className="text-xs font-bold text-slate-900">Household Perimeter & Habitat Inspection</h4>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    Inspect domestic water containers, overhead tanks, discarded tires, and shaded pooling areas within 50 meters of dwellings.
+                  </p>
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-start gap-3 text-xs">
-                <CheckCircle className="w-4 h-4 text-[#107C41] shrink-0 mt-0.5" />
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">2</span>
                 <div>
-                  <div className="font-bold text-slate-800">२. Bti जैविक विषादी प्रयोग (Biological Larvicide)</div>
-                  <div className="text-slate-500">लार्भा भेटिएमा निर्धारित मात्रामा Bti वा टेमिफोस प्रयोग गरी नष्ट गर्नुहोस्।</div>
+                  <h4 className="text-xs font-bold text-slate-900">Larval Identification & Mobile AI Scan</h4>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    Use the NidanIQ Mobile App camera to scan larvae specimens for instar stage determination and automated Breteau Index calculations.
+                  </p>
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-start gap-3 text-xs">
-                <CheckCircle className="w-4 h-4 text-[#107C41] shrink-0 mt-0.5" />
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">3</span>
                 <div>
-                  <div className="font-bold text-slate-800">३. मोबाइल एपमार्फत तथ्याङ्क प्रविष्टि (Mobile Entry)</div>
-                  <div className="text-slate-500">निरीक्षण गरिएका तथ्याङ्कहरू सिधै NidanIQ Sovereign मोबाइल एपमा प्रविष्ट गर्नुहोस्।</div>
+                  <h4 className="text-xs font-bold text-slate-900">Targeted Biological Larviciding</h4>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    Apply Bti bio-larvicide or Temephos in exact measured doses to positive stagnant pools and record treatment batch codes.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Col: Mobile App QR & Hotline */}
+        {/* Right Col: Mobile App Station */}
         <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs text-center">
-            <Smartphone className="w-8 h-8 text-[#1B4D9B] mx-auto mb-2" />
-            <h4 className="text-sm font-bold text-slate-800">
-              {lang === 'ne' ? 'NidanIQ मोबाइल एप' : 'NidanIQ Mobile App'}
-            </h4>
-            <p className="text-xs text-slate-500 mt-1 mb-4">
-              {lang === 'ne'
-                ? 'अन-फिल्ड निरीक्षण प्रतिवेदन पठाउन आफ्नो एन्ड्रोइड वा आईओएस डिभाइसमा NidanIQ एप प्रयोग गर्नुहोस्।'
-                : 'Field inspections, GPS household anchors, and AI larvae scans are performed via the mobile field app.'}
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs text-center">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+              <Smartphone className="w-6 h-6" />
+            </div>
+            <h4 className="text-sm font-bold text-slate-900">NidanIQ Mobile Field App</h4>
+            <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
+              Ground-level household inspections, GPS coordinates verification, and offline surveys must be logged using the official mobile application.
             </p>
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs font-semibold text-[#1B4D9B]">
-              Login on Mobile using <span className="font-mono font-bold">{currentUser?.phone}</span>
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700">
+              Authorized Phone: <span className="font-mono font-bold text-blue-600">{currentUser?.phone}</span>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs">
-            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-              Emergency Hotlines
-            </h4>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                <span className="text-slate-600">EDCD Teku Vector Section:</span>
-                <span className="font-mono font-bold text-[#1B4D9B]">01-5325551</span>
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs">
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Emergency Contact Channels</h4>
+            <div className="space-y-2.5 text-xs">
+              <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                <span className="text-slate-600">Central Vector Control Desk</span>
+                <span className="font-mono font-bold text-blue-600">01-5325551</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                <span className="text-slate-600">Hello Swasthya Helpline:</span>
-                <span className="font-mono font-bold text-[#C8102E]">1115</span>
+              <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                <span className="text-slate-600">Emergency Health Helpline</span>
+                <span className="font-mono font-bold text-rose-600">1115</span>
               </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-600">Municipal IT Desk:</span>
+              <div className="flex justify-between items-center py-1.5">
+                <span className="text-slate-600">Municipal Operations Desk</span>
                 <span className="font-mono font-bold text-slate-800">01-4256789</span>
               </div>
             </div>

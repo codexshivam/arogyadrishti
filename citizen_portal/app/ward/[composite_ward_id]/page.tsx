@@ -176,7 +176,7 @@ export default async function WardPublicTransparencyPage({
               {stats.breeding_sites_neutralized_month.toLocaleString()}
             </div>
             <div style={{ fontSize: "0.86rem", color: "#334155" }}>
-              Active Search &amp; Destroy (खोज र नष्ट गर):{" "}
+              Active Search &amp; Destroy:{" "}
               <strong>{stats.active_search_and_destroy_count}</strong> campaigns
             </div>
           </div>
@@ -200,12 +200,11 @@ export default async function WardPublicTransparencyPage({
                 marginTop: "6px",
               }}
             >
-              {stats.palika_name_np} — वडा {stats.ward_no} ({stats.risk_tier})
+              {stats.palika_name} — Ward {stats.ward_no} ({stats.risk_tier})
             </div>
             <div style={{ fontSize: "0.86rem", color: "#334155" }}>
               14-Day Breteau Index (BI):{" "}
-              <strong>{stats.breteau_index_bi}</strong> •{" "}
-              {stats.bs_ad_official_label}
+              <strong>{stats.breteau_index_bi}</strong>
             </div>
           </div>
 

@@ -49,7 +49,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
         return Scaffold(
           backgroundColor: NepalGovTheme.warmStoneBackground,
           appBar: AppBar(
-            title: const Text('OTP प्रमाणीकरण / Verify OTP'),
+            title: const Text('Verify OTP'),
           ),
           body: SafeArea(
             child: Center(
@@ -64,7 +64,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                           Text(
-                            'मोबाइल नम्बर: $phone',
+                            'Mobile Number: $phone',
                             style: NepalGovTheme.monoTelemetry(
                               fontSize: 14,
                               color: NepalGovTheme.darkSlateCard,
@@ -72,7 +72,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            'Sparrow SMS / Nepal Telecom मार्फत प्राप्त ६-अंकको कोड प्रविष्ट गर्नुहोस्।',
+                            'Enter the 6-digit verification code dispatched to your phone.',
                             style: TextStyle(
                               fontSize: 13,
                               color: NepalGovTheme.mutedInk,
@@ -86,7 +86,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                             keyboardType: TextInputType.number,
                             style: NepalGovTheme.monoTelemetry(fontSize: 18),
                             decoration: const InputDecoration(
-                              labelText: '६-अंकको OTP कोड (6-Digit OTP)',
+                              labelText: '6-Digit OTP Code',
                               prefixIcon: Icon(Icons.lock_clock_outlined),
                             ),
                           ),
@@ -108,7 +108,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                                 ? null
                                 : _handleVerifyOtp,
                             icon: const Icon(Icons.verified_user_outlined, size: 18),
-                            label: const Text('प्रमाणीकरण गर्नुहोस् / Verify & Enter Dashboard'),
+                            label: const Text('Verify & Enter Dashboard'),
                           ),
                         ],
                       ),

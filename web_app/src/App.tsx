@@ -11,11 +11,11 @@ const MainAppContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F4F6F9] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-[#1B4D9B] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="text-xs font-semibold text-slate-600">
-            NidanIQ Sovereign Platform Loading...
+            NidanIQ Platform Loading...
           </p>
         </div>
       </div>
@@ -27,7 +27,7 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F6F9] flex flex-col justify-between">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
       <Header />
 
       <main className="flex-1 pb-12">
@@ -38,13 +38,14 @@ const MainAppContent: React.FC = () => {
         )}
       </main>
 
-      <footer className="bg-[#123770] text-white text-xs py-3.5 px-6 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-slate-300">
-          <div>
-            नेपाल सरकार • स्वास्थ्य तथा जनसंख्या मन्त्रालय • इपिडिमियोलोजी तथा रोग नियन्त्रण महाशाखा (EDCD Teku)
+      <footer className="bg-slate-900 text-white text-xs py-4 px-6 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-slate-400">
+          <div className="flex items-center space-x-2">
+            <span className="font-bold text-white">NidanIQ</span>
+            <span>• Predictive Vector Surveillance & Outbreak Intelligence Platform</span>
           </div>
           <div>
-            Singhadurbar, Kathmandu, Nepal • IDMC Sovereign Cloud Infrastructure
+            Open Public Health Digital Infrastructure
           </div>
         </div>
       </footer>
