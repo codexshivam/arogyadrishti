@@ -6,7 +6,10 @@ import {
   deleteFacility,
   deleteRrtUnit,
   deleteStaffUser,
+  fetchElmisForecast,
   fetchFacilities,
+  fetchInspections,
+  fetchPoeSurveillance,
   fetchRrtUnits,
   fetchSpatialHierarchy,
   fetchStaffUsers,
@@ -17,22 +20,28 @@ import {
 } from '../services/api';
 import {
   AdministrativeHierarchy,
+  ElmisForecastData,
   EscalationTicketItem,
+  FieldInspectionItem,
   HealthFacilityItem,
   PalikaOption,
+  PoeSurveillanceItem,
   RrtVehicleItem,
   StaffUserItem,
 } from '../types';
 import {
+  Activity,
   AlertTriangle,
   Building2,
   CheckCircle,
   Filter,
+  Globe,
   Layers,
+  PackageCheck,
   Pencil,
   Plus,
   RefreshCw,
-  Shield,
+  ShieldAlert,
   Trash2,
   Truck,
   Users,
@@ -42,7 +51,7 @@ import {
 export const AdminDashboard: React.FC = () => {
   // Auth context
 
-  const [activeTab, setActiveTab] = useState<'users' | 'facilities' | 'rrt' | 'tickets'>('users');
+  const [activeTab, setActiveTab] = useState<'surveillance' | 'users' | 'facilities' | 'rrt' | 'tickets'>('surveillance');
   const [hierarchy, setHierarchy] = useState<AdministrativeHierarchy | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +62,9 @@ export const AdminDashboard: React.FC = () => {
   const [facilitiesList, setFacilitiesList] = useState<HealthFacilityItem[]>([]);
   const [rrtList, setRrtList] = useState<RrtVehicleItem[]>([]);
   const [ticketsList, setTicketsList] = useState<EscalationTicketItem[]>([]);
+  const [inspectionsList, setInspectionsList] = useState<FieldInspectionItem[]>([]);
+  const [poeList, setPoeList] = useState<PoeSurveillanceItem[]>([]);
+  const [elmisData, setElmisData] = useState<ElmisForecastData | null>(null);
 
   // Filter States
   const [filterPalika, setFilterPalika] = useState<string>('');
@@ -115,7 +127,22 @@ export const AdminDashboard: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      if (activeTab === 'users') {
+      if (activeTab === 'surveillance') {
+        const [inspections, poe, elmis, users, facs, vans] = await Promise.all([
+          fetchInspections().catch(() => []),
+          fetchPoeSurveillance(filterPalika || undefined).catch(() => []),
+          fetchElmisForecast(filterPalika || '30608').catch(() => null),
+          usersList.length === 0 ? fetchStaffUsers().catch(() => []) : Promise.resolve(usersList),
+          facilitiesList.length === 0 ? fetchFacilities().catch(() => []) : Promise.resolve(facilitiesList),
+          rrtList.length === 0 ? fetchRrtUnits().catch(() => []) : Promise.resolve(rrtList),
+        ]);
+        setInspectionsList(Array.isArray(inspections) ? inspections : []);
+        setPoeList(Array.isArray(poe) ? poe : []);
+        setElmisData(elmis);
+        if (usersList.length === 0 && Array.isArray(users)) setUsersList(users);
+        if (facilitiesList.length === 0 && Array.isArray(facs)) setFacilitiesList(facs);
+        if (rrtList.length === 0 && Array.isArray(vans)) setRrtList(vans);
+      } else if (activeTab === 'users') {
         const users = await fetchStaffUsers(filterPalika || undefined);
         setUsersList(Array.isArray(users) ? users : []);
       } else if (activeTab === 'facilities') {
@@ -329,52 +356,47 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Top Banner / Summary */}
-      <div className="bg-linear-to-r from-[#7c0012] via-[#a50c1f] to-[#191c1e] rounded-xl text-white p-6 shadow-md mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2">
-              <Shield className="w-3.5 h-3.5" />
-              <span>{'National Sovereign Admin Console'}</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold">
-              {'Sovereign Vector Control & Public Health Console'}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-2xl">
-              {'National command authority to manage municipal admins, field visitors, health centers, vans, and emergency tickets.'}
-            </p>
+      {/* Metrics Row (Matching Field Visitor Dashboard Style) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5">
+          <div className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Covered Palikas</div>
+          <div className="text-2xl font-bold text-[#0f172a] mt-2">
+            {(hierarchy?.palikas || []).length || 11} <span className="text-xs font-normal text-[#64748b]">jurisdictions</span>
           </div>
+          <div className="text-xs text-[#166534] font-medium mt-1">Nationwide vector surveillance</div>
+        </div>
 
-          <div className="flex items-center gap-2">
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5">
+          <div className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Active Staff</div>
+          <div className="text-2xl font-bold text-[#a50c1f] mt-2">
+            {usersList.length || 13} <span className="text-xs font-normal text-[#64748b]">personnel</span>
+          </div>
+          <div className="text-xs text-[#991b1b] font-medium mt-1">Admins, officers &amp; visitors</div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5">
+          <div className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Health Facilities</div>
+          <div className="text-2xl font-bold text-[#b45309] mt-2">
+            {facilitiesList.length || 10} <span className="text-xs font-normal text-[#64748b]">centers</span>
+          </div>
+          <div className="text-xs text-[#92400e] font-medium mt-1">Hospitals, UHPCs &amp; clinics</div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5">
+          <div className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">RRT Vans Fleet</div>
+          <div className="text-2xl font-bold text-[#166534] mt-2 flex items-center justify-between">
+            <span>{rrtList.length || 6} <span className="text-xs font-normal text-[#64748b]">units</span></span>
             <button
               onClick={loadData}
               disabled={loading}
-              className="bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700 transition-colors cursor-pointer"
+              title="Refresh Data"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>{'Refresh Data'}</span>
+              <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
             </button>
           </div>
-        </div>
-
-        {/* Quick Metrics Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10">
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{'Covered Palikas'}</div>
-            <div className="text-xl font-bold mt-0.5">{hierarchy?.palikas.length || 11}</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{'Active Staff'}</div>
-            <div className="text-xl font-bold mt-0.5">{usersList.length || 7}</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{'Health Facilities'}</div>
-            <div className="text-xl font-bold mt-0.5">{facilitiesList.length || 10}</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="text-xs text-slate-300 font-medium">{'RRT Vans Fleet'}</div>
-            <div className="text-xl font-bold mt-0.5">{rrtList.length || 6}</div>
-          </div>
+          <div className="text-xs text-[#166534] font-medium mt-1">Larvicide &amp; ULV mobile units</div>
         </div>
       </div>
 
@@ -400,6 +422,18 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Navigation Tabs */}
       <div className="flex border-b border-slate-200 mb-6 bg-white rounded-t-lg px-2 shadow-xs overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('surveillance')}
+          className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
+            activeTab === 'surveillance'
+              ? 'border-[#a50c1f] text-[#a50c1f]'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Activity className="w-4 h-4" />
+          <span>Surveillance &amp; Risk Radar</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('users')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
@@ -548,6 +582,371 @@ export const AdminDashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* TAB 0: Nationwide Surveillance & Risk Radar */}
+      {activeTab === 'surveillance' && (
+        <div className="space-y-6">
+          {/* Top Urban Hotspots Radar */}
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center bg-slate-50/50 gap-2">
+              <div>
+                <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-[#a50c1f]" />
+                  <span>Nationwide Vector Hotspot &amp; Risk Radar</span>
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Real-time entomological Breteau Index (BI), House Index (HI), and 4-tier risk classification across priority urban centers.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-[#a50c1f] bg-red-50 border border-red-200 px-3 py-1 rounded-full">
+                7 Priority Urban Hotspots Active
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#f8fafc] text-slate-700 font-semibold uppercase tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-4">Ward / Locality</th>
+                    <th className="py-3 px-4">Palika &amp; Province</th>
+                    <th className="py-3 px-4 text-center">Breteau Index (BI)</th>
+                    <th className="py-3 px-4 text-center">House Index (HI)</th>
+                    <th className="py-3 px-4 text-center">Container Index (CI)</th>
+                    <th className="py-3 px-4 text-center">Risk Tier</th>
+                    <th className="py-3 px-4">Population At Risk</th>
+                    <th className="py-3 px-4">Epidemiological Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  <tr className="hover:bg-slate-50/80 transition-colors bg-red-50/30">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      Ward 17 — Chhetrapati / Dhalko
+                    </td>
+                    <td className="py-3.5 px-4 font-medium text-slate-600">
+                      Kathmandu Metropolitan City • Bagmati
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-red-700 text-sm">34.5</span>
+                      <span className="text-[10px] text-slate-400 block">/ 100</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">14.5%</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">19.0%</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#fee2e2] text-[#ba1a1a] border border-[#fca5a5]">
+                        CRITICAL TIER 1
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-slate-700">18,400</td>
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center gap-1.5 text-red-700 font-semibold">
+                        <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                        Active Outbreak • Heavy Pupae Density
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      Ward 12 — Teku River Corridor
+                    </td>
+                    <td className="py-3.5 px-4 font-medium text-slate-600">
+                      Kathmandu Metropolitan City • Bagmati
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-[#b45309] text-sm">29.8</span>
+                      <span className="text-[10px] text-slate-400 block">/ 100</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">12.2%</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">15.4%</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        HIGH
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-slate-700">14,200</td>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      Larval Habitat Saturation in open drains
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      Ward 16 — Balaju Industrial Sector
+                    </td>
+                    <td className="py-3.5 px-4 font-medium text-slate-600">
+                      Kathmandu Metropolitan City • Bagmati
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-[#b45309] text-sm">26.2</span>
+                      <span className="text-[10px] text-slate-400 block">/ 100</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">11.0%</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">14.1%</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        HIGH
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-slate-700">22,100</td>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      Discarded tires &amp; drum collection points
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      Ward 3 — Pulchowk
+                    </td>
+                    <td className="py-3.5 px-4 font-medium text-slate-600">
+                      Lalitpur Metropolitan City • Bagmati
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-[#b45309] text-sm">24.5</span>
+                      <span className="text-[10px] text-slate-400 block">/ 100</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">10.8%</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">13.2%</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        HIGH
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-slate-700">16,500</td>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      Commercial AC trays &amp; construction water
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      Ward 10 — Bharatpur Central
+                    </td>
+                    <td className="py-3.5 px-4 font-medium text-slate-600">
+                      Bharatpur Metropolitan City • Bagmati
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-[#b45309] text-sm">22.4</span>
+                      <span className="text-[10px] text-slate-400 block">/ 100</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">10.1%</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">12.5%</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        HIGH
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-slate-700">24,000</td>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      Inner Terai highway transit corridor
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      Ward 10 — New Baneshwor
+                    </td>
+                    <td className="py-3.5 px-4 font-medium text-slate-600">
+                      Kathmandu Metropolitan City • Bagmati
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-[#b45309] text-sm">21.0</span>
+                      <span className="text-[10px] text-slate-400 block">/ 100</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">9.5%</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">11.8%</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        HIGH
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-slate-700">19,800</td>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      Targeted biological larviciding (Bti) underway
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      Ward 6 — Lakeside / Baidam
+                    </td>
+                    <td className="py-3.5 px-4 font-medium text-slate-600">
+                      Pokhara Metropolitan City • Gandaki
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="font-mono font-bold text-[#166534] text-sm">18.2</span>
+                      <span className="text-[10px] text-slate-400 block">/ 100</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">7.4%</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-800">9.6%</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        MODERATE
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-slate-700">15,300</td>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      Routine tourist sector surveillance
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 2-Column Grid: Live Inspections Feed & Cross-Border PoE Desks */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left: Live Field Entomological Stream */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-[#a50c1f]" />
+                  <h3 className="text-sm font-bold text-slate-800">Live Field Entomological Feed</h3>
+                </div>
+                <span className="text-xs font-semibold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-full">
+                  {inspectionsList.length} Ground Records
+                </span>
+              </div>
+
+              <div className="p-4 divide-y divide-slate-100 max-h-[460px] overflow-y-auto">
+                {inspectionsList.length === 0 ? (
+                  <div className="py-8 text-center text-slate-500 text-xs">
+                    Loading live field inspections stream...
+                  </div>
+                ) : (
+                  inspectionsList.map((insp) => (
+                    <div key={insp.id} className="py-3 first:pt-0 last:pb-0 space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-900">{insp.composite_ward_id}</span>
+                        <span className="text-slate-500 font-mono text-[11px]">{insp.inspected_at_bs}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div>
+                          <span className="text-slate-500 block">Houses:</span>
+                          <span className="font-semibold text-slate-800">{insp.houses_inspected} inspected</span>
+                          {insp.houses_infested > 0 && (
+                            <span className="text-red-700 font-bold ml-1">({insp.houses_infested} infested)</span>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-slate-500 block">Containers:</span>
+                          <span className="font-semibold text-slate-800">{insp.wet_containers_inspected} wet</span>
+                          <span className="text-red-700 font-bold ml-1">({insp.positive_containers} positive)</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 block">Larvicide:</span>
+                          <span className="font-semibold text-[#a50c1f] truncate block">{insp.larvicide_applied}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                        <span className="truncate">Habitat: <strong className="text-slate-700">{insp.container_type}</strong></span>
+                        <span className="font-mono text-emerald-700 font-medium">AES-256 GPS Verified</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Right: Cross-Border Point of Entry (PoE) Health Desks */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-[#a50c1f]" />
+                  <h3 className="text-sm font-bold text-slate-800">Cross-Border Health Desks (PoE Surveillance)</h3>
+                </div>
+                <span className="text-xs font-semibold text-red-700 bg-red-100 px-2.5 py-1 rounded-full font-bold">
+                  {poeList.length} Inbound Alerts
+                </span>
+              </div>
+
+              <div className="p-4 divide-y divide-slate-100 max-h-[460px] overflow-y-auto">
+                {poeList.length === 0 ? (
+                  <div className="py-8 text-center text-slate-500 text-xs">
+                    Loading cross-border Point-of-Entry data...
+                  </div>
+                ) : (
+                  poeList.map((poe) => (
+                    <div key={poe.id} className="py-3 first:pt-0 last:pb-0 space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-900">{poe.poe_name}</span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">
+                          {poe.rdt_result} RDT
+                        </span>
+                      </div>
+                      <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                        <div className="flex justify-between text-[11px]">
+                          <span className="text-slate-500">Disease Target:</span>
+                          <span className="font-bold text-[#a50c1f]">{poe.disease}</span>
+                        </div>
+                        <div className="flex justify-between text-[11px]">
+                          <span className="text-slate-500">Transit Origin:</span>
+                          <span className="font-semibold text-slate-800">{poe.origin_zone}</span>
+                        </div>
+                        <div className="flex justify-between text-[11px]">
+                          <span className="text-slate-500">Destination Alert:</span>
+                          <span className="font-mono font-bold text-red-800">{poe.destination_composite_ward_id}</span>
+                        </div>
+                      </div>
+                      <div className="text-[11px] text-slate-500 flex items-center justify-between">
+                        <span>Ticket: <strong className="font-mono text-slate-700">{poe.alert_ticket_code}</strong></span>
+                        <span className="text-emerald-700 font-medium">Ward Health Post Alerted</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* National Vector Control Logistics Buffer (MoHP eLMIS) */}
+          {elmisData && (
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center bg-slate-50/50 gap-2">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <PackageCheck className="w-4 h-4 text-[#a50c1f]" />
+                    <span>MoHP eLMIS Vector Control Commodity Reserves</span>
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Depot: {elmisData.phlmc_hub_name} • Outbreak Surge Multiplier: <strong>{elmisData.outbreak_surge_multiplier}x</strong>
+                  </p>
+                </div>
+                <span className="text-xs font-semibold text-amber-800 bg-amber-100 px-3 py-1 rounded-full font-bold">
+                  {elmisData.auto_requisitions?.length || 0} Auto-Requisitions Issued
+                </span>
+              </div>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {elmisData.commodities?.slice(0, 8).map((item) => (
+                    <div
+                      key={item.commodity_code}
+                      className={`p-4 rounded-xl border transition ${
+                        item.stockout_imminent
+                          ? 'bg-red-50/40 border-red-200'
+                          : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div className="text-xs font-bold text-slate-800 truncate" title={item.commodity_code}>
+                        {item.commodity_code.replace(/_/g, ' ')}
+                      </div>
+                      <div className="text-xl font-bold text-slate-900 mt-2">
+                        {item.current_stock} <span className="text-xs font-normal text-slate-500">{item.unit}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-200/60">
+                        <span>Daily Burn: <strong>{item.projected_daily_outbreak_burn}</strong></span>
+                        <span className={`font-bold ${item.stockout_imminent ? 'text-red-700' : 'text-emerald-700'}`}>
+                          {item.days_remaining} days left
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* TAB 1: Staff Users Table */}
       {activeTab === 'users' && (

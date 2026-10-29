@@ -1,10 +1,14 @@
 import {
   AdministrativeHierarchy,
+  ElmisForecastData,
   EscalationTicketItem,
+  FieldInspectionItem,
   HealthFacilityItem,
+  PoeSurveillanceItem,
   RrtVehicleItem,
   StaffUserItem,
   UserProfile,
+  WardRiskItem,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -276,4 +280,91 @@ export async function updateTicketStatus(ticketCode: string, status: 'OPEN' | 'A
     const err = await res.json().catch(() => ({ detail: 'Failed to update ticket status' }));
     throw new Error(err.detail || 'Failed to update ticket status');
   }
+}
+
+// Field Inspections
+export async function fetchInspections(compositeWardId?: string): Promise<FieldInspectionItem[]> {
+  const url = compositeWardId
+    ? `${API_BASE}/inspections?composite_ward_id=${encodeURIComponent(compositeWardId)}`
+    : `${API_BASE}/inspections`;
+  const res = await fetch(url, {
+    headers: { ...getAuthHeader() },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to fetch inspections' }));
+    throw new Error(err.detail || 'Failed to fetch inspections');
+  }
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.items || []);
+}
+
+export async function createInspection(data: Partial<FieldInspectionItem>): Promise<any> {
+  const payload = {
+    client_submission_uuid: data.client_submission_uuid || crypto.randomUUID(),
+    composite_ward_id: data.composite_ward_id || 'NP-P3-D27-30608-W17',
+    houses_inspected: data.houses_inspected || 25,
+    houses_infested: data.houses_infested || 5,
+    wet_containers_inspected: data.wet_containers_inspected || 40,
+    positive_containers: data.positive_containers || 6,
+    pupae_count: data.pupae_count || 15,
+    container_type: data.container_type || 'Open Plastic Drum (200L)',
+    water_matrix: 'POTABLE_STORAGE',
+    larvae_detected: (data.positive_containers ?? 0) > 0,
+    larvicide_applied: data.larvicide_applied || 'Bti 0.5g/m2 surface',
+    larvicide_dosage_mg: Number(data.positive_containers || 1) * 12.5,
+    latitude: data.exact_latitude || 27.7124,
+    longitude: data.exact_longitude || 85.3065,
+    notes: data.container_type || 'Ground inspection entry',
+  };
+
+  const res = await fetch(`${API_BASE}/inspections`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(),
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to record inspection' }));
+    throw new Error(err.detail || 'Failed to record inspection');
+  }
+  return res.json();
+}
+
+// Cross-Border PoE Surveillance Alerts
+export async function fetchPoeSurveillance(destinationPalikaCode?: string): Promise<PoeSurveillanceItem[]> {
+  const url = destinationPalikaCode
+    ? `${API_BASE}/poe/surveillance?destination_palika_code=${encodeURIComponent(destinationPalikaCode)}`
+    : `${API_BASE}/poe/surveillance`;
+  const res = await fetch(url, {
+    headers: { ...getAuthHeader() },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to fetch PoE surveillance' }));
+    throw new Error(err.detail || 'Failed to fetch PoE surveillance');
+  }
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
+
+// Public / Authenticated Ward Stats
+export async function fetchWardStats(compositeWardId: string): Promise<WardRiskItem> {
+  const res = await fetch(`${API_BASE}/public/ward/${encodeURIComponent(compositeWardId)}/stats`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch ward statistics');
+  }
+  return res.json();
+}
+
+// eLMIS Logistics Forecast
+export async function fetchElmisForecast(palikaCode: string): Promise<ElmisForecastData> {
+  const res = await fetch(`${API_BASE}/elmis/forecast/${encodeURIComponent(palikaCode)}`, {
+    headers: { ...getAuthHeader() },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to fetch eLMIS forecast' }));
+    throw new Error(err.detail || 'Failed to fetch eLMIS forecast');
+  }
+  return res.json();
 }
