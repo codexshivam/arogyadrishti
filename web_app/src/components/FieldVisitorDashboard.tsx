@@ -1,10 +1,7 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
 import { CheckCircle2, Smartphone, Droplets } from 'lucide-react';
 
 export const FieldVisitorDashboard: React.FC = () => {
-  const { currentUser } = useAuth();
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Metrics Row */}
@@ -133,13 +130,10 @@ export const FieldVisitorDashboard: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-[#fee2e2] text-[#a50c1f] flex items-center justify-center mx-auto mb-3">
               <Smartphone className="w-6 h-6" />
             </div>
-            <h4 className="text-sm font-bold text-[#0f172a]">NidanIQ Mobile Field App</h4>
-            <p className="text-xs text-[#64748b] mt-1 mb-4 leading-relaxed">
+            <h4 className="text-sm font-bold text-[#0f172a]">NidanIQ Mobile App</h4>
+            <p className="text-xs text-[#64748b] mt-1 leading-relaxed">
               Ground-level household inspections, GPS coordinates verification, and offline surveys must be logged using the official mobile application.
             </p>
-            <div className="p-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-xl text-xs text-[#334155]">
-              Authorized Phone: <span className="font-mono font-bold text-[#a50c1f]">{currentUser?.phone}</span>
-            </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6">

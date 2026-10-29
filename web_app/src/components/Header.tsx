@@ -95,23 +95,23 @@ export const Header: React.FC = () => {
     <header className="bg-transparent sticky top-0 z-50">
       {/* Top Bar */}
       <div className="bg-white/95 backdrop-blur-xs border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4.5 min-h-[68px] flex items-center justify-between">
           {/* Transparent background with official red text logo */}
           <div className="flex items-center">
             <img
               src="/nidaniq_logo.png"
               alt="NidanIQ"
-              className="h-7.5 w-auto object-contain cursor-pointer"
+              className="h-5.5 w-auto object-contain cursor-pointer"
             />
           </div>
 
-          {/* Profile chip with Name | Phone Number and Signout button */}
+          {/* Profile chip with Name | Phone Number (Red theme) and Signout button */}
           {currentUser && (
             <div className="flex items-center space-x-3">
-              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-800">
-                <span>{currentUser.full_name}</span>
-                <span className="mx-2 text-slate-400">|</span>
-                <span className="font-mono text-slate-600">{currentUser.phone}</span>
+              <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#fee2e2] border border-[#fca5a5] text-xs font-semibold shadow-2xs">
+                <span className="text-[#7c0012]">{currentUser.full_name}</span>
+                <span className="mx-2 text-[#ef4444] font-light">|</span>
+                <span className="font-mono font-bold text-[#991b1b]">{currentUser.phone}</span>
               </div>
 
               <button
