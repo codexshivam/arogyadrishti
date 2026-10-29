@@ -183,7 +183,7 @@ class Settings(BaseSettings):
 
     # API Hardening & Security Headers
     cors_allowed_origins: str = Field(
-        default="https://edcd.gov.np,https://mohp.gov.np,https://kathmandu.gov.np,http://localhost:3000,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:3000",
+        default="https://edcd.gov.np,https://mohp.gov.np,https://kathmandu.gov.np,http://localhost:3000,http://localhost:5173,http://localhost:4173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:4173,http://127.0.0.1:3000",
         alias="CORS_ALLOWED_ORIGINS",
     )
     max_upload_bytes: int = Field(
