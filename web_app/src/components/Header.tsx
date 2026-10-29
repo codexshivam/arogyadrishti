@@ -96,11 +96,13 @@ export const Header: React.FC = () => {
       {/* Top Bar */}
       <div className="bg-white/95 backdrop-blur-xs border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-          {/* Transparent background with red text logo */}
+          {/* Transparent background with official red text logo */}
           <div className="flex items-center">
-            <span className="text-2xl font-black tracking-tight text-[#a50c1f]">
-              Nidan<span className="text-[#7c0012]">IQ</span>
-            </span>
+            <img
+              src="/nidaniq_logo.png"
+              alt="NidanIQ"
+              className="h-7.5 w-auto object-contain cursor-pointer"
+            />
           </div>
 
           {/* Profile chip with Name | Phone Number and Signout button */}
@@ -128,19 +130,23 @@ export const Header: React.FC = () => {
 
       {/* Red Strip with active Jurisdiction and Assigned Ward (Name + Ward No, not ward code) */}
       {currentUser && (
-        <div className="bg-[#a50c1f] text-white text-xs font-medium py-2 px-4 sm:px-6 lg:px-8 shadow-xs">
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+        <div className="bg-[#a50c1f] text-white shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between text-xs font-medium">
             <div className="flex items-center gap-2">
               <MapPin className="w-3.5 h-3.5 text-[#ffdad7] shrink-0" />
-              <span>
-                Active Jurisdiction: <strong className="font-semibold text-white">{getJurisdiction()}</strong>
+              <div className="flex flex-wrap items-center">
+                <span>
+                  Active Jurisdiction: <strong className="font-semibold text-white">{getJurisdiction()}</strong>
+                </span>
                 {getAssignedWardDisplay() && (
                   <>
-                    <span className="mx-2 text-[#ffb1ad]">|</span>
-                    <span>Assigned Ward: <strong className="font-semibold text-white">{getAssignedWardDisplay()}</strong></span>
+                    <span className="mx-2.5 text-[#ffdad7] font-light">|</span>
+                    <span>
+                      Assigned Ward: <strong className="font-semibold text-white">{getAssignedWardDisplay()}</strong>
+                    </span>
                   </>
                 )}
-              </span>
+              </div>
             </div>
           </div>
         </div>

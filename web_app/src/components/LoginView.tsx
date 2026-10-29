@@ -58,10 +58,12 @@ export const LoginView: React.FC = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Brand Header: Transparent background with red text logo */}
         <div className="text-center">
-          <span className="text-3xl font-black tracking-tight text-[#a50c1f]">
-            Nidan<span className="text-[#7c0012]">IQ</span>
-          </span>
-          <p className="mt-1 text-xs text-[#64748b] font-medium">
+          <img
+            src="/nidaniq_logo.png"
+            alt="NidanIQ"
+            className="h-11 w-auto object-contain mx-auto"
+          />
+          <p className="mt-2 text-xs text-[#64748b] font-medium">
             Vector Surveillance &amp; Outbreak Intelligence Console
           </p>
         </div>
