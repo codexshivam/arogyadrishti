@@ -11,10 +11,10 @@ const MainAppContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7f9fb] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-xs font-semibold text-slate-600">
+          <div className="w-10 h-10 border-4 border-[#a50c1f] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-xs font-semibold text-[#64748b]">
             NidanIQ Platform Loading...
           </p>
         </div>
@@ -27,7 +27,7 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+    <div className="min-h-screen bg-[#f7f9fb] flex flex-col justify-between">
       <Header />
 
       <main className="flex-1 pb-12">
@@ -38,14 +38,14 @@ const MainAppContent: React.FC = () => {
         )}
       </main>
 
-      <footer className="bg-slate-900 text-white text-xs py-4 px-6 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-slate-400">
+      <footer className="bg-[#191c1e] text-white text-xs py-4 px-6 border-t border-[#2d3133]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-[#a0a4a8]">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-white">NidanIQ</span>
+            <span className="font-bold text-white">Nidan<span className="text-[#ffb1ad]">IQ</span></span>
             <span>• Predictive Vector Surveillance & Outbreak Intelligence Platform</span>
           </div>
           <div>
-            Open Public Health Digital Infrastructure
+            Digital Public Infrastructure
           </div>
         </div>
       </footer>

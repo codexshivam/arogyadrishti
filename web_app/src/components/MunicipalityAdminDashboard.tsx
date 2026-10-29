@@ -297,7 +297,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Municipality Header Card */}
-      <div className="bg-linear-to-r from-[#2563EB] via-[#1657A2] to-[#1E3A8A] rounded-xl text-white p-6 shadow-md mb-6">
+      <div className="bg-linear-to-r from-[#a50c1f] via-[#1657A2] to-[#7c0012] rounded-xl text-white p-6 shadow-md mb-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2">
@@ -376,7 +376,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           onClick={() => setActiveTab('users')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'users'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#a50c1f] text-[#a50c1f]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
@@ -388,7 +388,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           onClick={() => setActiveTab('facilities')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'facilities'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#a50c1f] text-[#a50c1f]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
@@ -400,7 +400,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           onClick={() => setActiveTab('rrt')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'rrt'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#a50c1f] text-[#a50c1f]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
@@ -412,7 +412,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           onClick={() => setActiveTab('tickets')}
           className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
             activeTab === 'tickets'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#a50c1f] text-[#a50c1f]'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
@@ -425,7 +425,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
-            <Filter className="w-4 h-4 text-[#2563EB]" />
+            <Filter className="w-4 h-4 text-[#a50c1f]" />
             <span>Scope: {currentPalikaObj?.palika_name}</span>
           </div>
 
@@ -463,7 +463,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           {activeTab === 'users' && (
             <button
               onClick={() => setShowAddVisitorModal(true)}
-              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="bg-[#a50c1f] hover:bg-[#7c0012] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>{'Add Field Visitor'}</span>
@@ -479,7 +479,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 setFacFacilityId(`FAC-${palikaCode}-${Date.now().toString().slice(-4)}`);
                 setShowFacilityModal(true);
               }}
-              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="bg-[#a50c1f] hover:bg-[#7c0012] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>{'Add Health Center'}</span>
@@ -495,7 +495,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 setRrtTeamLead('');
                 setShowRrtModal(true);
               }}
-              className="bg-[#2563EB] hover:bg-[#1E3A8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="bg-[#a50c1f] hover:bg-[#7c0012] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>{'Add RRT Van'}</span>
@@ -651,7 +651,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                           setFacEmergencyPhone(fac.emergency_phone);
                           setShowFacilityModal(true);
                         }}
-                        className="text-blue-600 hover:text-blue-800 p-1 cursor-pointer"
+                        className="text-[#a50c1f] hover:text-[#7c0012] p-1 cursor-pointer"
                         title="Edit Facility"
                       >
                         <Pencil className="w-4 h-4" />
@@ -757,7 +757,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                           setRrtStatus(van.status);
                           setShowRrtModal(true);
                         }}
-                        className="text-blue-600 hover:text-blue-800 p-1 cursor-pointer"
+                        className="text-[#a50c1f] hover:text-[#7c0012] p-1 cursor-pointer"
                         title="Edit Van"
                       >
                         <Pencil className="w-4 h-4" />
@@ -811,7 +811,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
               <tbody className="divide-y divide-slate-200 bg-white">
                 {ticketsList.map((t) => (
                   <tr key={t.ticket_code} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#2563EB]">
+                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#a50c1f]">
                       {t.ticket_code}
                     </td>
                     <td className="px-6 py-3.5 whitespace-nowrap font-mono text-slate-600">
@@ -842,7 +842,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                       {t.status !== 'ASSIGNED' && (
                         <button
                           onClick={() => handleUpdateTicket(t.ticket_code, 'ASSIGNED')}
-                          className="px-2 py-1 text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 cursor-pointer"
+                          className="px-2 py-1 text-[11px] font-semibold bg-[#fee2e2]/40 text-[#991b1b] border border-[#fca5a5] rounded hover:bg-blue-100 cursor-pointer"
                         >
                           Assign
                         </button>
@@ -870,7 +870,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Users className="w-5 h-5 text-[#2563EB]" />
+                <Users className="w-5 h-5 text-[#a50c1f]" />
                 <span>{'Add New Field Visitor'}</span>
               </h3>
               <button onClick={() => setShowAddVisitorModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -879,7 +879,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
             </div>
 
             <form onSubmit={handleCreateFieldVisitor} className="space-y-4 mt-4">
-              <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
+              <div className="p-2.5 bg-[#fee2e2]/40 border border-[#fca5a5] rounded-lg text-xs text-[#7c0012]">
                 <strong>Authority Notice:</strong> Municipality Admins are authorized to register Frontline Field Visitors and FCHVs for <strong>{currentPalikaObj?.palika_name}</strong>.
               </div>
 
@@ -971,7 +971,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#a50c1f] text-white rounded-lg hover:bg-[#7c0012] cursor-pointer shadow-xs"
                 >
                   Create Field Visitor
                 </button>
@@ -987,7 +987,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#2563EB]" />
+                <Building2 className="w-5 h-5 text-[#a50c1f]" />
                 <span>{editingFacility ? 'Edit Health Center' : 'Add Health Center'}</span>
               </h3>
               <button onClick={() => setShowFacilityModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -1076,7 +1076,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#a50c1f] text-white rounded-lg hover:bg-[#7c0012] cursor-pointer shadow-xs"
                 >
                   Save Health Center
                 </button>
@@ -1092,7 +1092,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Truck className="w-5 h-5 text-[#2563EB]" />
+                <Truck className="w-5 h-5 text-[#a50c1f]" />
                 <span>{editingRrt ? 'Edit RRT Van' : 'Add Rapid Response Van'}</span>
               </h3>
               <button onClick={() => setShowRrtModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -1189,7 +1189,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#2563EB] text-white rounded-lg hover:bg-[#1E3A8A] cursor-pointer shadow-xs"
+                  className="px-4 py-2 text-xs font-bold bg-[#a50c1f] text-white rounded-lg hover:bg-[#7c0012] cursor-pointer shadow-xs"
                 >
                   Save RRT Van
                 </button>

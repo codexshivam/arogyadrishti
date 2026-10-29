@@ -19,17 +19,17 @@ class NepalGovTheme {
   static const Color mutedInk = Color(0xFF475569);
   static const Color borderStone = Color(0xFFD6D3C9);
 
-  static const Color outbreakCrimson = Color(0xFFDC2626);
+  static const Color outbreakCrimson = Color(0xFFA50C1F);
+  static const Color nidaniqPrimary = Color(0xFFA50C1F);
+  static const Color nidaniqDarkRed = Color(0xFF7C0012);
   static const Color containedEmerald = Color(0xFF10B981);
   static const Color monsoonAmber = Color(0xFFD97706);
-  static const Color royalNepalBlue = Color(0xFF1D4ED8);
+  static const Color royalNepalBlue = Color(0xFFA50C1F);
 
-  /// Standard Government of Nepal Unicode Devanagari font fallback stack.
+  /// Standard NidanIQ Typography Stack with Plus Jakarta Sans.
   static const List<String> devanagariFontFallback = <String>[
+    'Plus Jakarta Sans',
     'Noto Sans Devanagari',
-    'Kalimati',
-    'Mangal',
-    'Kohinoor Devanagari',
     'sans-serif',
   ];
 
