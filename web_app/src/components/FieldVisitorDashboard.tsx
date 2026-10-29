@@ -4,7 +4,9 @@ import { MapPin, Phone, Shield, CheckCircle2, Smartphone, Droplets, Compass } fr
 
 export const FieldVisitorDashboard: React.FC = () => {
   const { currentUser } = useAuth();
-  const wardId = currentUser?.assigned_wards[0] || 'NP-P3-D27-30608-W17';
+  const wardId = (currentUser?.assigned_wards && currentUser.assigned_wards.length > 0)
+    ? currentUser.assigned_wards[0]
+    : 'NP-P3-D27-30608-W17';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">

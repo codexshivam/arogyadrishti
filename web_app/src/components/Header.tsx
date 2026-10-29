@@ -66,7 +66,7 @@ export const Header: React.FC = () => {
             <div className="flex items-center space-x-3 justify-end flex-wrap gap-y-2">
               <div className="flex items-center space-x-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-3 py-1.5 text-xs">
                 <div className="w-7 h-7 rounded-full bg-[#dae2fd] text-[#131b2e] flex items-center justify-center font-bold shrink-0">
-                  {currentUser.full_name.charAt(0) || 'U'}
+                  {(currentUser?.full_name || 'U').charAt(0).toUpperCase()}
                 </div>
                 <div className="text-left">
                   <div className="font-semibold text-[#0f172a] flex items-center gap-1.5">

@@ -100,8 +100,8 @@ export const MunicipalityAdminDashboard: React.FC = () => {
     fetchSpatialHierarchy()
       .then((data) => {
         setHierarchy(data);
-        const pal = data.palikas.find((p) => p.palika_code === palikaCode);
-        if (pal && pal.wards.length > 0) {
+        const pal = data?.palikas?.find((p) => p.palika_code === palikaCode);
+        if (pal && pal.wards && pal.wards.length > 0) {
           setVisitorWard(pal.wards[0].composite_ward_id);
           setFacWard(pal.wards[0].composite_ward_id);
           setRrtBaseWard(pal.wards[0].composite_ward_id);
@@ -110,7 +110,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
       .catch((e) => console.error(e));
   }, [palikaCode]);
 
-  const currentPalikaObj: PalikaOption | undefined = hierarchy?.palikas.find(
+  const currentPalikaObj: PalikaOption | undefined = hierarchy?.palikas?.find(
     (p) => p.palika_code === palikaCode
   );
 
@@ -333,7 +333,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10">
           <div className="bg-white/10 rounded-lg p-3">
             <div className="text-xs text-slate-300 font-medium">Municipality Wards</div>
-            <div className="text-xl font-bold mt-0.5">{currentPalikaObj?.wards.length || 32}</div>
+            <div className="text-xl font-bold mt-0.5">{currentPalikaObj?.wards?.length || 32}</div>
           </div>
           <div className="bg-white/10 rounded-lg p-3">
             <div className="text-xs text-slate-300 font-medium">Municipal Field Staff</div>
@@ -430,14 +430,14 @@ export const MunicipalityAdminDashboard: React.FC = () => {
           </div>
 
           {/* Ward filter for this municipality */}
-          {currentPalikaObj && currentPalikaObj.wards.length > 0 && (
+          {currentPalikaObj && currentPalikaObj.wards && currentPalikaObj.wards.length > 0 && (
             <select
               value={filterWard}
               onChange={(e) => setFilterWard(e.target.value)}
               className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium"
             >
               <option value="">All Municipality Wards</option>
-              {currentPalikaObj.wards.map((w) => (
+              {(currentPalikaObj.wards || []).map((w) => (
                 <option key={w.composite_ward_id} value={w.composite_ward_id}>
                   Ward {w.ward_no} - {w.locality_name}
                 </option>
@@ -452,9 +452,9 @@ export const MunicipalityAdminDashboard: React.FC = () => {
               className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium"
             >
               <option value="">All Statuses</option>
-              <option value="OPEN">OPEN (नयाँ)</option>
-              <option value="ASSIGNED">ASSIGNED (तोकिएको)</option>
-              <option value="RESOLVED">RESOLVED (समाधान)</option>
+              <option value="OPEN">Open</option>
+              <option value="ASSIGNED">Assigned</option>
+              <option value="RESOLVED">Resolved</option>
             </select>
           )}
         </div>
@@ -885,7 +885,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Assigned Ward (यस नगरपालिकाको वडा)
+                  Assigned Ward
                 </label>
                 <select
                   value={visitorWard}
@@ -893,7 +893,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                   className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
                   required
                 >
-                  {currentPalikaObj?.wards.map((w) => (
+                  {(currentPalikaObj?.wards || []).map((w) => (
                     <option key={w.composite_ward_id} value={w.composite_ward_id}>
                       Ward {w.ward_no} - {w.locality_name} ({w.composite_ward_id})
                     </option>
@@ -914,12 +914,12 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name (नेपाली)</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Secondary / Local Name</label>
                   <input
                     type="text"
                     value={visitorNameNe}
                     onChange={(e) => setVisitorNameNe(e.target.value)}
-                    placeholder="e.g. सुनिल बस्नेत"
+                    placeholder="e.g. Sunil Basnet"
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
                   />
                 </div>
@@ -1014,7 +1014,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                     onChange={(e) => setFacWard(e.target.value)}
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
                   >
-                    {currentPalikaObj?.wards.map((w) => (
+                    {(currentPalikaObj?.wards || []).map((w) => (
                       <option key={w.composite_ward_id} value={w.composite_ward_id}>
                         Ward {w.ward_no} - {w.locality_name}
                       </option>
@@ -1120,7 +1120,7 @@ export const MunicipalityAdminDashboard: React.FC = () => {
                     onChange={(e) => setRrtBaseWard(e.target.value)}
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
                   >
-                    {currentPalikaObj?.wards.map((w) => (
+                    {(currentPalikaObj?.wards || []).map((w) => (
                       <option key={w.composite_ward_id} value={w.composite_ward_id}>
                         Ward {w.ward_no} - {w.locality_name}
                       </option>

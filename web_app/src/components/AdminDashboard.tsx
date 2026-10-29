@@ -143,11 +143,11 @@ export const AdminDashboard: React.FC = () => {
     loadData();
   }, [activeTab, filterPalika, filterWard, filterStatus]);
 
-  const selectedPalikaObj: PalikaOption | undefined = hierarchy?.palikas.find(
+  const selectedPalikaObj: PalikaOption | undefined = hierarchy?.palikas?.find(
     (p) => p.palika_code === (filterPalika || newUserPalika)
   );
 
-  const newUserPalikaObj: PalikaOption | undefined = hierarchy?.palikas.find(
+  const newUserPalikaObj: PalikaOption | undefined = hierarchy?.palikas?.find(
     (p) => p.palika_code === newUserPalika
   );
 
@@ -164,13 +164,13 @@ export const AdminDashboard: React.FC = () => {
         assignedWards = ['*'];
       } else if (newUserRole === 'municipality_admin') {
         if (newUserWardAllocationType === 'all' || !palika.is_metro_or_submetro) {
-          assignedWards = palika.wards.map((w) => w.composite_ward_id);
+          assignedWards = (palika.wards || []).map((w) => w.composite_ward_id);
         } else {
-          assignedWards = [newUserSelectedWard || palika.wards[0]?.composite_ward_id || '*'];
+          assignedWards = [newUserSelectedWard || (palika.wards && palika.wards[0]?.composite_ward_id) || '*'];
         }
       } else {
         // Field visitor
-        assignedWards = [newUserSelectedWard || palika.wards[0]?.composite_ward_id || 'NP-P3-D27-30608-W17'];
+        assignedWards = [newUserSelectedWard || (palika.wards && palika.wards[0]?.composite_ward_id) || 'NP-P3-D27-30608-W17'];
       }
 
       await createStaffUser({
@@ -466,7 +466,7 @@ export const AdminDashboard: React.FC = () => {
           className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium focus:ring-1 focus:ring-[#a50c1f]"
         >
           <option value="">{'All Palikas (Nationwide)'}</option>
-          {hierarchy?.palikas.map((p) => (
+          {(hierarchy?.palikas || []).map((p) => (
             <option key={p.palika_code} value={p.palika_code}>
               {p.palika_name} ({p.palika_type})
             </option>
@@ -481,7 +481,7 @@ export const AdminDashboard: React.FC = () => {
             className="text-xs border border-blue-300 rounded-lg px-2.5 py-1.5 bg-[#fee2e2]/40/50 font-medium focus:ring-1 focus:ring-[#a50c1f]"
           >
             <option value="">{'All Wards (Metro Wide)'}</option>
-            {selectedPalikaObj.wards.map((w) => (
+            {(selectedPalikaObj.wards || []).map((w) => (
               <option key={w.composite_ward_id} value={w.composite_ward_id}>
                 Ward {w.ward_no} - {w.locality_name}
               </option>
@@ -497,9 +497,9 @@ export const AdminDashboard: React.FC = () => {
             className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium"
           >
             <option value="">All Statuses</option>
-            <option value="OPEN">OPEN (नयाँ)</option>
-            <option value="ASSIGNED">ASSIGNED (जिम्मेवारी तोकिएको)</option>
-            <option value="RESOLVED">RESOLVED (समाधान भएको)</option>
+            <option value="OPEN">Open</option>
+            <option value="ASSIGNED">Assigned</option>
+            <option value="RESOLVED">Resolved</option>
           </select>
         )}
 
@@ -980,9 +980,9 @@ export const AdminDashboard: React.FC = () => {
                   onChange={(e) => setNewUserRole(e.target.value as any)}
                   className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50 font-semibold"
                 >
-                  <option value="admin">🛡️ Federal System Admin (प्रणाली प्रशासक)</option>
-                  <option value="municipality_admin">🏛️ Municipality Admin (नगरपालिका प्रशासक)</option>
-                  <option value="field_visitor">🔍 Field Visitor (क्षेत्र निरिक्षक / FCHV)</option>
+                  <option value="admin">Federal System Admin</option>
+                  <option value="municipality_admin">Municipality Admin</option>
+                  <option value="field_visitor">Field Visitor (Inspector / FCHV)</option>
                 </select>
               </div>
 
@@ -995,15 +995,15 @@ export const AdminDashboard: React.FC = () => {
                   value={newUserPalika}
                   onChange={(e) => {
                     setNewUserPalika(e.target.value);
-                    const pal = hierarchy?.palikas.find((x) => x.palika_code === e.target.value);
-                    if (pal && pal.wards.length > 0) {
+                    const pal = hierarchy?.palikas?.find((x) => x.palika_code === e.target.value);
+                    if (pal && pal.wards && pal.wards.length > 0) {
                       setNewUserSelectedWard(pal.wards[0].composite_ward_id);
                     }
                   }}
                   className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
                   required
                 >
-                  {hierarchy?.palikas.map((p) => (
+                  {(hierarchy?.palikas || []).map((p) => (
                     <option key={p.palika_code} value={p.palika_code}>
                       {p.palika_name} ({p.palika_type})
                     </option>
@@ -1019,7 +1019,7 @@ export const AdminDashboard: React.FC = () => {
                     <span>Metropolitan / Sub-Metropolitan Jurisdiction Strategy</span>
                   </div>
                   <p className="text-[11px] text-slate-600 mb-2">
-                    {newUserPalikaObj.palika_name} contains {newUserPalikaObj.wards.length} wards. You can grant city-wide scope or allocate to a specific ward:
+                    {newUserPalikaObj.palika_name} contains {newUserPalikaObj.wards?.length || 0} wards. You can grant city-wide scope or allocate to a specific ward:
                   </p>
 
                   {newUserRole === 'municipality_admin' && (
@@ -1055,7 +1055,7 @@ export const AdminDashboard: React.FC = () => {
                         onChange={(e) => setNewUserSelectedWard(e.target.value)}
                         className="w-full text-xs border border-blue-300 rounded-lg p-2 bg-white"
                       >
-                        {newUserPalikaObj.wards.map((w) => (
+                        {(newUserPalikaObj.wards || []).map((w) => (
                           <option key={w.composite_ward_id} value={w.composite_ward_id}>
                             Ward {w.ward_no} - {w.locality_name} ({w.composite_ward_id})
                           </option>
@@ -1083,13 +1083,13 @@ export const AdminDashboard: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                    Full Name (नेपाली)
+                    Secondary / Local Name
                   </label>
                   <input
                     type="text"
                     value={newUserNameNe}
                     onChange={(e) => setNewUserNameNe(e.target.value)}
-                    placeholder="e.g. रमेश पौडेल"
+                    placeholder="e.g. Ramesh Poudel"
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
                   />
                 </div>
@@ -1186,12 +1186,12 @@ export const AdminDashboard: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Facility Name (NE)</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Secondary / Local Facility Name</label>
                   <input
                     type="text"
                     value={facNameNe}
                     onChange={(e) => setFacNameNe(e.target.value)}
-                    placeholder="e.g. क्षेत्रपाटी स्वास्थ्य केन्द्र"
+                    placeholder="e.g. Chhetrapati Health Post"
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
                   />
                 </div>
@@ -1220,7 +1220,7 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setFacPalika(e.target.value)}
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
                   >
-                    {hierarchy?.palikas.map((p) => (
+                    {(hierarchy?.palikas || []).map((p) => (
                       <option key={p.palika_code} value={p.palika_code}>
                         {p.palika_name}
                       </option>
@@ -1353,7 +1353,7 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setRrtPalika(e.target.value)}
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
                   >
-                    {hierarchy?.palikas.map((p) => (
+                    {(hierarchy?.palikas || []).map((p) => (
                       <option key={p.palika_code} value={p.palika_code}>
                         {p.palika_name}
                       </option>
@@ -1443,9 +1443,9 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setRrtStatus(e.target.value as any)}
                     className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50 font-bold"
                   >
-                    <option value="AVAILABLE">AVAILABLE (तयार)</option>
-                    <option value="DISPATCHED">DISPATCHED (खटिएको)</option>
-                    <option value="MAINTENANCE">MAINTENANCE (मर्मतमा)</option>
+                    <option value="AVAILABLE">Available</option>
+                    <option value="DISPATCHED">Dispatched</option>
+                    <option value="MAINTENANCE">Maintenance</option>
                   </select>
                 </div>
               </div>
