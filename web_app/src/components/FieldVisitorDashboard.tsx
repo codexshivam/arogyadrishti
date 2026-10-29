@@ -1,43 +1,12 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { MapPin, Phone, Shield, CheckCircle2, Smartphone, Droplets, Compass } from 'lucide-react';
+import { CheckCircle2, Smartphone, Droplets } from 'lucide-react';
 
 export const FieldVisitorDashboard: React.FC = () => {
   const { currentUser } = useAuth();
-  const wardId = (currentUser?.assigned_wards && currentUser.assigned_wards.length > 0)
-    ? currentUser.assigned_wards[0]
-    : 'NP-P3-D27-30608-W17';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-linear-to-r from-[#7c0012] via-[#a50c1f] to-[#191c1e] rounded-2xl text-white p-6 sm:p-8 shadow-sm">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold tracking-wide mb-3">
-          <Shield className="w-3.5 h-3.5 text-[#ffb1ad]" />
-          <span>Field Surveillance & Inspection Console</span>
-        </div>
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          Welcome, {currentUser?.full_name || 'Field Officer'}
-        </h2>
-        <p className="text-[#ffdad7] text-xs sm:text-sm mt-1 max-w-2xl">
-          Frontline vector surveillance station for household breeding habitat inspections, larval identification, and focal bio-larviciding.
-        </p>
-        <div className="flex flex-wrap items-center gap-4 text-xs text-white/90 mt-4 pt-4 border-t border-white/15">
-          <span className="flex items-center gap-1.5 bg-black/20 px-3 py-1 rounded-lg">
-            <MapPin className="w-3.5 h-3.5 text-[#ffb3af]" />
-            Assigned Ward: <strong className="text-white font-mono">{wardId}</strong>
-          </span>
-          <span className="flex items-center gap-1.5 bg-black/20 px-3 py-1 rounded-lg">
-            <Phone className="w-3.5 h-3.5 text-[#86efac]" />
-            Contact Phone: <strong className="text-white font-mono">{currentUser?.phone}</strong>
-          </span>
-          <span className="flex items-center gap-1.5 bg-black/20 px-3 py-1 rounded-lg">
-            <Compass className="w-3.5 h-3.5 text-[#fde047]" />
-            Palika Code: <strong className="text-white font-mono">{currentUser?.palika_code}</strong>
-          </span>
-        </div>
-      </div>
-
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5">

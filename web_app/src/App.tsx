@@ -38,14 +38,15 @@ const MainAppContent: React.FC = () => {
         )}
       </main>
 
-      <footer className="bg-[#191c1e] text-white text-xs py-4 px-6 border-t border-[#2d3133]">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-[#a0a4a8]">
+      <footer className="bg-transparent py-4 px-6 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-slate-500 font-medium">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-white">Nidan<span className="text-[#ffb1ad]">IQ</span></span>
-            <span>• Predictive Vector Surveillance & Outbreak Intelligence Platform</span>
+            <span className="hover:text-[#a50c1f] transition-colors cursor-pointer">Privacy Policy</span>
+            <span>|</span>
+            <span className="hover:text-[#a50c1f] transition-colors cursor-pointer">Terms of Services</span>
           </div>
-          <div>
-            Digital Public Infrastructure
+          <div className="text-slate-600">
+            Developed &amp; Maintained by Shivam Yadav
           </div>
         </div>
       </footer>

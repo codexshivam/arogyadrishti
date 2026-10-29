@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { KeyRound, Phone, ArrowRight, CheckCircle2, AlertCircle, Activity, Sparkles } from 'lucide-react';
+import { KeyRound, Phone, ArrowRight, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
 export const LoginView: React.FC = () => {
   const { sendOtp, confirmOtp } = useAuth();
@@ -56,18 +56,15 @@ export const LoginView: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f7f9fb] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        {/* Brand Header */}
-        <div className="flex justify-center mb-3">
-          <div className="w-14 h-14 rounded-2xl bg-linear-to-tr from-[#7c0012] to-[#a50c1f] flex items-center justify-center text-white shadow-lg shadow-[#a50c1f]/25">
-            <Activity className="w-8 h-8" />
-          </div>
+        {/* Brand Header: Transparent background with red text logo */}
+        <div className="text-center">
+          <span className="text-3xl font-black tracking-tight text-[#a50c1f]">
+            Nidan<span className="text-[#7c0012]">IQ</span>
+          </span>
+          <p className="mt-1 text-xs text-[#64748b] font-medium">
+            Vector Surveillance &amp; Outbreak Intelligence Console
+          </p>
         </div>
-        <h2 className="text-center text-2xl font-bold tracking-tight text-[#0f172a]">
-          Nidan<span className="text-[#a50c1f]">IQ</span> Console
-        </h2>
-        <p className="mt-1 text-center text-xs text-[#64748b]">
-          Predictive Vector Surveillance & Outbreak Intelligence Platform
-        </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -252,10 +249,20 @@ export const LoginView: React.FC = () => {
           </div>
         </div>
 
-        <p className="mt-4 text-center text-[11px] text-[#64748b]">
-          NidanIQ Digital Public Infrastructure • Vector-Borne Disease Control
-        </p>
       </div>
+
+      <footer className="mt-8 py-4 px-6 text-xs text-slate-500 font-medium">
+        <div className="max-w-md mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+          <div className="flex items-center space-x-2">
+            <span className="hover:text-[#a50c1f] transition-colors cursor-pointer">Privacy Policy</span>
+            <span>|</span>
+            <span className="hover:text-[#a50c1f] transition-colors cursor-pointer">Terms of Services</span>
+          </div>
+          <div className="text-slate-600">
+            Developed &amp; Maintained by Shivam Yadav
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
