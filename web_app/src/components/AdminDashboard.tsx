@@ -117,20 +117,20 @@ export const AdminDashboard: React.FC = () => {
     try {
       if (activeTab === 'users') {
         const users = await fetchStaffUsers(filterPalika || undefined);
-        setUsersList(users);
+        setUsersList(Array.isArray(users) ? users : []);
       } else if (activeTab === 'facilities') {
         const facs = await fetchFacilities(filterPalika || undefined);
-        setFacilitiesList(facs);
+        setFacilitiesList(Array.isArray(facs) ? facs : []);
       } else if (activeTab === 'rrt') {
         const vans = await fetchRrtUnits(filterPalika || undefined);
-        setRrtList(vans);
+        setRrtList(Array.isArray(vans) ? vans : []);
       } else if (activeTab === 'tickets') {
         const tix = await fetchTickets({
           palika_code: filterPalika || undefined,
           composite_ward_id: filterWard || undefined,
           status: filterStatus || undefined,
         });
-        setTicketsList(tix);
+        setTicketsList(Array.isArray(tix) ? tix : []);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load data');
@@ -580,7 +580,7 @@ export const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
-                {usersList.map((user) => (
+                {(Array.isArray(usersList) ? usersList : []).map((user) => (
                   <tr key={user.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 whitespace-nowrap">
                       <div className="font-bold text-slate-900">{user.full_name}</div>
@@ -674,7 +674,7 @@ export const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
-                {facilitiesList.map((fac) => (
+                {(Array.isArray(facilitiesList) ? facilitiesList : []).map((fac) => (
                   <tr key={fac.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 whitespace-nowrap">
                       <div className="font-bold text-slate-900">{fac.name}</div>
@@ -768,7 +768,7 @@ export const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
-                {rrtList.map((van) => (
+                {(Array.isArray(rrtList) ? rrtList : []).map((van) => (
                   <tr key={van.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 whitespace-nowrap font-bold text-slate-800">
                       {van.vehicle_id}
@@ -884,7 +884,7 @@ export const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
-                {ticketsList.map((t) => (
+                {(Array.isArray(ticketsList) ? ticketsList : []).map((t) => (
                   <tr key={t.ticket_code} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#a50c1f]">
                       {t.ticket_code}

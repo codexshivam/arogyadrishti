@@ -81,7 +81,8 @@ export async function fetchStaffUsers(palikaCode?: string): Promise<StaffUserIte
     const err = await res.json().catch(() => ({ detail: 'Failed to fetch users' }));
     throw new Error(err.detail || 'Failed to fetch users');
   }
-  return res.json();
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.users || []);
 }
 
 export async function createStaffUser(data: {
@@ -134,7 +135,8 @@ export async function fetchFacilities(palikaCode?: string): Promise<HealthFacili
     const err = await res.json().catch(() => ({ detail: 'Failed to fetch facilities' }));
     throw new Error(err.detail || 'Failed to fetch facilities');
   }
-  return res.json();
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.facilities || []);
 }
 
 export async function createFacility(data: Partial<HealthFacilityItem>): Promise<HealthFacilityItem> {
@@ -192,7 +194,8 @@ export async function fetchRrtUnits(palikaCode?: string): Promise<RrtVehicleItem
     const err = await res.json().catch(() => ({ detail: 'Failed to fetch RRT units' }));
     throw new Error(err.detail || 'Failed to fetch RRT units');
   }
-  return res.json();
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.units || []);
 }
 
 export async function createRrtUnit(data: Partial<RrtVehicleItem>): Promise<RrtVehicleItem> {
@@ -256,7 +259,8 @@ export async function fetchTickets(params?: {
     const err = await res.json().catch(() => ({ detail: 'Failed to fetch tickets' }));
     throw new Error(err.detail || 'Failed to fetch tickets');
   }
-  return res.json();
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.tickets || []);
 }
 
 export async function updateTicketStatus(ticketCode: string, status: 'OPEN' | 'ASSIGNED' | 'RESOLVED'): Promise<void> {
