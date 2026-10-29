@@ -97,6 +97,8 @@ class _FchvHomeViewState extends State<FchvHomeView> {
         final wardId = (user != null && user.assignedWards.isNotEmpty)
             ? user.assignedWards.first
             : 'NP-P3-D27-30608-W17';
+        final isAdminOrMunicipalityAdmin = user?.role == NepalStaffRole.admin ||
+            user?.role == NepalStaffRole.municipalityAdmin;
 
         return SingleChildScrollView(
           key: const Key('fchv_home_view'),
@@ -332,114 +334,179 @@ class _FchvHomeViewState extends State<FchvHomeView> {
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    const Text(
-                      'घरदैलो लामखुट्टे लार्भा निरीक्षण फारम (Zero-PII Field Survey)',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: NepalGovTheme.darkSlateCard,
+                child: isAdminOrMunicipalityAdmin
+                    ? Column(
+                        key: const Key('admin_inspection_restricted_banner'),
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: NepalGovTheme.darkSlateCard.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.admin_panel_settings_rounded,
+                                  color: NepalGovTheme.darkSlateCard,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'प्रशासकीय निगरानी दृश्य (Administrative View)',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: NepalGovTheme.darkSlateCard,
+                                      ),
+                                    ),
+                                    Text(
+                                      'क्षेत्र निरीक्षण फारम अन-ग्राउण्ड फिल्ड भिजिटर (Field Visitor / FCHV) का लागि मात्र उपलब्ध छ।',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: NepalGovTheme.mutedInk,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: NepalGovTheme.monsoonAmber.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: NepalGovTheme.monsoonAmber.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: const Text(
+                              'Field visit records can only be created and submitted by frontline Field Visitors (FCHV). Administrators and Municipality Admins have view-only access to surveillance telemetry, GIS maps, and RRT dispatch operations.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: NepalGovTheme.darkSlateCard,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          const Text(
+                            'घरदैलो लामखुट्टे लार्भा निरीक्षण फारम (Zero-PII Field Survey)',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: NepalGovTheme.darkSlateCard,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'वैयक्तिक गोपनीयता ऐन २०७५ अनुसार नागरिकको नाम वा फोन नम्बर राखिँदैन। PostGIS ST_DWithin(100m) र समय जाँच सक्रिय छ।',
+                            style: TextStyle(fontSize: 12, color: NepalGovTheme.mutedInk),
+                          ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: TextField(
+                                  key: const Key('houses_inspected_input'),
+                                  controller: _housesInspectedController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'निरीक्षण घर (Houses)',
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  key: const Key('positive_containers_input'),
+                                  controller: _positiveContainersController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'लार्भा भेटिएको भाँडो (+Containers)',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: TextField(
+                                  controller: _wetContainersController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'पानी जमेका भाँडा (Wet Containers)',
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: _pupaeCountController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'प्युपा संख्या (Pupae Count)',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            initialValue: _selectedContainerType,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'भाँडोको प्रकार (Breeding Habitat Container)',
+                            ),
+                            items: const <DropdownMenuItem<String>>[
+                              DropdownMenuItem<String>(
+                                value: 'uncovered_plastic_drum',
+                                child: Text(
+                                  'खुला प्लास्टिक ड्रम (Uncovered Plastic Drum - KUKL)',
+                                ),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: 'discarded_vehicle_tire',
+                                child: Text('पुरानो टायर (Discarded Vehicle Tire)'),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: 'flower_pot_tray',
+                                child: Text('गमलाको प्लेट (Flower Pot Tray)'),
+                              ),
+                            ],
+                            onChanged: (String? value) {
+                              if (value != null) {
+                                setState(() => _selectedContainerType = value);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 14),
+                          ElevatedButton.icon(
+                            key: const Key('submit_inspection_button'),
+                            onPressed: vm.isSubmitting ? null : _submitInspection,
+                            icon: const Icon(Icons.fact_check_outlined, size: 18),
+                            label: Text(
+                              vm.isOfflineMode
+                                  ? 'अफलाइन सुरक्षित गर्नुहोस् / Queue Inspection Offline'
+                                  : 'निरीक्षण पठाउनुहोस् / Submit Field Inspection',
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'वैयक्तिक गोपनीयता ऐन २०७५ अनुसार नागरिकको नाम वा फोन नम्बर राखिँदैन। PostGIS ST_DWithin(100m) र समय जाँच सक्रिय छ।',
-                      style: TextStyle(fontSize: 12, color: NepalGovTheme.mutedInk),
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: TextField(
-                            key: const Key('houses_inspected_input'),
-                            controller: _housesInspectedController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'निरीक्षण घर (Houses)',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            key: const Key('positive_containers_input'),
-                            controller: _positiveContainersController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'लार्भा भेटिएको भाँडो (+Containers)',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: TextField(
-                            controller: _wetContainersController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'पानी जमेका भाँडा (Wet Containers)',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            controller: _pupaeCountController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'प्युपा संख्या (Pupae Count)',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      initialValue: _selectedContainerType,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        labelText: 'भाँडोको प्रकार (Breeding Habitat Container)',
-                      ),
-                      items: const <DropdownMenuItem<String>>[
-                        DropdownMenuItem<String>(
-                          value: 'uncovered_plastic_drum',
-                          child: Text(
-                            'खुला प्लास्टिक ड्रम (Uncovered Plastic Drum - KUKL)',
-                          ),
-                        ),
-                        DropdownMenuItem<String>(
-                          value: 'discarded_vehicle_tire',
-                          child: Text('पुरानो टायर (Discarded Vehicle Tire)'),
-                        ),
-                        DropdownMenuItem<String>(
-                          value: 'flower_pot_tray',
-                          child: Text('गमलाको प्लेट (Flower Pot Tray)'),
-                        ),
-                      ],
-                      onChanged: (String? value) {
-                        if (value != null) {
-                          setState(() => _selectedContainerType = value);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 14),
-                    ElevatedButton.icon(
-                      key: const Key('submit_inspection_button'),
-                      onPressed: vm.isSubmitting ? null : _submitInspection,
-                      icon: const Icon(Icons.fact_check_outlined, size: 18),
-                      label: Text(
-                        vm.isOfflineMode
-                            ? 'अफलाइन सुरक्षित गर्नुहोस् / Queue Inspection Offline'
-                            : 'निरीक्षण पठाउनुहोस् / Submit Field Inspection',
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
 

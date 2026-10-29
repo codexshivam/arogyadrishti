@@ -390,180 +390,277 @@ async def get_nepal_administrative_hierarchy_endpoint(
     session: AsyncSession = Depends(get_read_db_session),
 ) -> dict[str, Any]:
     """
-    Return the bilingual (English + Nepali Devanagari) cascading administrative hierarchy:
-    Province -> District -> Palika -> Ward for the Manual Location Selector fallback.
+    Return the bilingual (English + Nepali Devanagari) administrative hierarchy:
+    Province -> District -> Palika -> Ward, complete with palika_type, is_metro_or_submetro flag,
+    and all associated wards for admin and municipality governance.
     """
-    _ = session
     stamp = ad_to_bs_stamp()
+
+    # Query all wards present in database
+    db_wards_res = await session.execute(
+        select(AdminBoundaryWard).order_by(AdminBoundaryWard.ward_number)
+    )
+    db_wards = db_wards_res.scalars().all()
+
+    # Group DB wards by palika_code
+    db_wards_by_palika: dict[str, list[dict[str, Any]]] = {}
+    for w in db_wards:
+        db_wards_by_palika.setdefault(w.palika_code, []).append(
+            {
+                "composite_ward_id": w.composite_ward_id,
+                "ward_no": w.ward_number,
+                "locality_name": w.locality_name,
+                "locality_name_np": w.locality_name_ne,
+            }
+        )
+
+    # Master palika registry covering Metros, Sub-Metros, Municipalities, and Rural Municipalities
+    master_palikas: list[dict[str, Any]] = [
+        # Bagmati Province - Kathmandu District
+        {
+            "palika_code": "30608",
+            "palika_name": "Kathmandu Metropolitan City",
+            "palika_name_np": "काठमाडौँ महानगरपालिका",
+            "palika_type": "Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 27,
+            "district_name": "Kathmandu",
+            "district_name_np": "काठमाडौँ",
+            "province_code": 3,
+            "province_name": "Bagmati Province",
+            "province_name_np": "बागमती प्रदेश",
+            "wards": db_wards_by_palika.get("30608", [
+                {"composite_ward_id": f"NP-P3-D27-30608-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w}", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 33)
+            ]),
+        },
+        # Bagmati Province - Lalitpur District
+        {
+            "palika_code": "30805",
+            "palika_name": "Lalitpur Metropolitan City",
+            "palika_name_np": "ललितपुर महानगरपालिका",
+            "palika_type": "Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 28,
+            "district_name": "Lalitpur",
+            "district_name_np": "ललितपुर",
+            "province_code": 3,
+            "province_name": "Bagmati Province",
+            "province_name_np": "बागमती प्रदेश",
+            "wards": db_wards_by_palika.get("30805", [
+                {"composite_ward_id": f"NP-P3-D28-30805-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Patan)", "locality_name_np": f"वडा नं {w} (पाटन)"}
+                for w in range(1, 30)
+            ]),
+        },
+        # Bagmati Province - Lalitpur Rural Municipality
+        {
+            "palika_code": "30806",
+            "palika_name": "Konjyosom Rural Municipality",
+            "palika_name_np": "कोन्ज्योसोम गाउँपालिका",
+            "palika_type": "Rural Municipality",
+            "is_metro_or_submetro": False,
+            "district_code": 28,
+            "district_name": "Lalitpur",
+            "district_name_np": "ललितपुर",
+            "province_code": 3,
+            "province_name": "Bagmati Province",
+            "province_name_np": "बागमती प्रदेश",
+            "wards": [
+                {"composite_ward_id": f"NP-P3-D28-30806-W0{w}", "ward_no": w, "locality_name": f"Ward {w} (Konjyosom)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 6)
+            ],
+        },
+        # Bagmati Province - Chitwan District
+        {
+            "palika_code": "30902",
+            "palika_name": "Bharatpur Metropolitan City",
+            "palika_name_np": "भरतपुर महानगरपालिका",
+            "palika_type": "Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 35,
+            "district_name": "Chitwan",
+            "district_name_np": "चितवन",
+            "province_code": 3,
+            "province_name": "Bagmati Province",
+            "province_name_np": "बागमती प्रदेश",
+            "wards": db_wards_by_palika.get("30902", db_wards_by_palika.get("30502", [
+                {"composite_ward_id": f"NP-P3-D35-30902-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Bharatpur)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 30)
+            ])),
+        },
+        # Bagmati Province - Chitwan Rural Municipality
+        {
+            "palika_code": "30906",
+            "palika_name": "Ichhyakamana Rural Municipality",
+            "palika_name_np": "इच्छाकामना गाउँपालिका",
+            "palika_type": "Rural Municipality",
+            "is_metro_or_submetro": False,
+            "district_code": 35,
+            "district_name": "Chitwan",
+            "district_name_np": "चितवन",
+            "province_code": 3,
+            "province_name": "Bagmati Province",
+            "province_name_np": "बागमती प्रदेश",
+            "wards": [
+                {"composite_ward_id": f"NP-P3-D35-30906-W0{w}", "ward_no": w, "locality_name": f"Ward {w} (Mugling / Kurintar)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 8)
+            ],
+        },
+        # Bagmati Province - Makwanpur District (Sub-Metro)
+        {
+            "palika_code": "30401",
+            "palika_name": "Hetauda Sub-Metropolitan City",
+            "palika_name_np": "हेटौंडा उपमहानगरपालिका",
+            "palika_type": "Sub-Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 31,
+            "district_name": "Makwanpur",
+            "district_name_np": "मकवानपुर",
+            "province_code": 3,
+            "province_name": "Bagmati Province",
+            "province_name_np": "बागमती प्रदेश",
+            "wards": [
+                {"composite_ward_id": f"NP-P3-D31-30401-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Hetauda)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 20)
+            ],
+        },
+        # Gandaki Province - Kaski District
+        {
+            "palika_code": "40307",
+            "palika_name": "Pokhara Metropolitan City",
+            "palika_name_np": "पोखरा महानगरपालिका",
+            "palika_type": "Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 40,
+            "district_name": "Kaski",
+            "district_name_np": "कास्की",
+            "province_code": 4,
+            "province_name": "Gandaki Province",
+            "province_name_np": "गण्डकी प्रदेश",
+            "wards": db_wards_by_palika.get("40307", db_wards_by_palika.get("40505", [
+                {"composite_ward_id": f"NP-P4-D40-40307-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Lakeside / Pokhara)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 34)
+            ])),
+        },
+        # Koshi Province - Morang District
+        {
+            "palika_code": "10403",
+            "palika_name": "Biratnagar Metropolitan City",
+            "palika_name_np": "विराटनगर महानगरपालिका",
+            "palika_type": "Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 5,
+            "district_name": "Morang",
+            "district_name_np": "मोरङ",
+            "province_code": 1,
+            "province_name": "Koshi Province",
+            "province_name_np": "कोशी प्रदेश",
+            "wards": [
+                {"composite_ward_id": f"NP-P1-D05-10403-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Biratnagar)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 20)
+            ],
+        },
+        # Lumbini Province - Banke District (Sub-Metro)
+        {
+            "palika_code": "50804",
+            "palika_name": "Nepalgunj Sub-Metropolitan City",
+            "palika_name_np": "नेपालगञ्ज उपमहानगरपालिका",
+            "palika_type": "Sub-Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 57,
+            "district_name": "Banke",
+            "district_name_np": "बाँके",
+            "province_code": 5,
+            "province_name": "Lumbini Province",
+            "province_name_np": "लुम्बिनी प्रदेश",
+            "wards": [
+                {"composite_ward_id": f"NP-P5-D57-50804-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Nepalgunj)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 24)
+            ],
+        },
+        # Karnali Province - Surkhet District (Municipality)
+        {
+            "palika_code": "60903",
+            "palika_name": "Birendranagar Municipality",
+            "palika_name_np": "वीरेन्द्रनगर नगरपालिका",
+            "palika_type": "Municipality",
+            "is_metro_or_submetro": False,
+            "district_code": 64,
+            "district_name": "Surkhet",
+            "district_name_np": "सुर्खेत",
+            "province_code": 6,
+            "province_name": "Karnali Province",
+            "province_name_np": "कर्णाली प्रदेश",
+            "wards": [
+                {"composite_ward_id": f"NP-P6-D64-60903-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Birendranagar)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 17)
+            ],
+        },
+        # Sudurpashchim Province - Kailali District (Sub-Metro)
+        {
+            "palika_code": "70901",
+            "palika_name": "Dhangadhi Sub-Metropolitan City",
+            "palika_name_np": "धनगढी उपमहानगरपालिका",
+            "palika_type": "Sub-Metropolitan City",
+            "is_metro_or_submetro": True,
+            "district_code": 71,
+            "district_name": "Kailali",
+            "district_name_np": "कैलाली",
+            "province_code": 7,
+            "province_name": "Sudurpashchim Province",
+            "province_name_np": "सुदूरपश्चिम प्रदेश",
+            "wards": [
+                {"composite_ward_id": f"NP-P7-D71-70901-W{w:02d}", "ward_no": w, "locality_name": f"Ward {w} (Dhangadhi)", "locality_name_np": f"वडा नं {w}"}
+                for w in range(1, 20)
+            ],
+        },
+    ]
+
+    # Build hierarchical tree: provinces -> districts -> palikas
+    prov_dict: dict[int, dict[str, Any]] = {}
+    for p in master_palikas:
+        p_code = p["province_code"]
+        if p_code not in prov_dict:
+            prov_dict[p_code] = {
+                "province_code": p_code,
+                "province_name": p["province_name"],
+                "province_name_np": p["province_name_np"],
+                "districts": {},
+            }
+        dist_code = p["district_code"]
+        if dist_code not in prov_dict[p_code]["districts"]:
+            prov_dict[p_code]["districts"][dist_code] = {
+                "district_code": dist_code,
+                "district_name": p["district_name"],
+                "district_name_np": p["district_name_np"],
+                "palikas": [],
+            }
+        prov_dict[p_code]["districts"][dist_code]["palikas"].append(
+            {
+                "palika_code": p["palika_code"],
+                "palika_name": p["palika_name"],
+                "palika_name_np": p["palika_name_np"],
+                "palika_type": p["palika_type"],
+                "is_metro_or_submetro": p["is_metro_or_submetro"],
+                "wards": p["wards"],
+            }
+        )
+
+    provinces_tree = []
+    for p_val in sorted(prov_dict.values(), key=lambda x: x["province_code"]):
+        d_list = []
+        for d_val in sorted(p_val["districts"].values(), key=lambda x: x["district_code"]):
+            d_list.append(d_val)
+        provinces_tree.append({
+            "province_code": p_val["province_code"],
+            "province_name": p_val["province_name"],
+            "province_name_np": p_val["province_name_np"],
+            "districts": d_list,
+        })
+
     return {
-        "provinces": [
-            {
-                "province_code": 3,
-                "province_name": "Bagmati Province",
-                "province_name_np": "बागमती प्रदेश",
-                "districts": [
-                    {
-                        "district_code": 27,
-                        "district_name": "Kathmandu",
-                        "district_name_np": "काठमाडौँ",
-                        "palikas": [
-                            {
-                                "palika_code": "30608",
-                                "palika_name": "Kathmandu Metropolitan City",
-                                "palika_name_np": "काठमाडौँ महानगरपालिका",
-                                "wards": [
-                                    {
-                                        "composite_ward_id": "NP-P3-D27-30608-W17",
-                                        "ward_no": 17,
-                                        "locality_name": "Chhetrapati",
-                                        "locality_name_np": "क्षेत्रपाटी",
-                                    },
-                                    {
-                                        "composite_ward_id": "NP-P3-D27-30608-W12",
-                                        "ward_no": 12,
-                                        "locality_name": "Teku",
-                                        "locality_name_np": "टेकु",
-                                    },
-                                    {
-                                        "composite_ward_id": "NP-P3-D27-30608-W16",
-                                        "ward_no": 16,
-                                        "locality_name": "Balaju",
-                                        "locality_name_np": "बालाजु",
-                                    },
-                                    {
-                                        "composite_ward_id": "NP-P3-D27-30608-W32",
-                                        "ward_no": 32,
-                                        "locality_name": "Koteshwor",
-                                        "locality_name_np": "कोटेश्वर",
-                                    },
-                                ],
-                            }
-                        ],
-                    },
-                    {
-                        "district_code": 28,
-                        "district_name": "Lalitpur",
-                        "district_name_np": "ललितपुर",
-                        "palikas": [
-                            {
-                                "palika_code": "30805",
-                                "palika_name": "Lalitpur Metropolitan City",
-                                "palika_name_np": "ललितपुर महानगरपालिका",
-                                "wards": [
-                                    {
-                                        "composite_ward_id": "NP-P3-D28-30805-W05",
-                                        "ward_no": 5,
-                                        "locality_name": "Lagankhel / Patan",
-                                        "locality_name_np": "लगनखेल / पाटन",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                    {
-                        "district_code": 35,
-                        "district_name": "Chitwan",
-                        "district_name_np": "चितवन",
-                        "palikas": [
-                            {
-                                "palika_code": "30902",
-                                "palika_name": "Bharatpur Metropolitan City",
-                                "palika_name_np": "भरतपुर महानगरपालिका",
-                                "wards": [
-                                    {
-                                        "composite_ward_id": "NP-P3-D35-30902-W10",
-                                        "ward_no": 10,
-                                        "locality_name": "Hospital Road / Hakim Chowk",
-                                        "locality_name_np": "अस्पताल रोड / हाकिम चोक",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                ],
-            },
-            {
-                "province_code": 4,
-                "province_name": "Gandaki Province",
-                "province_name_np": "गण्डकी प्रदेश",
-                "districts": [
-                    {
-                        "district_code": 40,
-                        "district_name": "Kaski",
-                        "district_name_np": "कास्की",
-                        "palikas": [
-                            {
-                                "palika_code": "40307",
-                                "palika_name": "Pokhara Metropolitan City",
-                                "palika_name_np": "पोखरा महानगरपालिका",
-                                "wards": [
-                                    {
-                                        "composite_ward_id": "NP-P4-D40-40307-W06",
-                                        "ward_no": 6,
-                                        "locality_name": "Baidam (Lakeside)",
-                                        "locality_name_np": "बैदाम (लेकसाइड)",
-                                    }
-                                ],
-                            }
-                        ],
-                    }
-                ],
-            },
-            {
-                "province_code": 1,
-                "province_name": "Koshi Province",
-                "province_name_np": "कोशी प्रदेश",
-                "districts": [
-                    {
-                        "district_code": 5,
-                        "district_name": "Morang",
-                        "district_name_np": "मोरङ",
-                        "palikas": [
-                            {
-                                "palika_code": "10403",
-                                "palika_name": "Biratnagar Metropolitan City",
-                                "palika_name_np": "विराटनगर महानगरपालिका",
-                                "wards": [
-                                    {
-                                        "composite_ward_id": "NP-P1-D05-10403-W07",
-                                        "ward_no": 7,
-                                        "locality_name": "Haatkhola",
-                                        "locality_name_np": "हाटखोला",
-                                    }
-                                ],
-                            }
-                        ],
-                    }
-                ],
-            },
-            {
-                "province_code": 6,
-                "province_name": "Karnali Province",
-                "province_name_np": "कर्णाली प्रदेश",
-                "districts": [
-                    {
-                        "district_code": 64,
-                        "district_name": "Surkhet",
-                        "district_name_np": "सुर्खेत",
-                        "palikas": [
-                            {
-                                "palika_code": "60903",
-                                "palika_name": "Birendranagar Municipality",
-                                "palika_name_np": "वीरेन्द्रनगर नगरपालिका",
-                                "wards": [
-                                    {
-                                        "composite_ward_id": "NP-P6-D64-60903-W06",
-                                        "ward_no": 6,
-                                        "locality_name": "Birendranagar Bazaar",
-                                        "locality_name_np": "वीरेन्द्रनगर बजार",
-                                    }
-                                ],
-                            }
-                        ],
-                    }
-                ],
-            },
-        ],
+        "provinces": provinces_tree,
+        "palikas": master_palikas,
         "bs_date": stamp.bs_combined_label,
         "bs_ad_official_label": stamp.bs_ad_official_label,
     }

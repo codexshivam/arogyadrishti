@@ -6,7 +6,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,7 +21,11 @@ from app.core.rbac import (
 from app.core.security import scrub_citizen_pii_text
 from app.db.models.escalation_ticket import EscalationTicket
 from app.db.session import get_db_session
-from app.schemas.dto import EscalationCreatePayload, EscalationTicketResponse
+from app.schemas.dto import (
+    EscalationCreatePayload,
+    EscalationTicketResponse,
+    EscalationTicketUpdateRequest,
+)
 
 router = APIRouter(prefix="/api/v1/escalations", tags=["SLA Escalation Tickets"])
 
@@ -109,18 +113,37 @@ async def create_escalation_ticket_endpoint(
 
 @router.get("")
 async def list_escalation_tickets_endpoint(
+    palika_code: str | None = Query(default=None),
+    composite_ward_id: str | None = Query(default=None),
+    ticket_status: str | None = Query(default=None, alias="status"),
     principal: AuthenticatedStaffPrincipal = Depends(get_current_staff),
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:
-    """List SLA escalation tickets scoped to the officer's Palika/Ward jurisdiction."""
+    """
+    List SLA escalation tickets:
+    - Admin: can see all or filter by municipality/ward.
+    - Municipality Admin: sees only tickets for their assigned municipality.
+    - Field Visitor: sees tickets for their assigned wards.
+    """
     stmt = select(EscalationTicket)
-    if principal.role != NepalStaffRole.EDCD_NODAL:
+
+    if principal.is_admin:
+        if palika_code:
+            stmt = stmt.where(EscalationTicket.palika_code == palika_code)
+    elif principal.is_municipality_admin:
         stmt = stmt.where(EscalationTicket.palika_code == principal.palika_code)
-    if principal.role in {NepalStaffRole.FCHV, NepalStaffRole.WARD_HEALTH_OFFICER}:
+    else:
         stmt = stmt.where(
             EscalationTicket.composite_ward_id.in_(principal.assigned_wards)
         )
 
+    if composite_ward_id:
+        stmt = stmt.where(EscalationTicket.composite_ward_id == composite_ward_id)
+
+    if ticket_status:
+        stmt = stmt.where(EscalationTicket.status == ticket_status.upper())
+
+    stmt = stmt.order_by(EscalationTicket.created_at_utc.desc())
     rows = list((await session.execute(stmt)).scalars().all())
     stamp = ad_to_bs_stamp()
     return {
@@ -143,4 +166,57 @@ async def list_escalation_tickets_endpoint(
         ],
         "timestamp_utc": stamp.timestamp_utc,
         "bs_date": stamp.bs_combined_label,
+    }
+
+
+@router.patch("/{ticket_id}")
+@router.put("/{ticket_id}")
+async def update_escalation_ticket_status_endpoint(
+    ticket_id: str,
+    payload: EscalationTicketUpdateRequest,
+    principal: AuthenticatedStaffPrincipal = Depends(get_current_staff),
+    session: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """Update SLA escalation ticket status (OPEN -> IN_PROGRESS -> RESOLVED -> CLOSED)."""
+    ticket = (
+        await session.execute(
+            select(EscalationTicket).where(
+                (EscalationTicket.id == ticket_id) | (EscalationTicket.ticket_code == ticket_id)
+            )
+        )
+    ).scalar_one_or_none()
+    if ticket is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found.")
+
+    if not principal.is_admin:
+        if not principal.is_municipality_admin or ticket.palika_code != principal.palika_code:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden: Cannot modify escalation tickets outside your assigned municipality.",
+            )
+
+    old_status = ticket.status
+    ticket.status = payload.status.upper()
+    await session.flush()
+
+    await append_worm_audit_log(
+        session,
+        event_type="ESCALATION_TICKET_STATUS_UPDATED",
+        actor_id=principal.sub,
+        actor_role=principal.role.value,
+        palika_code=ticket.palika_code,
+        resource_id=f"escalations/{ticket.ticket_code}",
+        payload={
+            "ticket_code": ticket.ticket_code,
+            "old_status": old_status,
+            "new_status": ticket.status,
+            "notes": payload.resolution_notes,
+        },
+    )
+
+    return {
+        "status": "UPDATED",
+        "ticket_code": ticket.ticket_code,
+        "old_status": old_status,
+        "new_status": ticket.status,
     }

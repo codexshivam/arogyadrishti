@@ -27,8 +27,10 @@ from PIL import Image
 
 from app.core.config import get_settings
 
-# Nepali mobile validation: Nepal Telecom (984, 985, 986, 974, 975, 976) & Ncell (980, 981, 982, 961, 962)
+# Mobile validation: Nepal Telecom / Ncell (+977) and Indian Mobile (+91)
 NEPAL_MOBILE_REGEX = re.compile(r"^\+977(98|97|96)\d{8}$")
+INDIA_MOBILE_REGEX = re.compile(r"^\+91[6-9]\d{9}$")
+SOVEREIGN_PHONE_REGEX = re.compile(r"^(\+91[6-9]\d{9}|\+977(98|97|96)\d{8})$")
 
 # Forbidden Citizen PII field keys under Individual Privacy Act, 2075 (2018)
 FORBIDDEN_CITIZEN_PII_KEYS: frozenset[str] = frozenset(
@@ -190,20 +192,33 @@ def get_ed25519_keypair() -> tuple[ed25519.Ed25519PrivateKey, ed25519.Ed25519Pub
 
 
 def normalize_nepal_phone(raw_phone: str) -> str:
-    """Normalize and strictly validate a +977 Nepali mobile number (NTC / Ncell)."""
+    """Normalize and validate mobile numbers: Indian (+91) or Nepali (+977)."""
     cleaned = re.sub(r"[\s\-\(\)]", "", str(raw_phone or ""))
-    if cleaned.startswith("00977"):
+    # Handle Indian international prefix 0091 or 91
+    if cleaned.startswith("0091"):
+        cleaned = "+" + cleaned[2:]
+    elif cleaned.startswith("91") and len(cleaned) == 12:
+        cleaned = "+" + cleaned
+    # Handle Nepali international prefix 00977 or 977
+    elif cleaned.startswith("00977"):
         cleaned = "+" + cleaned[2:]
     elif cleaned.startswith("977") and len(cleaned) == 13:
         cleaned = "+" + cleaned
-    elif len(cleaned) == 10 and cleaned[:2] in {"98", "97", "96"}:
-        cleaned = "+977" + cleaned
+    # 10-digit mobile numbers without country code
+    elif len(cleaned) == 10:
+        if cleaned[:2] in {"98", "97", "96"}:
+            cleaned = "+977" + cleaned
+        elif cleaned[0] in {"6", "7", "8", "9"}:
+            cleaned = "+91" + cleaned
 
-    if not NEPAL_MOBILE_REGEX.match(cleaned):
+    if not SOVEREIGN_PHONE_REGEX.match(cleaned):
         raise ValueError(
-            "Invalid Nepali mobile number. Must match ^\\+977(98|97|96)\\d{8}$ (Nepal Telecom / Ncell)."
+            "Invalid mobile number. Must be a valid Indian (+91) or Nepali (+977) mobile number."
         )
     return cleaned
+
+
+normalize_phone = normalize_nepal_phone
 
 
 def hash_nepal_phone(phone: str) -> str:

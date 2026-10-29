@@ -854,3 +854,102 @@ class PalikaAnnualBudgetForecastResponse(DualCalendarMixin):
     total_estimated_budget_npr: float
     cao_tippani_reference_no: str
     ward_allocations: list[WardFiscalAllocationItem]
+
+
+# ---------------------------------------------------------------------------
+# 11. User Management, Centers & Fleet CRUD DTOs
+# ---------------------------------------------------------------------------
+
+
+class StaffUserCreateRequest(BaseModel):
+    full_name: str = Field(..., min_length=2, max_length=120)
+    full_name_ne: str = Field(default="", max_length=120)
+    phone: str = Field(..., description="Indian (+91) or Nepali (+977) mobile number")
+    designation: str = Field(default="Public Health Officer", max_length=120)
+    role: str = Field(..., description="admin | municipality_admin | field_visitor | fchv | ward_health_officer | palika_health_chief | edcd_nodal")
+    province_code: int = Field(default=3)
+    district_code: int = Field(default=27)
+    palika_code: str = Field(default="30608")
+    assigned_wards: list[str] = Field(default_factory=list)
+    email: str | None = None
+    pin: str | None = None
+
+
+class StaffUserUpdateRequest(BaseModel):
+    full_name: str | None = None
+    full_name_ne: str | None = None
+    designation: str | None = None
+    role: str | None = None
+    province_code: int | None = None
+    district_code: int | None = None
+    palika_code: str | None = None
+    assigned_wards: list[str] | None = None
+    email: str | None = None
+    is_active: bool | None = None
+
+
+class HealthFacilityCreateRequest(BaseModel):
+    nhfr_code: str = Field(..., max_length=32)
+    name_en: str = Field(..., max_length=160)
+    name_ne: str = Field(default="", max_length=160)
+    facility_type: str = Field(default="UHPC", max_length=64)
+    palika_code: str = Field(default="30608", max_length=16)
+    composite_ward_id: str = Field(..., max_length=36)
+    latitude: float
+    longitude: float
+    elevation_m: float = 1300.0
+    has_24x7_fever_clinic: bool = True
+    ns1_elisa_available: bool = True
+    rapid_diagnostic_kit_stock: int = 100
+    emergency_phone: str = Field(default="1115", max_length=32)
+    hello_swasthya_hotline: str = Field(default="1115", max_length=16)
+
+
+class HealthFacilityUpdateRequest(BaseModel):
+    name_en: str | None = None
+    name_ne: str | None = None
+    facility_type: str | None = None
+    composite_ward_id: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    elevation_m: float | None = None
+    has_24x7_fever_clinic: bool | None = None
+    ns1_elisa_available: bool | None = None
+    rapid_diagnostic_kit_stock: int | None = None
+    emergency_phone: str | None = None
+    hello_swasthya_hotline: str | None = None
+
+
+class RrtVehicleCreateRequest(BaseModel):
+    vehicle_id: str = Field(..., max_length=36)
+    plate_number: str = Field(..., max_length=32)
+    palika_code: str = Field(default="30608", max_length=16)
+    base_ward_id: str = Field(..., max_length=36)
+    team_lead_name: str = Field(..., max_length=120)
+    team_lead_name_ne: str = Field(default="", max_length=120)
+    driver_phone: str = Field(..., max_length=24)
+    bti_stock_kg: float = 30.0
+    temephos_stock_liters: float = 20.0
+    ulv_equipment_mounted: bool = False
+    status: str = Field(default="AVAILABLE", max_length=32)
+    base_lat: float = 27.7124
+    base_lng: float = 85.3065
+
+
+class RrtVehicleUpdateRequest(BaseModel):
+    plate_number: str | None = None
+    base_ward_id: str | None = None
+    team_lead_name: str | None = None
+    team_lead_name_ne: str | None = None
+    driver_phone: str | None = None
+    bti_stock_kg: float | None = None
+    temephos_stock_liters: float | None = None
+    ulv_equipment_mounted: bool | None = None
+    status: str | None = None
+    base_lat: float | None = None
+    base_lng: float | None = None
+
+
+class EscalationTicketUpdateRequest(BaseModel):
+    status: str = Field(..., description="OPEN | IN_PROGRESS | RESOLVED | CLOSED")
+    resolution_notes: str | None = None

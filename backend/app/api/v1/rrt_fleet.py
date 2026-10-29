@@ -24,6 +24,8 @@ from app.schemas.dto import (
     RrtDispatchRequest,
     RrtDispatchResponse,
     RrtUlvOverrideRequest,
+    RrtVehicleCreateRequest,
+    RrtVehicleUpdateRequest,
 )
 from app.services.notification_service import get_notification_service
 from app.services.routing_adapter import select_nearest_available_rrt
@@ -38,24 +40,17 @@ async def list_rrt_units_endpoint(
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:
     """List Rapid Response Team (RRT — BA-2-JHA-... government plates) units and Bti/Temephos stocks."""
-    target_palika = palika_code or principal.palika_code
-    if not principal.can_access_palika(target_palika):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Palika isolation violation: cannot view RRT fleet for palika '{target_palika}'.",
-        )
+    stmt = select(RrtVehicleUnit)
+    target_palika = palika_code
 
-    units = list(
-        (
-            await session.execute(
-                select(RrtVehicleUnit).where(
-                    RrtVehicleUnit.palika_code == target_palika
-                )
-            )
-        )
-        .scalars()
-        .all()
-    )
+    if principal.is_admin:
+        if palika_code:
+            stmt = stmt.where(RrtVehicleUnit.palika_code == palika_code)
+    else:
+        target_palika = principal.palika_code
+        stmt = stmt.where(RrtVehicleUnit.palika_code == target_palika)
+
+    units = list((await session.execute(stmt)).scalars().all())
     stamp = ad_to_bs_stamp()
     return {
         "palika_code": target_palika,
@@ -64,6 +59,7 @@ async def list_rrt_units_endpoint(
             {
                 "vehicle_id": u.vehicle_id,
                 "plate_number": u.plate_number,
+                "palika_code": u.palika_code,
                 "base_ward_id": u.base_ward_id,
                 "team_lead_name": u.team_lead_name,
                 "team_lead_name_ne": u.team_lead_name_ne,
@@ -77,6 +73,201 @@ async def list_rrt_units_endpoint(
                 "updated_at_bs": u.updated_at_bs,
             }
             for u in units
+        ],
+        "timestamp_utc": stamp.timestamp_utc,
+        "bs_date": stamp.bs_combined_label,
+    }
+
+
+@router.post("/units", status_code=status.HTTP_201_CREATED)
+async def create_rrt_unit_endpoint(
+    payload: RrtVehicleCreateRequest,
+    principal: AuthenticatedStaffPrincipal = Depends(get_current_staff),
+    session: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """
+    Register a new Rapid Response Team (RRT) fogging/larvicidal vehicle unit:
+    - Admin: can create in any Palika.
+    - Municipality Admin: can only create for their assigned Palika.
+    """
+    if not (principal.is_admin or principal.is_municipality_admin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: Only Administrators and Municipality Administrators can register fleet vehicles.",
+        )
+
+    target_palika = principal.palika_code if principal.is_municipality_admin else payload.palika_code
+
+    existing = (
+        await session.execute(
+            select(RrtVehicleUnit).where(
+                or_(
+                    RrtVehicleUnit.vehicle_id == payload.vehicle_id,
+                    RrtVehicleUnit.plate_number == payload.plate_number,
+                )
+            )
+        )
+    ).scalar_one_or_none()
+    if existing is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Conflict: Vehicle ID '{payload.vehicle_id}' or Plate '{payload.plate_number}' already registered.",
+        )
+
+    stamp = ad_to_bs_stamp()
+    van = RrtVehicleUnit(
+        vehicle_id=payload.vehicle_id,
+        plate_number=payload.plate_number,
+        palika_code=target_palika,
+        base_ward_id=payload.base_ward_id,
+        team_lead_name=payload.team_lead_name,
+        team_lead_name_ne=payload.team_lead_name_ne or payload.team_lead_name,
+        driver_phone=payload.driver_phone,
+        bti_stock_kg=payload.bti_stock_kg,
+        temephos_stock_liters=payload.temephos_stock_liters,
+        ulv_equipment_mounted=payload.ulv_equipment_mounted,
+        status=payload.status,
+        base_lat=payload.base_lat,
+        base_lng=payload.base_lng,
+        updated_at_bs=stamp.bs_combined_label,
+    )
+    session.add(van)
+    await session.flush()
+
+    await append_worm_audit_log(
+        session,
+        event_type="RRT_VEHICLE_CREATED",
+        actor_id=principal.sub,
+        actor_role=principal.role.value,
+        palika_code=target_palika,
+        resource_id=f"rrt_units/{payload.vehicle_id}",
+        payload={"plate_number": payload.plate_number, "team_lead": payload.team_lead_name},
+    )
+
+    return {"status": "CREATED", "vehicle_id": van.vehicle_id, "plate_number": van.plate_number}
+
+
+@router.put("/units/{vehicle_id}")
+async def update_rrt_unit_endpoint(
+    vehicle_id: str,
+    payload: RrtVehicleUpdateRequest,
+    principal: AuthenticatedStaffPrincipal = Depends(get_current_staff),
+    session: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """Update RRT vehicle specifications or stocks with jurisdiction check."""
+    van = (
+        await session.execute(
+            select(RrtVehicleUnit).where(RrtVehicleUnit.vehicle_id == vehicle_id)
+        )
+    ).scalar_one_or_none()
+    if van is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vehicle not found.")
+
+    if not principal.is_admin:
+        if not principal.is_municipality_admin or van.palika_code != principal.palika_code:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden: Cannot modify fleet vehicles outside your assigned municipality.",
+            )
+
+    if payload.plate_number is not None:
+        van.plate_number = payload.plate_number
+    if payload.base_ward_id is not None:
+        van.base_ward_id = payload.base_ward_id
+    if payload.team_lead_name is not None:
+        van.team_lead_name = payload.team_lead_name
+    if payload.team_lead_name_ne is not None:
+        van.team_lead_name_ne = payload.team_lead_name_ne
+    if payload.driver_phone is not None:
+        van.driver_phone = payload.driver_phone
+    if payload.bti_stock_kg is not None:
+        van.bti_stock_kg = payload.bti_stock_kg
+    if payload.temephos_stock_liters is not None:
+        van.temephos_stock_liters = payload.temephos_stock_liters
+    if payload.ulv_equipment_mounted is not None:
+        van.ulv_equipment_mounted = payload.ulv_equipment_mounted
+    if payload.status is not None:
+        van.status = payload.status
+    if payload.base_lat is not None:
+        van.base_lat = payload.base_lat
+    if payload.base_lng is not None:
+        van.base_lng = payload.base_lng
+
+    stamp = ad_to_bs_stamp()
+    van.updated_at_bs = stamp.bs_combined_label
+    await session.flush()
+    return {"status": "UPDATED", "vehicle_id": van.vehicle_id, "plate_number": van.plate_number}
+
+
+@router.delete("/units/{vehicle_id}")
+async def delete_rrt_unit_endpoint(
+    vehicle_id: str,
+    principal: AuthenticatedStaffPrincipal = Depends(get_current_staff),
+    session: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """Delete RRT vehicle with jurisdiction check."""
+    van = (
+        await session.execute(
+            select(RrtVehicleUnit).where(RrtVehicleUnit.vehicle_id == vehicle_id)
+        )
+    ).scalar_one_or_none()
+    if van is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vehicle not found.")
+
+    if not principal.is_admin:
+        if not principal.is_municipality_admin or van.palika_code != principal.palika_code:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden: Cannot delete fleet vehicles outside your assigned municipality.",
+            )
+
+    await session.delete(van)
+    await session.flush()
+    return {"status": "DELETED", "vehicle_id": vehicle_id}
+
+
+@router.get("/dispatches")
+async def list_rrt_dispatches_endpoint(
+    palika_code: str | None = Query(default=None),
+    composite_ward_id: str | None = Query(default=None),
+    principal: AuthenticatedStaffPrincipal = Depends(get_current_staff),
+    session: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    """List RRT van dispatches with RBAC (Admin can filter by municipality/ward, Municipality Admin restricted to their area)."""
+    stmt = select(RrtDispatchLog)
+
+    if principal.is_admin:
+        if palika_code:
+            stmt = stmt.where(RrtDispatchLog.palika_code == palika_code)
+    elif principal.is_municipality_admin:
+        stmt = stmt.where(RrtDispatchLog.palika_code == principal.palika_code)
+    else:
+        stmt = stmt.where(RrtDispatchLog.composite_ward_id.in_(principal.assigned_wards))
+
+    if composite_ward_id:
+        stmt = stmt.where(RrtDispatchLog.composite_ward_id == composite_ward_id)
+
+    stmt = stmt.order_by(RrtDispatchLog.dispatch_id.desc())
+    dispatches = list((await session.execute(stmt)).scalars().all())
+    stamp = ad_to_bs_stamp()
+
+    return {
+        "count": len(dispatches),
+        "dispatches": [
+            {
+                "dispatch_id": d.dispatch_id,
+                "vehicle_id": d.vehicle_id,
+                "plate_number": d.plate_number,
+                "composite_ward_id": d.composite_ward_id,
+                "palika_code": d.palika_code,
+                "dispatch_type": d.dispatch_type,
+                "campaign_action_en": d.campaign_action_en,
+                "campaign_action_ne": d.campaign_action_ne,
+                "route_distance_km": d.route_distance_km,
+                "route_eta_minutes": d.route_eta_minutes,
+                "breteau_index_at_dispatch": d.breteau_index_at_dispatch,
+            }
+            for d in dispatches
         ],
         "timestamp_utc": stamp.timestamp_utc,
         "bs_date": stamp.bs_combined_label,

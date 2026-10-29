@@ -20,6 +20,9 @@ class NepalStaffRole(StrEnum):
     WARD_HEALTH_OFFICER = "ward_health_officer"  # HA / AHW / Ward Sanitary Inspector at Ward BHSC/UHPC
     PALIKA_HEALTH_CHIEF = "palika_health_chief"  # Chief of Municipal Public Health Division (Jan Swasthya Bibhag)
     EDCD_NODAL = "edcd_nodal"  # Federal MoHP / EDCD Teku / Provincial Health Directorate Officer
+    ADMIN = "admin"  # National System Administrator / Federal Executive
+    MUNICIPALITY_ADMIN = "municipality_admin"  # Palika / Municipality Health Administrator
+    FIELD_VISITOR = "field_visitor"  # On-ground Field Inspector / FCHV Officer
 
 
 @dataclass(frozen=True)
@@ -36,22 +39,33 @@ class AuthenticatedStaffPrincipal:
     iat: int
     exp: int
 
+    @property
+    def is_admin(self) -> bool:
+        return self.role in {NepalStaffRole.EDCD_NODAL, NepalStaffRole.ADMIN}
+
+    @property
+    def is_municipality_admin(self) -> bool:
+        return self.role in {NepalStaffRole.PALIKA_HEALTH_CHIEF, NepalStaffRole.MUNICIPALITY_ADMIN}
+
+    @property
+    def is_field_visitor(self) -> bool:
+        return self.role in {NepalStaffRole.FCHV, NepalStaffRole.WARD_HEALTH_OFFICER, NepalStaffRole.FIELD_VISITOR}
+
     def can_access_palika(self, target_palika_code: str) -> bool:
-        if self.role == NepalStaffRole.EDCD_NODAL:
+        if self.is_admin:
             return True
         return str(self.palika_code) == str(target_palika_code)
 
     def can_access_ward(self, composite_ward_id: str, target_palika_code: str | None = None) -> bool:
         """
         Enforce Constitution of Nepal Schedule 8 & Local Government Operation Act 2074 isolation:
-        - edcd_nodal: read-only access across all Palikas/Wards
-        - palika_health_chief: full access to all wards within their assigned palika_code
-        - ward_health_officer / fchv: strictly isolated to their assigned_wards list
+        - Admin / EDCD Nodal: full access across all Palikas/Wards
+        - Municipality Admin / Palika Health Chief: full access to all wards within their palika
+        - Field Visitor / Ward Health Officer / FCHV: isolated to their assigned_wards list
         """
-        if self.role == NepalStaffRole.EDCD_NODAL:
+        if self.is_admin:
             return True
 
-        # Extract palika_code from composite_ward_id (e.g. NP-P3-D27-30608-W17 -> 30608)
         inferred_palika = target_palika_code
         if not inferred_palika and composite_ward_id.startswith("NP-"):
             parts = composite_ward_id.split("-")
@@ -61,16 +75,23 @@ class AuthenticatedStaffPrincipal:
         if inferred_palika and str(inferred_palika) != str(self.palika_code):
             return False
 
-        if self.role == NepalStaffRole.PALIKA_HEALTH_CHIEF:
+        if self.is_municipality_admin:
             return True
 
-        return composite_ward_id in self.assigned_wards
+        return composite_ward_id in self.assigned_wards or "*" in self.assigned_wards
 
     def can_mutate_ward(self, composite_ward_id: str, target_palika_code: str | None = None) -> bool:
-        """EDCD Nodal officers have read-only national telemetry access; mutations require Palika/Ward jurisdiction."""
-        if self.role == NepalStaffRole.EDCD_NODAL:
-            return False
-        return self.can_access_ward(composite_ward_id, target_palika_code)
+        """Permission check for mutating ward data."""
+        if self.is_admin:
+            return True
+        if self.is_municipality_admin:
+            inferred_palika = target_palika_code
+            if not inferred_palika and composite_ward_id.startswith("NP-"):
+                parts = composite_ward_id.split("-")
+                if len(parts) >= 4:
+                    inferred_palika = parts[3]
+            return not inferred_palika or str(inferred_palika) == str(self.palika_code)
+        return composite_ward_id in self.assigned_wards or "*" in self.assigned_wards
 
 
 _bearer_scheme = HTTPBearer(auto_error=False)

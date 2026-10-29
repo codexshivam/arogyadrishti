@@ -15,7 +15,7 @@ import 'package:nidaniq/viewmodels/surveillance_viewmodel.dart';
 void main() {
   group('Sovereign Nepal Government Field App — Security, RBAC & Offline Tests', () {
     testWidgets(
-      '1. Login screen has ZERO role selection UI and rejects non-Nepal (+91) numbers',
+      '1. Login screen has ZERO role selection UI, supports +977 and +91, and rejects invalid numbers',
       (WidgetTester tester) async {
         final deps = SovereignAppDependencies.create(
           useInMemoryStorageForTests: true,
@@ -29,7 +29,17 @@ void main() {
         expect(find.byType(Radio<String>), findsNothing);
         expect(find.byType(SegmentedButton<String>), findsNothing);
 
-        // Rejects non-+977 phone numbers
+        // Rejects invalid international numbers (e.g. US +1)
+        await tester.enterText(
+          find.byKey(const Key('nepal_phone_input')),
+          '+12025550199',
+        );
+        await tester.tap(find.byKey(const Key('request_otp_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('login_error_banner')), findsOneWidget);
+
+        // Accepts Indian phone numbers (+91)
         await tester.enterText(
           find.byKey(const Key('nepal_phone_input')),
           '+919876543210',
@@ -37,7 +47,7 @@ void main() {
         await tester.tap(find.byKey(const Key('request_otp_button')));
         await tester.pumpAndSettle();
 
-        expect(find.byKey(const Key('login_error_banner')), findsOneWidget);
+        expect(find.byKey(const Key('otp_code_input')), findsOneWidget);
       },
     );
 
@@ -88,6 +98,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Authenticate as FCHV (+9779841000001)
+        await tester.ensureVisible(find.byKey(const Key('request_otp_button')));
         await tester.tap(find.byKey(const Key('request_otp_button')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('verify_otp_submit_button')));
@@ -175,6 +186,7 @@ void main() {
           find.byKey(const Key('nepal_phone_input')),
           '+9779851000003',
         );
+        await tester.ensureVisible(find.byKey(const Key('request_otp_button')));
         await tester.tap(find.byKey(const Key('request_otp_button')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('verify_otp_submit_button')));
@@ -339,6 +351,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Login as FCHV (+9779841000001) -> test Offline Status Pill, Socratic Quiz & 1-Tap Palika IT Escalation
+        await tester.ensureVisible(find.byKey(const Key('request_otp_button')));
         await tester.tap(find.byKey(const Key('request_otp_button')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('verify_otp_submit_button')));
@@ -374,6 +387,7 @@ void main() {
           find.byKey(const Key('nepal_phone_input')),
           '+9779851000003',
         );
+        await tester.ensureVisible(find.byKey(const Key('request_otp_button')));
         await tester.tap(find.byKey(const Key('request_otp_button')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('verify_otp_submit_button')));
@@ -412,6 +426,7 @@ void main() {
         expect(find.textContaining('Email Login'), findsNothing);
 
         // Login as FCHV (+9779841000001)
+        await tester.ensureVisible(find.byKey(const Key('request_otp_button')));
         await tester.tap(find.byKey(const Key('request_otp_button')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('verify_otp_submit_button')));
@@ -534,6 +549,7 @@ void main() {
         await tester.pumpWidget(NidanIqNepalSovereignApp(dependencies: deps));
         await tester.pumpAndSettle();
 
+        await tester.ensureVisible(find.byKey(const Key('request_otp_button')));
         await tester.tap(find.byKey(const Key('request_otp_button')));
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('verify_otp_submit_button')));
@@ -568,6 +584,42 @@ void main() {
           find.byKey(const Key('location_picker_ward_dropdown')),
           findsOneWidget,
         );
+      },
+    );
+
+    testWidgets(
+      '11. Admins and Municipality Admins access field viewer but cannot add field visit records',
+      (WidgetTester tester) async {
+        final deps = SovereignAppDependencies.create(
+          useInMemoryStorageForTests: true,
+        );
+        await tester.pumpWidget(NidanIqNepalSovereignApp(dependencies: deps));
+        await tester.pumpAndSettle();
+
+        // 1. Authenticate as Federal Admin (+919876543210)
+        await tester.enterText(
+          find.byKey(const Key('nepal_phone_input')),
+          '+919876543210',
+        );
+        await tester.tap(find.byKey(const Key('request_otp_button')));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('verify_otp_submit_button')));
+        await tester.pumpAndSettle();
+
+        // App routes to field viewer dashboard shell
+        expect(find.byKey(const Key('fchv_home_view')), findsOneWidget);
+
+        // Submitting field inspection is RESTRICTED:
+        expect(
+          find.byKey(const Key('admin_inspection_restricted_banner')),
+          findsOneWidget,
+        );
+        expect(find.byKey(const Key('submit_inspection_button')), findsNothing);
+
+        // All other viewer features (status pill, guides, maps, offline switch) remain identical and active
+        expect(find.byKey(const Key('offline_status_pill')), findsOneWidget);
+        expect(find.byKey(const Key('offline_mode_switch')), findsOneWidget);
       },
     );
   });

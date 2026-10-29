@@ -392,19 +392,37 @@ Frontline health workers and FCHVs operate in deep mid-hill river gorges, remote
 
 ---
 
-## 6. Zero-Training Municipal CRM: 7-Tab Master Ledger Matrix
+## 6. Sovereign Multi-Platform Ecosystem & Nidan Web App
 
-To ensure immediate adoption across Municipal Corporations (*Mahanagarpalika*), Sub-Metros (*Upamahanagarpalika*), and Municipalities (*Nagarpalika*) without requiring staff to learn proprietary software, NidanIQ synchronizes bi-directionally with a master civic spreadsheet exportable to local XLSX or secure government cloud drives:
+NidanIQ provides an integrated public health delivery ecosystem comprising 4 coordinated platforms designed for the Government of Nepal:
 
-| Tab Index | Worksheet Name | Data Structure & Key Fields | Administrative Purpose |
-| :--- | :--- | :--- | :--- |
-| **Tab 1** | `1_Vans_Fleet` | `van_id`, `vehicle_no` (BA-2-JHA), `team_lead_name`, `driver_phone`, `status`, `lat`, `lng`, `bti_stock_kg`, `temephos_liters` | Real-time vehicle telematics, biological larvicide inventory, and dispatch state. |
-| **Tab 2** | `2_Health_Facilities`| `facility_id`, `name_en`, `name_ne`, `nhfr_code`, `ward_id`, `fever_clinic_24x7`, `ns1_elisa_available`, `rdt_kits_stock` | Bed availability and rapid diagnostic test kit inventory across NHFR accredited hospitals. |
-| **Tab 3** | `3_Staff_Directory`| `staff_id`, `name`, `role`, `assigned_ward`, `palika_code`, `email`, `phone_encrypted` | Roster of Ward Health Officers, Sanitary Inspectors, FCHVs, and Palika Chiefs. |
-| **Tab 4** | `4_Van_Requests` | `dispatch_id`, `timestamp_bs`, `ward_id`, `vehicle_id`, `dispatched_by`, `eta_minutes`, `status` | Real-time immutable audit log of automated and manual larviciding dispatches. |
-| **Tab 5** | `5_Alert_Logs` | `alert_id`, `timestamp_npt`, `ward_id`, `bi_index`, `composite_score`, `recipient_email`, `status` | Palika Health Chief emergency escalation notices with delivery timestamps. |
-| **Tab 6** | `6_Weekly_Surveillance_Stats` | `week_iso`, `ward_id`, `hi_pct`, `ci_pct`, `bi_index`, `lst_celsius`, `ndwi`, `risk_tier` | Multi-year epidemiological data warehouse for longitudinal predictive modeling. |
-| **Tab 7** | `7_WORM_Audit_Trail`| `seq_id`, `timestamp_npt`, `sha256_hash`, `prev_hash`, `actor_role`, `canonical_payload` | Immutable, hash-chained audit trail for the Auditor General (OAG / Office of the Auditor General). |
+```text
+========================================================================================================
+                          NIDANIQ 4-TIER UNIFIED SOVEREIGN HEALTH ECOSYSTEM
+========================================================================================================
+
+ ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐
+ │  1. CITIZEN PORTAL   │  │    2. MOBILE APP     │  │     3. WEB APP       │  │    4. PUBLIC API     │
+ │    (Next.js / SSR)   │  │   (Flutter iOS/And)  │  │   (React + TS + TW)  │  │   (FastAPI PostGIS)  │
+ ├──────────────────────┤  ├──────────────────────┤  ├──────────────────────┤  ├──────────────────────┤
+ │ • Fever self-check   │  │ • FCHV field surveys │  │ • Official MoHP CRM  │  │ • GeoJSON spatial    │
+ │ • Real-time ward DPI │  │ • Larvae AI scan     │  │ • Palika/Ward RBAC   │  │ • Briere & SAR index │
+ │ • Nearest clinic map │  │ • Offline Hive sync  │  │ • Fleet & Center CRUD│  │ • Twilio OTP SMS     │
+ │ • Devanagari guide   │  │ • Read-only for admin│  │ • Area ticket inbox  │  │ • Hash-chained audit │
+ └──────────────────────┘  └──────────────────────┘  └──────────────────────┘  └──────────────────────┘
+```
+
+### 6.1 Nidan Web App (React) — Municipal Health Administration Console
+The **Nidan Web App** (`web_app/`) is an administrative console built with React 18, TypeScript, Vite, and Tailwind CSS. It adheres strictly to the official **Government of Nepal** design system (matching `camis.ocr.gov.np` and `mohp.gov.np`):
+* **Sovereign Design Tokens:** Royal Nepal Blue (`#1B4D9B`), Deep Navy (`#123770`), Crimson Red (`#C8102E`), Forest Emerald (`#107C41`), and official Devanagari typography.
+* **OTP Phone Authentication:** Twilio SMS integration supporting both Nepali (`+977`) and Indian (`+91`) mobile numbers, with persistent browser local storage sessions (`localStorage`) to prevent redundant authentication.
+* **Hierarchical MoFAGA Permission Scoping:**
+  * **Federal Admins:** Manage system-wide users (Admins, Municipality Admins, Field Visitors). When provisioning staff for Metropolitan or Sub-Metropolitan cities, Admins can allocate permissions at the city level or drill down to specific ward numbers. Admins have complete CRUD access over Health Centers and RRT Vans across all palikas, with global filterable support ticket oversight.
+  * **Municipality Admins:** Strictly scoped to their assigned Palika (`palika_code`). Permitted to onboard Field Visitors, manage local health facilities and RRT fleet vehicles, and resolve local support and fogging requests.
+  * **Field Visitors:** Dedicated frontline portal with inspection guidelines, mobile app onboarding, and emergency protocol references.
+
+### 6.2 Frontline Mobile App (Flutter)
+The mobile client (`flutter_app/`) provides offline-first surveillance for frontline health workers (FCHVs, Sanitary Inspectors). For **Admins** and **Municipality Admins**, the app grants full situational awareness (telemetry, GIS risk maps, emergency outbreak briefs, RRT fleet tracker) while intentionally restricting direct field visit record submission to preserve data integrity from genuine frontline ground surveys.
 
 ---
 

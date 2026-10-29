@@ -20,6 +20,7 @@ class AuthViewModel extends ChangeNotifier {
   final SovereignDioClient _dioClient;
 
   static final RegExp _nepalMobileRegex = RegExp(r'^(\+977[-\s]?)?9[78]\d{8}$');
+  static final RegExp _indiaMobileRegex = RegExp(r'^(\+91[-\s]?)?[6-9]\d{9}$');
 
   StaffUserProfile? _currentUser;
   String? _pendingPhone;
@@ -53,14 +54,18 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Normalizes and validates a `+977` Nepal Telecom / Ncell mobile number.
+  /// Normalizes and validates a `+977` (Nepal) or `+91` (India) mobile number.
   static String? normalizeNepalPhone(String rawInput) {
     final trimmed = rawInput.trim().replaceAll(' ', '').replaceAll('-', '');
-    if (!_nepalMobileRegex.hasMatch(trimmed)) {
-      return null;
+    if (_nepalMobileRegex.hasMatch(trimmed)) {
+      final digits = trimmed.startsWith('+977') ? trimmed.substring(4) : trimmed;
+      return '+977$digits';
     }
-    final digits = trimmed.startsWith('+977') ? trimmed.substring(4) : trimmed;
-    return '+977$digits';
+    if (_indiaMobileRegex.hasMatch(trimmed)) {
+      final digits = trimmed.startsWith('+91') ? trimmed.substring(3) : trimmed;
+      return '+91$digits';
+    }
+    return null;
   }
 
   /// Step 1: Request 6-digit OTP via Sparrow SMS / Nepal Telecom gateway.
@@ -70,7 +75,7 @@ class AuthViewModel extends ChangeNotifier {
     final normalized = normalizeNepalPhone(rawPhone);
     if (normalized == null) {
       _errorMessage =
-          'मान्य नेपाली मोबाइल नम्बर प्रविष्ट गर्नुहोस् (+977 98XXXXXXXX / 97XXXXXXXX)';
+          'मान्य मोबाइल नम्बर प्रविष्ट गर्नुहोस् (+977 / +91 Mobile Number)';
       notifyListeners();
       return false;
     }
@@ -153,6 +158,48 @@ class AuthViewModel extends ChangeNotifier {
   /// (mirrors `/Users/shivamyadav/Projects/nidaniq/backend/app/api/v1/auth.py`).
   StaffUserProfile _resolveWhitelistedStaffByPhone(String normalizedPhone) {
     switch (normalizedPhone) {
+      case '+919876543210':
+      case '+9779800000001':
+        return const StaffUserProfile(
+          id: 'staff-admin-nepal-01',
+          fullName: 'Sovereign System Admin',
+          fullNameNe: 'सार्वभौम प्रणाली प्रशासक',
+          designation: 'Federal System Administrator — MoHP / EDCD',
+          role: NepalStaffRole.admin,
+          provinceCode: 3,
+          districtCode: 27,
+          palikaCode: '30608',
+          assignedWards: <String>['*'],
+          bsDate: '2083-07-09 BS | २०८३ कार्तिक ९',
+        );
+      case '+919876543211':
+      case '+9779800000002':
+        return const StaffUserProfile(
+          id: 'staff-muni-kmc-01',
+          fullName: 'KMC Municipality Admin',
+          fullNameNe: 'का.म.न.पा. नगरपालिका प्रशासक',
+          designation: 'Municipality Administrator — Kathmandu Metropolitan City',
+          role: NepalStaffRole.municipalityAdmin,
+          provinceCode: 3,
+          districtCode: 27,
+          palikaCode: '30608',
+          assignedWards: <String>['NP-P3-D27-30608-W01', 'NP-P3-D27-30608-W17'],
+          bsDate: '2083-07-09 BS | २०८३ कार्तिक ९',
+        );
+      case '+919876543212':
+      case '+9779800000003':
+        return const StaffUserProfile(
+          id: 'staff-field-kmc-w17',
+          fullName: 'Sunil Basnet',
+          fullNameNe: 'सुनिल बस्नेत',
+          designation: 'Field Inspection Visitor — Ward 17 Chhetrapati',
+          role: NepalStaffRole.fieldVisitor,
+          provinceCode: 3,
+          districtCode: 27,
+          palikaCode: '30608',
+          assignedWards: <String>['NP-P3-D27-30608-W17'],
+          bsDate: '2083-07-09 BS | २०८३ कार्तिक ९',
+        );
       case '+9779841000002':
         return const StaffUserProfile(
           id: 'staff-who-kmc-w16',

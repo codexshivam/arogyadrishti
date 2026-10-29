@@ -8,14 +8,16 @@ class SovereignDioClient {
   SovereignDioClient({
     required SecureSovereignStorage storage,
     String baseUrl = 'http://127.0.0.1:8000',
+    Duration connectTimeout = const Duration(seconds: 4),
+    Duration receiveTimeout = const Duration(seconds: 6),
     Dio? dio,
   })  : _storage = storage,
         _dio = dio ??
             Dio(
               BaseOptions(
                 baseUrl: baseUrl,
-                connectTimeout: const Duration(seconds: 4),
-                receiveTimeout: const Duration(seconds: 6),
+                connectTimeout: connectTimeout,
+                receiveTimeout: receiveTimeout,
                 headers: const <String, String>{
                   'Accept': 'application/json',
                   'Content-Type': 'application/json',

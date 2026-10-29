@@ -47,14 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(16),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 440),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       Container(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: NepalGovTheme.darkSlateCard,
                           borderRadius: BorderRadius.circular(16),
@@ -95,60 +95,60 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             const Text(
                               'स्वास्थ्य तथा जनसंख्या मन्त्रालय\nइपिडिमियोलोजी तथा रोग नियन्त्रण महाशाखा (EDCD Teku)',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                height: 1.35,
+                                height: 1.3,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             const Text(
                               'NidanIQ Sovereign Vector Surveillance & Early Warning DPI',
                               style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 12.5,
+                                fontSize: 12,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 14),
                       Card(
                         child: Padding(
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
                               const Text(
                                 'कर्मचारी प्रमाणीकरण (Staff Authentication)',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                   color: NepalGovTheme.darkSlateCard,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
                               const Text(
-                                'आफ्नो दर्ता भएको +977 मोबाइल नम्बर प्रविष्ट गर्नुहोस्। तपाईंको पदीय भूमिका (FCHV / Ward Officer / Palika Chief / EDCD) प्रणालीले स्वतः पहिचान गर्नेछ।',
+                                'आफ्नो दर्ता भएको मोबाइल नम्बर (+977 / +91) प्रविष्ट गर्नुहोस्।',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 12.5,
                                   color: NepalGovTheme.mutedInk,
-                                  height: 1.4,
+                                  height: 1.3,
                                 ),
                               ),
-                              const SizedBox(height: 18),
+                              const SizedBox(height: 14),
                               TextField(
                                 key: const Key('nepal_phone_input'),
                                 controller: _phoneController,
                                 keyboardType: TextInputType.phone,
                                 style: NepalGovTheme.monoTelemetry(fontSize: 15),
                                 decoration: const InputDecoration(
-                                  labelText: 'नेपाली मोबाइल नम्बर (+977 Mobile Number)',
-                                  hintText: '+9779841000001',
+                                  labelText: 'मोबाइल नम्बर (+977 / +91 Mobile Number)',
+                                  hintText: '+919876543210 or +9779841000001',
                                   prefixIcon: Icon(Icons.phone_android_rounded),
                                 ),
                               ),

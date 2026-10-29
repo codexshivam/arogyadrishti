@@ -544,7 +544,7 @@ class UserLocationStateNotifier extends ChangeNotifier {
 
     // Attempt backend `/api/v1/spatial/resolve?lat={lat}&lng={lng}` if online Dio client is wired
     ResolvedWardLocation? resolved;
-    if (_dioClient != null) {
+    if (_dioClient != null && !_storage.isInMemory) {
       try {
         final data = await _dioClient.getJson(
           '/api/v1/spatial/resolve',

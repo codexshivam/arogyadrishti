@@ -21,6 +21,8 @@ class SecureSovereignStorage {
   final FlutterSecureStorage _secureStorage;
   final bool _useInMemoryForTests;
 
+  bool get isInMemory => _useInMemoryForTests;
+
   static const String keyAccessToken = 'np_gov_jwt_access_token';
   static const String keyRefreshToken = 'np_gov_jwt_refresh_token';
   static const String keyMasterCipherKey = 'np_gov_256bit_master_key';

@@ -81,7 +81,7 @@ class NepalAuthService:
             )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Forbidden: Nepali mobile number is not registered in the accredited MoHP/Palika Staff Whitelist.",
+                detail="Forbidden: Mobile number is not registered in the accredited MoHP/Palika Staff Whitelist.",
             )
 
         # 3. Enforce max 3 OTP generation requests per 15m
@@ -113,16 +113,21 @@ class NepalAuthService:
         )
 
         stamp = ad_to_bs_stamp()
-        return {
+        resp: dict[str, Any] = {
             "status": "OTP_SENT",
             "gateway": gateway_used,
             "ttl_seconds": 300,
             "message_ne": "तपाईंको दर्ता भएको मोबाइल नम्बरमा ६ अंकको ओटिपी (OTP) पठाइएको छ।",
-            "message_en": "A 6-digit OTP has been dispatched to your whitelisted +977 mobile number.",
+            "message_en": "A 6-digit OTP has been dispatched to your whitelisted mobile number.",
             "timestamp_utc": stamp.timestamp_utc,
             "timestamp_npt": stamp.timestamp_npt,
             "bs_date": stamp.bs_combined_label,
         }
+        if settings.env in {"development", "test"} or not (
+            settings.twilio_account_sid or settings.sparrow_sms_token or settings.aakash_sms_token
+        ):
+            resp["dev_otp"] = otp_code
+        return resp
 
     async def verify_staff_otp(
         self,
@@ -296,20 +301,42 @@ class NepalAuthService:
         )
 
     async def _dispatch_sms_nepal(self, phone: str, otp_code: str) -> str:
-        """Dispatch SMS via Sparrow SMS or Aakash SMS (or deterministic console mock in dev)."""
+        """Dispatch SMS via Twilio SMS, Sparrow SMS, or Aakash SMS (or deterministic console mock in dev)."""
         settings = get_settings()
         msg_text = (
-            f"MoHP/EDCD Nepal Vector DPI: Your login OTP is {otp_code} (valid 5 mins). "
+            f"NidanIQ Health DPI: Your login verification OTP is {otp_code} (valid for 5 minutes). "
             f"Do not share. ओटिपी: {otp_code}"
         )
         if settings.env in {"development", "test"} or not (
-            settings.sparrow_sms_token or settings.aakash_sms_token
+            settings.twilio_account_sid or settings.sparrow_sms_token or settings.aakash_sms_token
         ):
             clean_phone = phone.replace("\r", "").replace("\n", "")
             clean_msg = msg_text.replace("\r", "").replace("\n", " ")
             logger.info("[DEV SMS MOCK -> %s] %s", clean_phone, clean_msg)
-            return f"{settings.sms_provider}_dev_mock"
+            return "twilio_dev_mock" if settings.sms_provider.lower() == "twilio" else f"{settings.sms_provider}_dev_mock"
 
+        # 1. Twilio SMS Gateway (supports Indian +91 and Nepal +977 numbers)
+        if settings.sms_provider.lower() == "twilio" and settings.twilio_account_sid and settings.twilio_auth_token:
+            twilio_url = f"https://api.twilio.com/2010-04-01/Accounts/{settings.twilio_account_sid}/Messages.json"
+            try:
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    resp = await client.post(
+                        twilio_url,
+                        data={
+                            "From": settings.twilio_from_phone,
+                            "To": phone,
+                            "Body": msg_text,
+                        },
+                        auth=(settings.twilio_account_sid, settings.twilio_auth_token),
+                    )
+                    if resp.status_code in {200, 201}:
+                        return "twilio_sms_live"
+                    logger.error("Twilio SMS dispatch failed: %s %s", resp.status_code, resp.text)
+            except Exception as tw_err:
+                logger.error("Twilio SMS request exception: %s", tw_err)
+            return "twilio_sms_error"
+
+        # 2. Aakash SMS Gateway Fallback
         if settings.sms_provider.lower() == "aakash" and settings.aakash_sms_token:
             url = validate_outbound_ssrf_url(settings.aakash_sms_api_url)
             async with httpx.AsyncClient(timeout=8.0) as client:
@@ -323,6 +350,7 @@ class NepalAuthService:
                 )
             return "aakash_sms_live"
 
+        # 3. Sparrow SMS Gateway Fallback
         url = validate_outbound_ssrf_url(settings.sparrow_sms_api_url)
         async with httpx.AsyncClient(timeout=8.0) as client:
             await client.post(

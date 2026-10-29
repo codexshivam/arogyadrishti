@@ -51,7 +51,11 @@ GoRouter createNepalSovereignRouter({
       }
 
       // Role-Based Route Guards (Prevent Cross-Role Deep-Link Escalation)
-      if (path.startsWith('/dashboard/fchv') && user.role != NepalStaffRole.fchv) {
+      if (path.startsWith('/dashboard/fchv') &&
+          user.role != NepalStaffRole.fchv &&
+          user.role != NepalStaffRole.fieldVisitor &&
+          user.role != NepalStaffRole.admin &&
+          user.role != NepalStaffRole.municipalityAdmin) {
         return user.role.homeRoute;
       }
       if (path.startsWith('/dashboard/ward-officer') &&

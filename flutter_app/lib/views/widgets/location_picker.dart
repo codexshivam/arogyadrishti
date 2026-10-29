@@ -224,6 +224,7 @@ class _LocationPickerState extends State<LocationPicker> {
             // 1. Province Dropdown
             DropdownButtonFormField<int>(
               key: const Key('location_picker_province_dropdown'),
+              isExpanded: true,
               initialValue: _selectedProvinceCode,
               decoration: const InputDecoration(
                 labelText: '1. Province / प्रदेश',
@@ -246,6 +247,7 @@ class _LocationPickerState extends State<LocationPicker> {
             // 2. District Dropdown
             DropdownButtonFormField<int>(
               key: const Key('location_picker_district_dropdown'),
+              isExpanded: true,
               initialValue: _selectedDistrictCode,
               decoration: const InputDecoration(
                 labelText: '2. District / जिल्ला',
@@ -268,6 +270,7 @@ class _LocationPickerState extends State<LocationPicker> {
             // 3. Palika Dropdown
             DropdownButtonFormField<String>(
               key: const Key('location_picker_palika_dropdown'),
+              isExpanded: true,
               initialValue: _selectedPalikaCode,
               decoration: const InputDecoration(
                 labelText: '3. Palika (Local Level) / पालिका',
@@ -291,6 +294,7 @@ class _LocationPickerState extends State<LocationPicker> {
             // 4. Ward Dropdown
             DropdownButtonFormField<String>(
               key: const Key('location_picker_ward_dropdown'),
+              isExpanded: true,
               initialValue: _selectedCompositeWardId,
               decoration: const InputDecoration(
                 labelText: '4. Ward / वडा नं.',

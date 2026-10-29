@@ -80,8 +80,11 @@ class Settings(BaseSettings):
         alias="PHONE_HMAC_SECRET",
     )
 
-    # Nepali Telecom Gateways (+977 NTC & Ncell via Sparrow SMS & Aakash SMS 5-Digit Shortcode)
-    sms_provider: str = Field(default="sparrow", alias="SMS_PROVIDER")
+    # SMS Gateways (Twilio SMS Primary, Sparrow SMS & Aakash SMS Gateways)
+    sms_provider: str = Field(default="twilio", alias="SMS_PROVIDER")
+    twilio_account_sid: str = Field(default="", alias="TWILIO_ACCOUNT_SID")
+    twilio_auth_token: str = Field(default="", alias="TWILIO_AUTH_TOKEN")
+    twilio_from_phone: str = Field(default="", alias="TWILIO_FROM_PHONE")
     sparrow_sms_api_url: str = Field(
         default="https://api.sparrowsms.com/v2/sms/", alias="SPARROW_SMS_API_URL"
     )
@@ -173,18 +176,14 @@ class Settings(BaseSettings):
         default="https://nhfr.mohp.gov.np/api/v1", alias="NHFR_API_BASE_URL"
     )
 
-    # Sovereign 7-Tab Municipal Command Ledger
+    # Sovereign 7-Tab Municipal Command Ledger (Local Signed Storage, Zero Spreadsheets)
     ledger_export_dir: str = Field(
         default="./exports/municipal_ledger", alias="LEDGER_EXPORT_DIR"
     )
-    google_sheets_enabled: bool = Field(
-        default=False, alias="GOOGLE_SHEETS_ENABLED"
-    )
-    master_spreadsheet_id: str = Field(default="", alias="MASTER_SPREADSHEET_ID")
 
     # API Hardening & Security Headers
     cors_allowed_origins: str = Field(
-        default="https://edcd.gov.np,https://mohp.gov.np,https://kathmandu.gov.np,http://localhost:3000,http://localhost:8080",
+        default="https://edcd.gov.np,https://mohp.gov.np,https://kathmandu.gov.np,http://localhost:3000,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:3000",
         alias="CORS_ALLOWED_ORIGINS",
     )
     max_upload_bytes: int = Field(
@@ -194,7 +193,7 @@ class Settings(BaseSettings):
         default="60/minute", alias="PUBLIC_API_RATE_LIMIT"
     )
     allowed_ssrf_hosts: str = Field(
-        default="api.sparrowsms.com,sms.aakashsms.com,hmis.gov.np,nhfr.mohp.gov.np,bipadportal.gov.np,dhm.gov.np,elmis.mohp.gov.np,vllm-gemma,osrm-nepal,minio-worm,localhost,127.0.0.1",
+        default="api.twilio.com,api.sparrowsms.com,sms.aakashsms.com,hmis.gov.np,nhfr.mohp.gov.np,bipadportal.gov.np,dhm.gov.np,elmis.mohp.gov.np,vllm-gemma,osrm-nepal,minio-worm,localhost,127.0.0.1",
         alias="ALLOWED_SSRF_HOSTS",
     )
 

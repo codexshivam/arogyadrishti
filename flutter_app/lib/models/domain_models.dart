@@ -5,6 +5,9 @@ import '../core/utils/bs_calendar_formatter.dart';
 /// Statutory Nepal Government Staff Roles returned inside the EdDSA JWT.
 enum NepalStaffRole {
   fchv('fchv', 'महिला सामुदायिक स्वास्थ्य स्वयंसेविका (FCHV)', '/dashboard/fchv'),
+  fieldVisitor('field_visitor', 'क्षेत्र निरिक्षक (Field Visitor)', '/dashboard/fchv'),
+  admin('admin', 'प्रणाली प्रशासक (System Admin)', '/dashboard/fchv'),
+  municipalityAdmin('municipality_admin', 'नगरपालिका प्रशासक (Municipality Admin)', '/dashboard/fchv'),
   wardHealthOfficer(
     'ward_health_officer',
     'वार्ड स्वास्थ्य प्रमुख (Ward Health Officer)',

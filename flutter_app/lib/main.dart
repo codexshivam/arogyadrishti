@@ -40,7 +40,15 @@ class SovereignAppDependencies {
     final storage = SecureSovereignStorage(
       useInMemoryForTests: useInMemoryStorageForTests,
     );
-    final dioClient = SovereignDioClient(storage: storage);
+    final dioClient = SovereignDioClient(
+      storage: storage,
+      connectTimeout: useInMemoryStorageForTests
+          ? const Duration(milliseconds: 50)
+          : const Duration(seconds: 4),
+      receiveTimeout: useInMemoryStorageForTests
+          ? const Duration(milliseconds: 50)
+          : const Duration(seconds: 6),
+    );
     final offlineQueueService = OfflineSyncQueueService(
       storage: storage,
       dioClient: dioClient,

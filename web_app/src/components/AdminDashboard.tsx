@@ -1,0 +1,1479 @@
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import {
+  createFacility,
+  createRrtUnit,
+  createStaffUser,
+  deleteFacility,
+  deleteRrtUnit,
+  deleteStaffUser,
+  fetchFacilities,
+  fetchRrtUnits,
+  fetchSpatialHierarchy,
+  fetchStaffUsers,
+  fetchTickets,
+  updateFacility,
+  updateRrtUnit,
+  updateTicketStatus,
+} from '../services/api';
+import {
+  AdministrativeHierarchy,
+  EscalationTicketItem,
+  HealthFacilityItem,
+  PalikaOption,
+  RrtVehicleItem,
+  StaffUserItem,
+} from '../types';
+import {
+  AlertTriangle,
+  Building2,
+  CheckCircle,
+  Filter,
+  Layers,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Shield,
+  Trash2,
+  Truck,
+  Users,
+  X,
+} from 'lucide-react';
+
+export const AdminDashboard: React.FC = () => {
+  const { lang } = useAuth();
+
+  const [activeTab, setActiveTab] = useState<'users' | 'facilities' | 'rrt' | 'tickets'>('users');
+  const [hierarchy, setHierarchy] = useState<AdministrativeHierarchy | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Data States
+  const [usersList, setUsersList] = useState<StaffUserItem[]>([]);
+  const [facilitiesList, setFacilitiesList] = useState<HealthFacilityItem[]>([]);
+  const [rrtList, setRrtList] = useState<RrtVehicleItem[]>([]);
+  const [ticketsList, setTicketsList] = useState<EscalationTicketItem[]>([]);
+
+  // Filter States
+  const [filterPalika, setFilterPalika] = useState<string>('');
+  const [filterWard, setFilterWard] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('');
+
+  // Modals
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showFacilityModal, setShowFacilityModal] = useState(false);
+  const [editingFacility, setEditingFacility] = useState<HealthFacilityItem | null>(null);
+  const [showRrtModal, setShowRrtModal] = useState(false);
+  const [editingRrt, setEditingRrt] = useState<RrtVehicleItem | null>(null);
+
+  // Add User Form State
+  const [newUserRole, setNewUserRole] = useState<'admin' | 'municipality_admin' | 'field_visitor'>('municipality_admin');
+  const [newUserPalika, setNewUserPalika] = useState<string>('30608');
+  const [newUserWardAllocationType, setNewUserWardAllocationType] = useState<'all' | 'specific'>('all');
+  const [newUserSelectedWard, setNewUserSelectedWard] = useState<string>('');
+  const [newUserName, setNewUserName] = useState<string>('');
+  const [newUserNameNe, setNewUserNameNe] = useState<string>('');
+  const [newUserPhone, setNewUserPhone] = useState<string>('+919876543220');
+  const [newUserDesignation, setNewUserDesignation] = useState<string>('Municipality Public Health Officer');
+  const [newUserPin, setNewUserPin] = useState<string>('123456');
+
+  // Facility Form State
+  const [facFacilityId, setFacFacilityId] = useState('');
+  const [facName, setFacName] = useState('');
+  const [facNameNe, setFacNameNe] = useState('');
+  const [facType, setFacType] = useState('Urban Health Promotion Center (UHPC)');
+  const [facPalika, setFacPalika] = useState('30608');
+  const [facWard, setFacWard] = useState('NP-P3-D27-30608-W17');
+  const [facTotalBeds, setFacTotalBeds] = useState(15);
+  const [facDengueBeds, setFacDengueBeds] = useState(4);
+  const [facNs1Kits, setFacNs1Kits] = useState(50);
+  const [facEmergencyPhone, setFacEmergencyPhone] = useState('01-4256789');
+
+  // RRT Form State
+  const [rrtVehicleId, setRrtVehicleId] = useState('');
+  const [rrtPlateNumber, setRrtPlateNumber] = useState('');
+  const [rrtPalika, setRrtPalika] = useState('30608');
+  const [rrtBaseWard, setRrtBaseWard] = useState('NP-P3-D27-30608-W17');
+  const [rrtTeamLead, setRrtTeamLead] = useState('');
+  const [rrtDriverPhone, setRrtDriverPhone] = useState('+919876543221');
+  const [rrtBtiKg, setRrtBtiKg] = useState(40.0);
+  const [rrtTemephosL, setRrtTemephosL] = useState(20.0);
+  const [rrtUlvMounted, setRrtUlvMounted] = useState(true);
+  const [rrtStatus, setRrtStatus] = useState<'AVAILABLE' | 'DISPATCHED' | 'MAINTENANCE'>('AVAILABLE');
+
+  // Load Hierarchy on Mount
+  useEffect(() => {
+    fetchSpatialHierarchy()
+      .then((data) => {
+        setHierarchy(data);
+      })
+      .catch((e) => console.error(e));
+  }, []);
+
+  // Load data when active tab or filters change
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (activeTab === 'users') {
+        const users = await fetchStaffUsers(filterPalika || undefined);
+        setUsersList(users);
+      } else if (activeTab === 'facilities') {
+        const facs = await fetchFacilities(filterPalika || undefined);
+        setFacilitiesList(facs);
+      } else if (activeTab === 'rrt') {
+        const vans = await fetchRrtUnits(filterPalika || undefined);
+        setRrtList(vans);
+      } else if (activeTab === 'tickets') {
+        const tix = await fetchTickets({
+          palika_code: filterPalika || undefined,
+          composite_ward_id: filterWard || undefined,
+          status: filterStatus || undefined,
+        });
+        setTicketsList(tix);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [activeTab, filterPalika, filterWard, filterStatus]);
+
+  const selectedPalikaObj: PalikaOption | undefined = hierarchy?.palikas.find(
+    (p) => p.palika_code === (filterPalika || newUserPalika)
+  );
+
+  const newUserPalikaObj: PalikaOption | undefined = hierarchy?.palikas.find(
+    (p) => p.palika_code === newUserPalika
+  );
+
+  // Handle Add User
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const palika = newUserPalikaObj;
+      if (!palika) throw new Error('Please select a Palika');
+
+      let assignedWards: string[] = [];
+      if (newUserRole === 'admin') {
+        assignedWards = ['*'];
+      } else if (newUserRole === 'municipality_admin') {
+        if (newUserWardAllocationType === 'all' || !palika.is_metro_or_submetro) {
+          assignedWards = palika.wards.map((w) => w.composite_ward_id);
+        } else {
+          assignedWards = [newUserSelectedWard || palika.wards[0]?.composite_ward_id || '*'];
+        }
+      } else {
+        // Field visitor
+        assignedWards = [newUserSelectedWard || palika.wards[0]?.composite_ward_id || 'NP-P3-D27-30608-W17'];
+      }
+
+      await createStaffUser({
+        phone: newUserPhone,
+        full_name: newUserName,
+        full_name_ne: newUserNameNe || newUserName,
+        designation: newUserDesignation,
+        role: newUserRole,
+        province_code: palika.province_code,
+        district_code: palika.district_code,
+        palika_code: palika.palika_code,
+        assigned_wards: assignedWards,
+        pin: newUserPin,
+      });
+
+      setSuccessMsg(lang === 'ne' ? 'कर्मचारी सफलतापूर्वक थपियो!' : 'Staff user successfully created!');
+      setShowAddUserModal(false);
+      // Reset form
+      setNewUserName('');
+      setNewUserNameNe('');
+      loadData();
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to create staff user');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm(lang === 'ne' ? 'के तपाईं यो प्रयोगकर्ता मेटाउन निश्चित हुनुहुन्छ?' : 'Are you sure you want to delete this staff user?')) {
+      return;
+    }
+    try {
+      await deleteStaffUser(userId);
+      setSuccessMsg(lang === 'ne' ? 'प्रयोगकर्ता हटाइयो!' : 'Staff user removed!');
+      loadData();
+      setTimeout(() => setSuccessMsg(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete user');
+    }
+  };
+
+  // Facility Actions
+  const handleSaveFacility = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const p = hierarchy?.palikas.find((x) => x.palika_code === facPalika) || newUserPalikaObj;
+      if (editingFacility) {
+        await updateFacility(editingFacility.id, {
+          name: facName,
+          name_ne: facNameNe,
+          facility_type: facType,
+          composite_ward_id: facWard,
+          total_beds: Number(facTotalBeds),
+          dengue_ward_beds: Number(facDengueBeds),
+          ns1_rdt_kits_stock: Number(facNs1Kits),
+          emergency_phone: facEmergencyPhone,
+        });
+        setSuccessMsg('Facility updated!');
+      } else {
+        await createFacility({
+          facility_id: facFacilityId || `FAC-${Date.now().toString().slice(-6)}`,
+          name: facName,
+          name_ne: facNameNe || facName,
+          facility_type: facType,
+          palika_code: facPalika,
+          composite_ward_id: facWard,
+          province_code: p?.province_code || 3,
+          district_code: p?.district_code || 27,
+          total_beds: Number(facTotalBeds),
+          dengue_ward_beds: Number(facDengueBeds),
+          ns1_rdt_kits_stock: Number(facNs1Kits),
+          emergency_phone: facEmergencyPhone,
+          hello_swasthya_hotline: '1115',
+          status: 'OPERATIONAL',
+        });
+        setSuccessMsg('Facility created!');
+      }
+      setShowFacilityModal(false);
+      setEditingFacility(null);
+      loadData();
+      setTimeout(() => setSuccessMsg(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to save health facility');
+    }
+  };
+
+  const handleDeleteFacility = async (id: string) => {
+    if (!confirm('Delete this health facility?')) return;
+    try {
+      await deleteFacility(id);
+      loadData();
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete facility');
+    }
+  };
+
+  // RRT Actions
+  const handleSaveRrt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingRrt) {
+        await updateRrtUnit(editingRrt.id, {
+          team_lead_name: rrtTeamLead,
+          driver_phone: rrtDriverPhone,
+          bti_stock_kg: Number(rrtBtiKg),
+          temephos_stock_liters: Number(rrtTemephosL),
+          ulv_equipment_mounted: Boolean(rrtUlvMounted),
+          status: rrtStatus,
+        });
+        setSuccessMsg('RRT Van updated!');
+      } else {
+        await createRrtUnit({
+          vehicle_id: rrtVehicleId || `RRT-VAN-${Date.now().toString().slice(-4)}`,
+          plate_number: rrtPlateNumber || 'BA-2-JHA-9999',
+          palika_code: rrtPalika,
+          base_ward_id: rrtBaseWard,
+          team_lead_name: rrtTeamLead,
+          team_lead_name_ne: rrtTeamLead,
+          driver_phone: rrtDriverPhone,
+          bti_stock_kg: Number(rrtBtiKg),
+          temephos_stock_liters: Number(rrtTemephosL),
+          ulv_equipment_mounted: Boolean(rrtUlvMounted),
+          status: rrtStatus,
+        });
+        setSuccessMsg('RRT Van created!');
+      }
+      setShowRrtModal(false);
+      setEditingRrt(null);
+      loadData();
+      setTimeout(() => setSuccessMsg(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to save RRT unit');
+    }
+  };
+
+  const handleDeleteRrt = async (id: string) => {
+    if (!confirm('Delete this RRT van?')) return;
+    try {
+      await deleteRrtUnit(id);
+      loadData();
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete RRT van');
+    }
+  };
+
+  const handleUpdateTicket = async (ticketCode: string, status: 'OPEN' | 'ASSIGNED' | 'RESOLVED') => {
+    try {
+      await updateTicketStatus(ticketCode, status);
+      setSuccessMsg(`Ticket ${ticketCode} updated to ${status}`);
+      loadData();
+      setTimeout(() => setSuccessMsg(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to update ticket');
+    }
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Top Banner / Summary */}
+      <div className="bg-linear-to-r from-[#1B4D9B] to-[#123770] rounded-xl text-white p-6 shadow-md mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2">
+              <Shield className="w-3.5 h-3.5" />
+              <span>{lang === 'ne' ? 'राष्ट्रिय प्रशासक कमाण्ड सेन्टर' : 'National Sovereign Admin Console'}</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold">
+              {lang === 'ne' ? 'सार्वभौम स्वास्थ्य तथा भेक्टर नियन्त्रण कमाण्ड' : 'Sovereign Vector Control & Public Health Console'}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-2xl">
+              {lang === 'ne'
+                ? 'देशभरका सबै पालिका, महानगरपालिका, स्वास्थ्य संस्था, आर.आर.टी. टोली तथा सुरक्षा टिकटहरूको केन्द्रीय व्यवस्थापन।'
+                : 'National command authority to manage municipal admins, field visitors, health centers, vans, and emergency tickets.'}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={loadData}
+              disabled={loading}
+              className="bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <span>{lang === 'ne' ? 'ताजा गर्नुहोस्' : 'Refresh Data'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Metrics Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'स्थानिय तह (Palikas)' : 'Covered Palikas'}</div>
+            <div className="text-xl font-bold mt-0.5">{hierarchy?.palikas.length || 11}</div>
+          </div>
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'स्वास्थ्यकर्मी (Staff)' : 'Active Staff'}</div>
+            <div className="text-xl font-bold mt-0.5">{usersList.length || 7}</div>
+          </div>
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'स्वास्थ्य संस्था (Centers)' : 'Health Facilities'}</div>
+            <div className="text-xl font-bold mt-0.5">{facilitiesList.length || 10}</div>
+          </div>
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="text-xs text-slate-300 font-medium">{lang === 'ne' ? 'आर.आर.टी. गाडी (RRT Fleet)' : 'RRT Vans Fleet'}</div>
+            <div className="text-xl font-bold mt-0.5">{rrtList.length || 6}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button onClick={() => setError(null)} className="cursor-pointer text-slate-400 hover:text-slate-600">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
+          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* Navigation Tabs */}
+      <div className="flex border-b border-slate-200 mb-6 bg-white rounded-t-lg px-2 shadow-xs overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('users')}
+          className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
+            activeTab === 'users'
+              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>{lang === 'ne' ? 'कर्मचारी तथा भूमिका व्यवस्थापन' : 'Staff & RBAC Directory'}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('facilities')}
+          className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
+            activeTab === 'facilities'
+              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Building2 className="w-4 h-4" />
+          <span>{lang === 'ne' ? 'स्वास्थ्य संस्था (NHFR Centers)' : 'Health Facilities (Centers)'}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('rrt')}
+          className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
+            activeTab === 'rrt'
+              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Truck className="w-4 h-4" />
+          <span>{lang === 'ne' ? 'आर.आर.टी. द्रुत प्रतिकार्य गाडी' : 'Rapid Response Fleet (Vans)'}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('tickets')}
+          className={`py-3 px-4 font-semibold text-xs sm:text-sm flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
+            activeTab === 'tickets'
+              ? 'border-[#1B4D9B] text-[#1B4D9B]'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <AlertTriangle className="w-4 h-4" />
+          <span>{lang === 'ne' ? 'सहयोग टिकट तथा उजुरीहरू' : 'Support Tickets & Escalations'}</span>
+        </button>
+      </div>
+
+      {/* Global Filter Bar */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs mb-6 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+          <Filter className="w-4 h-4 text-[#1B4D9B]" />
+          <span>{lang === 'ne' ? 'फिल्टर गर्नुहोस्:' : 'Filter Scope:'}</span>
+        </div>
+
+        {/* Palika Filter */}
+        <select
+          value={filterPalika}
+          onChange={(e) => {
+            setFilterPalika(e.target.value);
+            setFilterWard('');
+          }}
+          className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium focus:ring-1 focus:ring-[#1B4D9B]"
+        >
+          <option value="">{lang === 'ne' ? 'सबै पालिका (All Palikas)' : 'All Palikas (Nationwide)'}</option>
+          {hierarchy?.palikas.map((p) => (
+            <option key={p.palika_code} value={p.palika_code}>
+              {p.palika_name} ({p.palika_type})
+            </option>
+          ))}
+        </select>
+
+        {/* Ward Filter (Visible if selected Palika is Metropolitan or Sub-Metropolitan) */}
+        {selectedPalikaObj && selectedPalikaObj.is_metro_or_submetro && (
+          <select
+            value={filterWard}
+            onChange={(e) => setFilterWard(e.target.value)}
+            className="text-xs border border-blue-300 rounded-lg px-2.5 py-1.5 bg-blue-50/50 font-medium focus:ring-1 focus:ring-[#1B4D9B]"
+          >
+            <option value="">{lang === 'ne' ? 'सबै वडाहरू (All Wards)' : 'All Wards (Metro Wide)'}</option>
+            {selectedPalikaObj.wards.map((w) => (
+              <option key={w.composite_ward_id} value={w.composite_ward_id}>
+                Ward {w.ward_no} - {w.locality_name}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {/* Status Filter for Tickets Tab */}
+        {activeTab === 'tickets' && (
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium"
+          >
+            <option value="">All Statuses</option>
+            <option value="OPEN">OPEN (नयाँ)</option>
+            <option value="ASSIGNED">ASSIGNED (जिम्मेवारी तोकिएको)</option>
+            <option value="RESOLVED">RESOLVED (समाधान भएको)</option>
+          </select>
+        )}
+
+        {/* Action Button on Right */}
+        <div className="ml-auto flex items-center gap-2">
+          {activeTab === 'users' && (
+            <button
+              onClick={() => setShowAddUserModal(true)}
+              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{lang === 'ne' ? 'नयाँ कर्मचारी थप्नुहोस्' : 'Add Staff Member'}</span>
+            </button>
+          )}
+
+          {activeTab === 'facilities' && (
+            <button
+              onClick={() => {
+                setEditingFacility(null);
+                setFacName('');
+                setFacNameNe('');
+                setFacFacilityId(`FAC-${Date.now().toString().slice(-6)}`);
+                setShowFacilityModal(true);
+              }}
+              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{lang === 'ne' ? 'नयाँ स्वास्थ्य संस्था थप्नुहोस्' : 'Add Health Center'}</span>
+            </button>
+          )}
+
+          {activeTab === 'rrt' && (
+            <button
+              onClick={() => {
+                setEditingRrt(null);
+                setRrtVehicleId(`RRT-VAN-${Date.now().toString().slice(-4)}`);
+                setRrtPlateNumber('BA-2-JHA-');
+                setRrtTeamLead('');
+                setShowRrtModal(true);
+              }}
+              className="bg-[#1B4D9B] hover:bg-[#123770] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{lang === 'ne' ? 'नयाँ आर.आर.टी. गाडी थप्नुहोस्' : 'Add RRT Van'}</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* TAB 1: Staff Users Table */}
+      {activeTab === 'users' && (
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+          <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">
+                {lang === 'ne' ? 'दर्ता भएका स्वास्थ्यकर्मी तथा प्रशासकहरू' : 'Authorized Health Personnel & Administrators'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {lang === 'ne'
+                  ? 'प्रशासकले नयाँ प्रशासक, पालिका प्रशासक र फिल्ड भिजिटरहरू थप्न सक्नुहुन्छ।'
+                  : 'Federal admins can authorize Admins, Municipality Admins, and Field Visitors.'}
+              </p>
+            </div>
+            <span className="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-full">
+              {usersList.length} Staff Accounts
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th className="px-6 py-3 text-left">Staff Name / Nepali</th>
+                  <th className="px-6 py-3 text-left">Phone Number</th>
+                  <th className="px-6 py-3 text-left">Role / Designation</th>
+                  <th className="px-6 py-3 text-left">Palika & Jurisdiction</th>
+                  <th className="px-6 py-3 text-left">Assigned Wards</th>
+                  <th className="px-6 py-3 text-left">Status</th>
+                  <th className="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {usersList.map((user) => (
+                  <tr key={user.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <div className="font-bold text-slate-900">{user.full_name}</div>
+                      <div className="text-[11px] text-slate-500">{user.full_name_ne}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap font-mono text-slate-700">
+                      {user.phone}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                          user.role === 'admin'
+                            ? 'bg-purple-100 text-purple-800'
+                            : user.role === 'municipality_admin'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-emerald-100 text-emerald-800'
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                      <div className="text-[11px] text-slate-500 mt-0.5">{user.designation}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <div className="font-medium text-slate-800">
+                        {user.palika_code === '00000' || user.role === 'admin'
+                          ? 'Federal / All Nepal'
+                          : `Palika ${user.palika_code}`}
+                      </div>
+                      <div className="text-[11px] text-slate-400">Province {user.province_code} • District {user.district_code}</div>
+                    </td>
+                    <td className="px-6 py-3.5">
+                      <div className="text-slate-700 max-w-xs truncate">
+                        {user.assigned_wards.includes('*')
+                          ? '⭐ All Wards / Nationwide'
+                          : user.assigned_wards.length > 3
+                          ? `${user.assigned_wards.length} Wards (Metro Wide)`
+                          : user.assigned_wards.join(', ')}
+                      </div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <CheckCircle className="w-3 h-3" /> Active
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-right">
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        title="Delete User"
+                        className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 cursor-pointer transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: Health Facilities Table */}
+      {activeTab === 'facilities' && (
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+          <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">
+                {lang === 'ne' ? 'राष्ट्रिय स्वास्थ्य संस्था निर्देशिका (NHFR Facilities)' : 'National Health Facility Registry (NHFR)'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                Manage dengue wards, inpatient beds, and NS1 RDT rapid test kit stocks.
+              </p>
+            </div>
+            <span className="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-full">
+              {facilitiesList.length} Facilities
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th className="px-6 py-3 text-left">Facility Name</th>
+                  <th className="px-6 py-3 text-left">Facility Type</th>
+                  <th className="px-6 py-3 text-left">Palika & Ward</th>
+                  <th className="px-6 py-3 text-center">Total Beds</th>
+                  <th className="px-6 py-3 text-center">Dengue Beds</th>
+                  <th className="px-6 py-3 text-center">NS1 Kits</th>
+                  <th className="px-6 py-3 text-left">Emergency Hotline</th>
+                  <th className="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {facilitiesList.map((fac) => (
+                  <tr key={fac.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <div className="font-bold text-slate-900">{fac.name}</div>
+                      <div className="text-[11px] text-slate-500">{fac.name_ne}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-slate-600">
+                      {fac.facility_type}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-slate-600">
+                      <div>Palika: {fac.palika_code}</div>
+                      <div className="text-[11px] text-slate-400 font-mono">{fac.composite_ward_id}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-slate-800">
+                      {fac.total_beds}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-[#C8102E]">
+                      {fac.dengue_ward_beds}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-emerald-700">
+                      {fac.ns1_rdt_kits_stock}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap font-mono text-slate-600">
+                      {fac.emergency_phone || '1115'}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-right space-x-2">
+                      <button
+                        onClick={() => {
+                          setEditingFacility(fac);
+                          setFacName(fac.name);
+                          setFacNameNe(fac.name_ne);
+                          setFacType(fac.facility_type);
+                          setFacPalika(fac.palika_code);
+                          setFacWard(fac.composite_ward_id);
+                          setFacTotalBeds(fac.total_beds);
+                          setFacDengueBeds(fac.dengue_ward_beds);
+                          setFacNs1Kits(fac.ns1_rdt_kits_stock);
+                          setFacEmergencyPhone(fac.emergency_phone);
+                          setShowFacilityModal(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 p-1 cursor-pointer"
+                        title="Edit Facility"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFacility(fac.id)}
+                        className="text-red-600 hover:text-red-800 p-1 cursor-pointer"
+                        title="Delete Facility"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: RRT Rapid Response Vans Table */}
+      {activeTab === 'rrt' && (
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+          <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">
+                {lang === 'ne' ? 'द्रुत प्रतिकार्य टोली (RRT Vans & Chemical Stock)' : 'Rapid Response Team Fleet & Chemical Stock'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                Sovereign government vans with Bti larvicide, Temephos, and ULV fogging equipment.
+              </p>
+            </div>
+            <span className="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-full">
+              {rrtList.length} RRT Vehicles
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th className="px-6 py-3 text-left">Vehicle ID</th>
+                  <th className="px-6 py-3 text-left">Plate Number</th>
+                  <th className="px-6 py-3 text-left">Palika & Base Ward</th>
+                  <th className="px-6 py-3 text-left">Team Lead / Driver</th>
+                  <th className="px-6 py-3 text-center">Bti Stock</th>
+                  <th className="px-6 py-3 text-center">Temephos Stock</th>
+                  <th className="px-6 py-3 text-center">ULV Equipment</th>
+                  <th className="px-6 py-3 text-center">Status</th>
+                  <th className="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {rrtList.map((van) => (
+                  <tr key={van.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-3.5 whitespace-nowrap font-bold text-slate-800">
+                      {van.vehicle_id}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-slate-700">
+                      <span className="bg-red-50 text-red-900 border border-red-200 px-2 py-0.5 rounded">
+                        {van.plate_number}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-slate-600">
+                      <div>Palika: {van.palika_code}</div>
+                      <div className="text-[11px] text-slate-400 font-mono">{van.base_ward_id}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <div className="font-semibold text-slate-800">{van.team_lead_name}</div>
+                      <div className="text-[11px] text-slate-500 font-mono">{van.driver_phone}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-slate-800">
+                      {van.bti_stock_kg} kg
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center font-bold text-slate-800">
+                      {van.temephos_stock_liters} L
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          van.ulv_equipment_mounted
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {van.ulv_equipment_mounted ? 'Mounted' : 'No'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          van.status === 'AVAILABLE'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                            : van.status === 'DISPATCHED'
+                            ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                            : 'bg-slate-100 text-slate-800'
+                        }`}
+                      >
+                        {van.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-right space-x-2">
+                      <button
+                        onClick={() => {
+                          setEditingRrt(van);
+                          setRrtVehicleId(van.vehicle_id);
+                          setRrtPlateNumber(van.plate_number);
+                          setRrtPalika(van.palika_code);
+                          setRrtBaseWard(van.base_ward_id);
+                          setRrtTeamLead(van.team_lead_name);
+                          setRrtDriverPhone(van.driver_phone);
+                          setRrtBtiKg(van.bti_stock_kg);
+                          setRrtTemephosL(van.temephos_stock_liters);
+                          setRrtUlvMounted(van.ulv_equipment_mounted);
+                          setRrtStatus(van.status);
+                          setShowRrtModal(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 p-1 cursor-pointer"
+                        title="Edit RRT Van"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteRrt(van.id)}
+                        className="text-red-600 hover:text-red-800 p-1 cursor-pointer"
+                        title="Delete RRT Van"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: Support Tickets & Requests Table */}
+      {activeTab === 'tickets' && (
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+          <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">
+                {lang === 'ne' ? 'सार्वजनिक स्वास्थ्य सहयोग टिकट तथा उजुरीहरू' : 'Community Outbreak Alerts & SLA Support Tickets'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                Filtered across municipalities and specific wards. Update ticket status in real-time.
+              </p>
+            </div>
+            <span className="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-full">
+              {ticketsList.length} Tickets
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th className="px-6 py-3 text-left">Ticket Code</th>
+                  <th className="px-6 py-3 text-left">Palika & Ward</th>
+                  <th className="px-6 py-3 text-left">Severity</th>
+                  <th className="px-6 py-3 text-left">Category</th>
+                  <th className="px-6 py-3 text-left">Summary / Description</th>
+                  <th className="px-6 py-3 text-center">Status</th>
+                  <th className="px-6 py-3 text-right">Update Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {ticketsList.map((t) => (
+                  <tr key={t.ticket_code} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-[#1B4D9B]">
+                      {t.ticket_code}
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-slate-600">
+                      <div>Palika: {t.palika_code}</div>
+                      <div className="text-[11px] text-slate-400 font-mono">{t.composite_ward_id}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          t.severity_tier === 'CRITICAL'
+                            ? 'bg-red-100 text-red-800 border border-red-300'
+                            : t.severity_tier === 'HIGH'
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-slate-100 text-slate-700'
+                        }`}
+                      >
+                        {t.severity_tier} ({t.sla_hours}h SLA)
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap font-medium text-slate-800">
+                      {t.category}
+                    </td>
+                    <td className="px-6 py-3.5 max-w-sm text-slate-700">
+                      <div className="truncate">{t.summary}</div>
+                      <div className="text-[11px] text-slate-400">{t.created_at_bs}</div>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                          t.status === 'RESOLVED'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : t.status === 'ASSIGNED'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {t.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 whitespace-nowrap text-right space-x-1.5">
+                      {t.status !== 'ASSIGNED' && (
+                        <button
+                          onClick={() => handleUpdateTicket(t.ticket_code, 'ASSIGNED')}
+                          className="px-2 py-1 text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 cursor-pointer"
+                        >
+                          Assign
+                        </button>
+                      )}
+                      {t.status !== 'RESOLVED' && (
+                        <button
+                          onClick={() => handleUpdateTicket(t.ticket_code, 'RESOLVED')}
+                          className="px-2 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100 cursor-pointer"
+                        >
+                          Resolve
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Add Staff Member */}
+      {showAddUserModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#1B4D9B]" />
+                <span>{lang === 'ne' ? 'नयाँ कर्मचारी / प्रशासक थप्नुहोस्' : 'Authorize New Staff User'}</span>
+              </h3>
+              <button
+                onClick={() => setShowAddUserModal(false)}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateUser} className="space-y-4 mt-4">
+              {/* Role Selector */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  {lang === 'ne' ? 'भूमिका (Role / Authority Level)' : 'Role / Authority Level'}
+                </label>
+                <select
+                  value={newUserRole}
+                  onChange={(e) => setNewUserRole(e.target.value as any)}
+                  className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50 font-semibold"
+                >
+                  <option value="admin">🛡️ Federal System Admin (प्रणाली प्रशासक)</option>
+                  <option value="municipality_admin">🏛️ Municipality Admin (नगरपालिका प्रशासक)</option>
+                  <option value="field_visitor">🔍 Field Visitor (क्षेत्र निरिक्षक / FCHV)</option>
+                </select>
+              </div>
+
+              {/* Palika Selector (Hierarchy) */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  {lang === 'ne' ? 'स्थानिय तह / पालिका (Municipality / Rural Municipality)' : 'Assigned Local Level (Palika)'}
+                </label>
+                <select
+                  value={newUserPalika}
+                  onChange={(e) => {
+                    setNewUserPalika(e.target.value);
+                    const pal = hierarchy?.palikas.find((x) => x.palika_code === e.target.value);
+                    if (pal && pal.wards.length > 0) {
+                      setNewUserSelectedWard(pal.wards[0].composite_ward_id);
+                    }
+                  }}
+                  className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
+                  required
+                >
+                  {hierarchy?.palikas.map((p) => (
+                    <option key={p.palika_code} value={p.palika_code}>
+                      {p.palika_name} ({p.palika_type})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Metropolitan or Sub-Metropolitan Ward Allocation Strategy */}
+              {newUserPalikaObj && newUserPalikaObj.is_metro_or_submetro && newUserRole !== 'admin' && (
+                <div className="bg-blue-50/60 border border-blue-200 rounded-lg p-3">
+                  <div className="text-xs font-bold text-[#1B4D9B] mb-1.5 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Metropolitan / Sub-Metropolitan Jurisdiction Strategy</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mb-2">
+                    {newUserPalikaObj.palika_name} contains {newUserPalikaObj.wards.length} wards. You can grant city-wide scope or allocate to a specific ward:
+                  </p>
+
+                  {newUserRole === 'municipality_admin' && (
+                    <div className="flex gap-4 mb-2 text-xs">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="ward_alloc"
+                          checked={newUserWardAllocationType === 'all'}
+                          onChange={() => setNewUserWardAllocationType('all')}
+                        />
+                        <span className="font-semibold text-slate-800">Whole City (All Wards)</span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="ward_alloc"
+                          checked={newUserWardAllocationType === 'specific'}
+                          onChange={() => setNewUserWardAllocationType('specific')}
+                        />
+                        <span className="font-semibold text-slate-800">Specific Ward Only</span>
+                      </label>
+                    </div>
+                  )}
+
+                  {(newUserWardAllocationType === 'specific' || newUserRole === 'field_visitor') && (
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                        Select Ward:
+                      </label>
+                      <select
+                        value={newUserSelectedWard}
+                        onChange={(e) => setNewUserSelectedWard(e.target.value)}
+                        className="w-full text-xs border border-blue-300 rounded-lg p-2 bg-white"
+                      >
+                        {newUserPalikaObj.wards.map((w) => (
+                          <option key={w.composite_ward_id} value={w.composite_ward_id}>
+                            Ward {w.ward_no} - {w.locality_name} ({w.composite_ward_id})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Staff Details */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Full Name (English)
+                  </label>
+                  <input
+                    type="text"
+                    value={newUserName}
+                    onChange={(e) => setNewUserName(e.target.value)}
+                    placeholder="e.g. Ramesh Poudel"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Full Name (नेपाली)
+                  </label>
+                  <input
+                    type="text"
+                    value={newUserNameNe}
+                    onChange={(e) => setNewUserNameNe(e.target.value)}
+                    placeholder="e.g. रमेश पौडेल"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Mobile Phone (+977 / +91)
+                  </label>
+                  <input
+                    type="text"
+                    value={newUserPhone}
+                    onChange={(e) => setNewUserPhone(e.target.value)}
+                    placeholder="+91XXXXXXXXXX or +977XXXXXXXXXX"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Initial Security PIN
+                  </label>
+                  <input
+                    type="password"
+                    value={newUserPin}
+                    onChange={(e) => setNewUserPin(e.target.value)}
+                    placeholder="6 digits"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Designation / Title
+                </label>
+                <input
+                  type="text"
+                  value={newUserDesignation}
+                  onChange={(e) => setNewUserDesignation(e.target.value)}
+                  placeholder="e.g. Senior Public Health Assistant"
+                  className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowAddUserModal(false)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                >
+                  Create Staff User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Add/Edit Facility */}
+      {showFacilityModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-[#1B4D9B]" />
+                <span>{editingFacility ? 'Edit Health Center' : 'Add Health Center'}</span>
+              </h3>
+              <button onClick={() => setShowFacilityModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveFacility} className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Facility Name (EN)</label>
+                  <input
+                    type="text"
+                    value={facName}
+                    onChange={(e) => setFacName(e.target.value)}
+                    placeholder="e.g. Chhetrapati UHPC"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Facility Name (NE)</label>
+                  <input
+                    type="text"
+                    value={facNameNe}
+                    onChange={(e) => setFacNameNe(e.target.value)}
+                    placeholder="e.g. क्षेत्रपाटी स्वास्थ्य केन्द्र"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Facility Type</label>
+                <select
+                  value={facType}
+                  onChange={(e) => setFacType(e.target.value)}
+                  className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
+                >
+                  <option value="Urban Health Promotion Center (UHPC)">Urban Health Promotion Center (UHPC)</option>
+                  <option value="General Hospital">General Hospital</option>
+                  <option value="Primary Health Center (PHC)">Primary Health Center (PHC)</option>
+                  <option value="Health Post">Health Post</option>
+                  <option value="Vector Borne Disease Research Center">Vector Borne Disease Research Center</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Palika Code</label>
+                  <select
+                    value={facPalika}
+                    onChange={(e) => setFacPalika(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
+                  >
+                    {hierarchy?.palikas.map((p) => (
+                      <option key={p.palika_code} value={p.palika_code}>
+                        {p.palika_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Composite Ward ID</label>
+                  <input
+                    type="text"
+                    value={facWard}
+                    onChange={(e) => setFacWard(e.target.value)}
+                    placeholder="NP-P3-D27-30608-W17"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Total Beds</label>
+                  <input
+                    type="number"
+                    value={facTotalBeds}
+                    onChange={(e) => setFacTotalBeds(Number(e.target.value))}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Dengue Beds</label>
+                  <input
+                    type="number"
+                    value={facDengueBeds}
+                    onChange={(e) => setFacDengueBeds(Number(e.target.value))}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">NS1 Test Kits</label>
+                  <input
+                    type="number"
+                    value={facNs1Kits}
+                    onChange={(e) => setFacNs1Kits(Number(e.target.value))}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Emergency Phone Hotline</label>
+                <input
+                  type="text"
+                  value={facEmergencyPhone}
+                  onChange={(e) => setFacEmergencyPhone(e.target.value)}
+                  placeholder="01-XXXXXXX"
+                  className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowFacilityModal(false)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                >
+                  Save Health Center
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Add/Edit RRT Van */}
+      {showRrtModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 my-8">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Truck className="w-5 h-5 text-[#1B4D9B]" />
+                <span>{editingRrt ? 'Edit RRT Van' : 'Add Rapid Response Van'}</span>
+              </h3>
+              <button onClick={() => setShowRrtModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveRrt} className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Vehicle Unit ID</label>
+                  <input
+                    type="text"
+                    value={rrtVehicleId}
+                    onChange={(e) => setRrtVehicleId(e.target.value)}
+                    placeholder="e.g. RRT-KMC-07"
+                    disabled={!!editingRrt}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Government Plate</label>
+                  <input
+                    type="text"
+                    value={rrtPlateNumber}
+                    onChange={(e) => setRrtPlateNumber(e.target.value)}
+                    placeholder="BA-2-JHA-4107"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Palika Code</label>
+                  <select
+                    value={rrtPalika}
+                    onChange={(e) => setRrtPalika(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50"
+                  >
+                    {hierarchy?.palikas.map((p) => (
+                      <option key={p.palika_code} value={p.palika_code}>
+                        {p.palika_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Base Ward ID</label>
+                  <input
+                    type="text"
+                    value={rrtBaseWard}
+                    onChange={(e) => setRrtBaseWard(e.target.value)}
+                    placeholder="NP-P3-D27-30608-W17"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Team Lead Name</label>
+                  <input
+                    type="text"
+                    value={rrtTeamLead}
+                    onChange={(e) => setRrtTeamLead(e.target.value)}
+                    placeholder="e.g. Hari Bahadur Thapa"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Driver Phone (+977 / +91)</label>
+                  <input
+                    type="text"
+                    value={rrtDriverPhone}
+                    onChange={(e) => setRrtDriverPhone(e.target.value)}
+                    placeholder="+9198XXXXXXXX"
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Bti Larvicide Stock (kg)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={rrtBtiKg}
+                    onChange={(e) => setRrtBtiKg(Number(e.target.value))}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Temephos Stock (Liters)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={rrtTemephosL}
+                    onChange={(e) => setRrtTemephosL(Number(e.target.value))}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 items-center">
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="ulvMounted"
+                    checked={rrtUlvMounted}
+                    onChange={(e) => setRrtUlvMounted(e.target.checked)}
+                    className="rounded border-slate-300"
+                  />
+                  <label htmlFor="ulvMounted" className="text-xs font-bold text-slate-700 cursor-pointer">
+                    ULV Fogging Mounted
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Vehicle Status</label>
+                  <select
+                    value={rrtStatus}
+                    onChange={(e) => setRrtStatus(e.target.value as any)}
+                    className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50 font-bold"
+                  >
+                    <option value="AVAILABLE">AVAILABLE (तयार)</option>
+                    <option value="DISPATCHED">DISPATCHED (खटिएको)</option>
+                    <option value="MAINTENANCE">MAINTENANCE (मर्मतमा)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowRrtModal(false)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-xs font-bold bg-[#1B4D9B] text-white rounded-lg hover:bg-[#123770] cursor-pointer shadow-xs"
+                >
+                  Save RRT Van
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
